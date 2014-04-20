@@ -1,0 +1,12 @@
+<ion-view title="{{title}}" hide-back-button="true">
+    <ion-nav-buttons side="left" >
+        <a class="button button-icon icon ion-android-close" ng-click="cancel()"></a>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="right">
+        <a class="button button-icon icon ion-android-camera" ng-click="picture()"></a>
+        <a class="button button-icon icon ion-android-send" ng-click="save()"></a>
+    </ion-nav-buttons>
+  <ion-content class="has-header fill-content">
+      <textarea id="addpost" class="super-fill screen-pad" placeholder="Post content" ng-model="item.text"></textarea>
+  </ion-content>
+</ion-view>
