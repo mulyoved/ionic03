@@ -10,7 +10,7 @@ angular.module('Ionic03', [
     'ionic',
     'Ionic03.controllers',
     'Ionic03.services',
-    'directive.g+signin',
+    'directive.g+signin'
 ])
 
 
