@@ -5,6 +5,10 @@ angular.module('Ionic03.controllers', [])
 		console.log('AppCtrl');
 })
 
+.controller('UnlockCtrl', function($scope, ConfigService) {
+    console.log('UnlockCtrl');
+})
+
 .controller('LoginCtrl', function($scope, ConfigService) {
     console.log('LoginCtrl');
     $scope.googleClientId = ConfigService.googleClientId();

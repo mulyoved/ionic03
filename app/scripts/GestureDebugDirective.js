@@ -1,35 +1,34 @@
-/**
- * Created by Muly on 4/20/2014.
- */
 'use strict';
 
-angular.module('Ionic03.directives', [])
-    .directive('holdSelect', function (Gesture) {
+angular.module('Ionic03.directives',[])
+    .directive('onhold', function ($parse, Gesture) {
         return {
-            restrict: 'C',
-            link: function($scope, $element, $attr) {
-                var output = angular.element(document.getElementById('output'));
+            restrict: 'A',
+            link: function($scope, $element, attr) {
+                //console.log('onhold '+attr['onhold']);
+                var fn = $parse(attr['onhold'])
 
-                // Debug output function
-                var o = function(type, d) {
-                    console.log("o: "+type);
-                };
-
-                var releaseFn = function(e) {
-                    o('release', [e.gesture.touches[0].pageX, e.gesture.touches[0].pageY]);
-                };
-                var releaseGesture = Gesture.on('release', releaseFn, $element);
+                /*
+                 var releaseFn = function(e) {
+                 //o('release', [e.gesture.touches[0].pageX, e.gesture.touches[0].pageY]);
+                 };
+                 var releaseGesture = Gesture.on('release', releaseFn, $element);
+                 */
 
                 var holdFn = function(e) {
-                    o('hold', [e.gesture.touches[0].pageX, e.gesture.touches[0].pageY]);
+                    //o('hold', [e.gesture.touches[0].pageX, e.gesture.touches[0].pageY]);
+                    console.log('onhold v3 '+attr['onhold']);
+                    return $scope.$apply(function() {
+                        return fn($scope)(e);
+                    });
                 };
                 var holdGesture = Gesture.on('hold', holdFn, $element);
 
                 $scope.$on('$destroy', function () {
                     Gesture.off(holdGesture, 'hold', holdFn);
-                    Gesture.off(releaseGesture, 'release', releaseFn);
+                    //Gesture.off(releaseGesture, 'release', releaseFn);
                 });
-            }
-        };
-    });
 
+            }
+        }
+    });

@@ -10,6 +10,7 @@ angular.module('Ionic03', [
     'ionic',
     'Ionic03.controllers',
     'Ionic03.services',
+    'Ionic03.directives',
     'directive.g+signin'
 ])
 
@@ -42,16 +43,20 @@ angular.module('Ionic03', [
         console.log("$stateChangeStart", event, toState, toParams, fromState, fromParams);
         console.log("toState.authenticate",toState);
 
-        if (!ConfigService.login) {
-            if (toState.authenticate) {
-                console.log("Redirect to login");
-                $state.transitionTo("login");
+
+        if (false) {
+
+            if (!ConfigService.login) {
+                if (toState.authenticate) {
+                    console.log("Redirect to login");
+                    $state.transitionTo("login");
+                    event.preventDefault();
+                }
+            }
+            else if (toState.name == 'login') {
+                $state.transitionTo("app.playlists");
                 event.preventDefault();
             }
-        }
-        else if (toState.name == 'login') {
-            $state.transitionTo("app.playlists");
-            event.preventDefault();
         }
 
     });
