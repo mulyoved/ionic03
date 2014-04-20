@@ -60,8 +60,15 @@ angular.module('Ionic03', [
 .config(function($stateProvider, $urlRouterProvider) {
 
   $stateProvider
+      .state('unlock', {
+          url: '/unlock',
+          abstract: false,
+          templateUrl: 'templates/unlock.html',
+          controller: 'UnlockCtrl',
+          authenticate: false
+      })
     .state('login', {
-          url: '/app',
+          url: '/login',
           abstract: false,
           templateUrl: 'templates/login.html',
           controller: 'LoginCtrl',
