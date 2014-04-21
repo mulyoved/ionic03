@@ -47,9 +47,6 @@ angular.module('Ionic03.services',[])
         return {
             blogName: function() {
                 return 'm&m&stars';
-            },
-            googleClientId: function() {
-                return '44535440585-rshs1j4t1jc4qnp295fqmkr7jt12tbrh.apps.googleusercontent.com';
             }
         }
     });
