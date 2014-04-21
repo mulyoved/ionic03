@@ -11,7 +11,8 @@ angular.module('Ionic03', [
     'Ionic03.controllers',
     'Ionic03.services',
     'Ionic03.directives',
-    'directive.g+signin'
+    'directive.g+signin',
+    'LocalStorageModule'
 ])
 
 
@@ -62,7 +63,9 @@ angular.module('Ionic03', [
     });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, localStorageServiceProvider) {
+
+    localStorageServiceProvider.setPrefix('Ionic03');
 
   $stateProvider
       .state('unlock', {

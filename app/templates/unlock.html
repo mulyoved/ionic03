@@ -1,19 +1,38 @@
-<ion-content onhold="onHold" scroll="false" has-header="false" class="super-center holdSelect" >
-    <h1 class="huge">
+<ion-content get-gesture="drag dragstart dragend" get-gesture-action="onDragOver" scroll="false" has-header="false" >
+    <div class="unlock-area super-fill">
         <div class="row">
-            <i class="ion-ios7-star-outline unlock-size"></i>
-            <i class="ion-ios7-star-outline unlock-size"></i>
-            <i class="ion-ios7-star-outline unlock-size"></i>
+            <p id="0" class="center col">{{text}}</p>
+        </div>
+
+        <div class="row">
+            <div class="col unlock-icon"><i id="1" class="ion-ios7-star-outline"></i></div>
+            <div class="col unlock-icon"><i id="2" class="ion-ios7-star-outline"></i></div>
+            <div class="col unlock-icon"><i id="3" class="ion-ios7-star-outline"></i></div>
         </div>
         <div class="row">
-            <i class="ion-ios7-star-outline unlock-size"></i>
-            <i class="ion-ios7-star-outline unlock-size"></i>
-            <i class="ion-ios7-star-outline unlock-size"></i>
+            <div class="col unlock-icon"><i id="4" class="ion-ios7-star-outline"></i></div>
+            <div class="col unlock-icon"><i id="5" class="ion-ios7-star-outline"></i></div>
+            <div class="col unlock-icon"><i id="6" class="ion-ios7-star-outline"></i></div>
         </div>
         <div class="row">
-            <i class="ion-ios7-star-outline unlock-size"></i>
-            <i class="ion-ios7-star-outline unlock-size"></i>
-            <i class="ion-ios7-star-outline unlock-size"></i>
+            <div class="col unlock-icon"><i id="7" class="ion-ios7-star-outline"></i></div>
+            <div class="col unlock-icon"><i id="8" class="ion-ios7-star-outline"></i></div>
+            <div class="col unlock-icon"><i id="9" class="ion-ios7-star-outline"></i></div>
         </div>
-    </h1>
+    </div>
 </ion-content>
+
+<!--
+<ion-content get-gesture="drag" get-gesture-action="onDragOver" scroll="false" has-header="false" class="fill-content">
+    <div class="unlock-area super-fill">
+        <div class="rowitem row">
+            <div class="unlock-icon col"><i id="7" class="ion-ios7-star-outline unlock-size"></i></div>
+            <div class="unlock-icon col"><i id="7" class="ion-ios7-star-outline unlock-size"></i></div>
+        </div>
+        <div class="rowitem row">
+            <div class="unlock-icon col"><i id="7" class="ion-ios7-star-outline unlock-size"></i></div>
+            <div class="unlock-icon col"><i id="7" class="ion-ios7-star-outline unlock-size"></i></div>
+        </div>
+    </div>
+</ion-content>
+-->
