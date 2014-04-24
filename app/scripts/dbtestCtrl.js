@@ -1,113 +1,149 @@
 'use strict';
 
+angular.module('Ionic03.controllers')
 
+.service('GoogleApi', function($q, $http, localStorageService) {
+    var googleapi = {
+        setToken: function (data) {
+            console.log('API: setToken: [' + data + ']');
 
-var googleapi = {
-    setToken: function(data) {
-        //Cache the token
-        localStorage.access_token = data.access_token;
-        //Cache the refresh token, if there is one
-        localStorage.refresh_token = data.refresh_token || localStorage.refresh_token;
-        //Figure out when the token will expire by using the current
-        //time, plus the valid time (in seconds), minus a 1 minute buffer
-        var expiresAt = new Date().getTime() + parseInt(data.expires_in, 10) * 1000 - 60000;
-        localStorage.expires_at = expiresAt;
-    },
-    authorize: function(options) {
-        var deferred = $.Deferred();
+            //Cache the token
+            localStorageService.add('access_token',data.access_token);
+            //Cache the refresh token, if there is one
+            localStorageService.add('refresh_token', data.refresh_token || localStorageService.get('refresh_token'));
+            //Figure out when the token will expire by using the current
+            //time, plus the valid time (in seconds), minus a 1 minute buffer
+            var expiresAt = new Date().getTime() + parseInt(data.expires_in, 10) * 1000 - 60000;
+            localStorageService.add('expires_at', expiresAt);
+        },
 
-        //Build the OAuth consent page URL
-        var authUrl = 'https://accounts.google.com/o/oauth2/auth?' + $.param({
-            client_id: options.client_id,
-            redirect_uri: options.redirect_uri,
-            response_type: 'code',
-            scope: options.scope
-        });
+        authorize: function (options) {
+            var deferred = $q.defer();
 
-        console.log('authorize', authUrl);
+            //Build the OAuth consent page URL
+            var authUrl = 'https://accounts.google.com/o/oauth2/auth?' + $.param({
+                client_id: options.client_id,
+                redirect_uri: options.redirect_uri,
+                response_type: 'code',
+                scope: options.scope
+            });
 
-        //Open the OAuth consent page in the InAppBrowser
-        var authWindow = window.open(authUrl, '_blank', 'location=no,toolbar=no');
+            console.log('authorize: [' + authUrl + ']');
 
-        //The recommendation is to use the redirect_uri "urn:ietf:wg:oauth:2.0:oob"
-        //which sets the authorization code in the browser's title. However, we can't
-        //access the title of the InAppBrowser.
-        //
-        //Instead, we pass a bogus redirect_uri of "http://localhost", which means the
-        //authorization code will get set in the url. We can access the url in the
-        //loadstart and loadstop events. So if we bind the loadstart event, we can
-        //find the authorization code and close the InAppBrowser after the user
-        //has granted us access to their data.
-        authWindow.addEventListener('loadstart', googleCallback);
-        function googleCallback(e){
-            console.log('googleCallback', e);
+            if (true) {
+                //Open the OAuth consent page in the InAppBrowser
+                var authWindow = window.open(authUrl, '_blank', 'location=no,toolbar=no');
 
-            var url = (typeof e.url !== 'undefined' ? e.url : e.originalEvent.url);
-            var code = /\?code=(.+)$/.exec(url);
-            var error = /\?error=(.+)$/.exec(url);
-
-            if (code || error) {
-                //Always close the browser when match is found
-                authWindow.close();
+                //The recommendation is to use the redirect_uri "urn:ietf:wg:oauth:2.0:oob"
+                //which sets the authorization code in the browser's title. However, we can't
+                //access the title of the InAppBrowser.
+                //
+                //Instead, we pass a bogus redirect_uri of "http://localhost", which means the
+                //authorization code will get set in the url. We can access the url in the
+                //loadstart and loadstop events. So if we bind the loadstart event, we can
+                //find the authorization code and close the InAppBrowser after the user
+                //has granted us access to their data.
+                authWindow.addEventListener('loadstart', googleCallback);
             }
 
-            if (code) {
-                //Exchange the authorization code for an access token
+
+            function googleCallback(e) {
+                console.log('googleCallback [' + e +']');
+
+                var url = (typeof e.url !== 'undefined' ? e.url : e.originalEvent.url);
+                var code = /\?code=(.+)$/.exec(url);
+                var error = /\?error=(.+)$/.exec(url);
+
+                console.log('googleCallback url:[' + url +']');
+                console.log('googleCallback code:[' + code +']');
+                console.log('googleCallback error:[' + error +']');
+
+                if (code || error) {
+                    //Always close the browser when match is found
+                    console.log('googleCallback Close window');
+                    authWindow.close();
+                }
+
+                if (code) {
+                    //Exchange the authorization code for an access token
+                    $.post('https://accounts.google.com/o/oauth2/token', {
+                        code: code[1],
+                        client_id: options.client_id,
+                        client_secret: options.client_secret,
+                        redirect_uri: options.redirect_uri,
+                        grant_type: 'authorization_code'
+                }).done(function(data) {
+                        console.log('googleCallback finally, calling setToken' + data);
+                        googleapi.setToken(data);
+                        deferred.resolve(data);
+                }).fail(function(response) {
+                        console.log('googleCallback catch ' + response);
+                        console.log('googleCallback catch JSON:' + response.responseJSON);
+                        deferred.reject(response.responseJSON);
+                    });
+                } else if (error) {
+                    console.log('googleCallback error [' + error + ']');
+                    //The user denied access to the app
+                    deferred.reject({
+                        error: error[1]
+                    });
+                }
+            }
+
+            return deferred.promise;
+        },
+
+        getToken: function (options) {
+            var deferred = $q.defer();
+
+            if (new Date().getTime() < localStorageService.get('expires_at')) {
+                console.log('API:getToken, resolve');
+
+                deferred.resolve({
+                    access_token: localStorageService.get('access_token')
+                });
+            } else if (localStorageService.get('refresh_token')) {
+                console.log('API:getToken, post');
                 $.post('https://accounts.google.com/o/oauth2/token', {
-                    code: code[1],
+                    refresh_token: localStorageService.get('refresh_token'),
                     client_id: options.client_id,
                     client_secret: options.client_secret,
-                    redirect_uri: options.redirect_uri,
-                    grant_type: 'authorization_code'
+                    grant_type: 'refresh_token'
                 }).done(function(data) {
+                    console.log('API:getToken, done Call SetToken: '+data);
                     googleapi.setToken(data);
                     deferred.resolve(data);
                 }).fail(function(response) {
+                    console.log('API:getToken, fail '+response);
                     deferred.reject(response.responseJSON);
                 });
-            } else if (error) {
-                //The user denied access to the app
-                deferred.reject({
-                    error: error[1]
-                });
+            } else {
+                deferred.reject();
             }
-        }
 
-        return deferred.promise();
-    },
-    getToken: function(options) {
-        var deferred = $.Deferred();
+            return deferred.promise;
+        },
+        userInfo: function (options) {
+            var deferred = $q.defer();
+            console.log('API:getUserInfo ' + JSON.stringify(options));
 
-        if (new Date().getTime() < localStorage.expires_at) {
-            deferred.resolve({
-                access_token: localStorage.access_token
-            });
-        } else if (localStorage.refresh_token) {
-            $.post('https://accounts.google.com/o/oauth2/token', {
-                refresh_token: localStorage.refresh_token,
-                client_id: options.client_id,
-                client_secret: options.client_secret,
-                grant_type: 'refresh_token'
-            }).done(function(data) {
-                googleapi.setToken(data);
+            $.getJSON('https://www.googleapis.com/oauth2/v1/userinfo', options
+            ).done(function(data) {
+                console.log('API:getUserInfo resolve: ' + JSON.stringify(data));
                 deferred.resolve(data);
             }).fail(function(response) {
+                console.log('API:getUserInfo reject' + response);
                 deferred.reject(response.responseJSON);
             });
-        } else {
-            deferred.reject();
+
+            return deferred.promise;
         }
+    };
 
-        return deferred.promise();
-    },
-    userInfo: function(options) {
-        return $.getJSON('https://www.googleapis.com/oauth2/v1/userinfo', options);
-    }
-};
+    return googleapi;
+})
 
-angular.module('Ionic03.controllers')
-
-.controller('dbTestCtrl', function($scope, ConfigService, $log, $q, GAPI, Blogger, pouchdb) {
+.controller('dbTestCtrl', function($scope, ConfigService, $log, $q, GAPI, Blogger, pouchdb, GoogleApi) {
     $scope.blogId = '4462544572529633201';
     $scope.answer = '<empty>';
     $scope.posts = [];
@@ -125,14 +161,16 @@ angular.module('Ionic03.controllers')
         //Check if we have a valid token
         //cached or if we can get a new
         //one using a refresh token.
-        googleapi.getToken({
+        GoogleApi.getToken({
             client_id: prop.client_id,
             client_secret: prop.client_secret
-        }).done(function() {
+        }).finally(function() {
             //Show the greet view if we get a valid token
+            console.log('getToken finally');
             $scope.showGreetView();
-        }).fail(function() {
+        }).catch(function() {
             //Show the login view if we have no valid token
+            console.log('getToken catch');
             $scope.showLoginView();
         });
     };
@@ -146,18 +184,25 @@ angular.module('Ionic03.controllers')
 
         //Get the token, either from the cache
         //or by using the refresh token.
-        googleapi.getToken({
+        GoogleApi.getToken({
             client_id: prop.client_id,
             client_secret: prop.client_secret
         }).then(function(data) {
             //Pass the token to the API call and return a new promise object
-            return googleapi.userInfo({ access_token: data.access_token });
-        }).done(function(user) {
+            console.log('getToken then: '+data);
+            return GoogleApi.userInfo({ access_token: data.access_token });
+        }).finally(function(user) {
             //Display a greeting if the API call was successful
-            console.log('Hello ' + user.name + '!');
-        }).fail(function() {
+            if (user) {
+                console.log('Hello ' + user.name + '!');
+            }
+            else {
+                console.log('Got token but user is null: ['+user+']');
+            }
+        }).catch(function(err) {
             //If getting the token fails, or the token has been
             //revoked, show the login view.
+            console.log('getToken catch: '+err);
             $scope.showLoginView();
         });
     };
@@ -198,18 +243,24 @@ angular.module('Ionic03.controllers')
         console.log('Google_Sign_Cordova');
 
         //Show the consent page
-        googleapi.authorize({
+        GoogleApi.authorize({
             client_id: prop.client_id,
             client_secret: prop.client_secret,
             redirect_uri: prop.redirect_uri,
             scope: prop.scope
-        }).done(function() {
+        }).finally(function() {
             console.log('authorize: Finally');
             //Show the greet view if access is granted
             $scope.showGreetView();
-        }).fail(function(data) {
+        }).catch(function(data) {
             //Show an error message if access was denied
-            console.log('Show an error message if access was denied ', data.error);
+            if (data) {
+                console.log('Show an error message if access was denied ', data.error);
+            }
+            else {
+                console.log('GoogleApi.authorize catch, but no data object');
+            }
+
         });
     };
 
