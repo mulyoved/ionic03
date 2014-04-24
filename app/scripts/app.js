@@ -45,13 +45,14 @@ angular.module('Ionic03', [
         console.log("$stateChangeStart", event, toState, toParams, fromState, fromParams);
         console.log("toState.authenticate", toState);
 
-
-        if (false) {
+        //http://arthur.gonigberg.com/2013/06/29/angularjs-role-based-auth/
+        //https://medium.com/opinionated-angularjs/4e927af3a15f
+        if (true) {
 
             if (!ConfigService.login) {
                 if (toState.authenticate) {
                     console.log("Redirect to login");
-                    $state.transitionTo("login");
+                    $state.transitionTo("dbtest");
                     event.preventDefault();
                 }
             }
@@ -64,8 +65,8 @@ angular.module('Ionic03', [
     });
 })
 .value('GoogleApp', {
-    apiKey: 'AIzaSyA78RO9-B7qEr-WXJULOq3u-n4C7RS9wz4',
-    clientId: '44535440585-rshs1j4t1jc4qnp295fqmkr7jt12tbrh.apps.googleusercontent.com',
+    apiKey: 'BCOBtps2R5GQHlGKb7mu7nQt', //'AIzaSyA78RO9-B7qEr-WXJULOq3u-n4C7RS9wz4',
+    clientId: '44535440585-tej15rtq3jgao112ks9pe4v5tobr7nhd.apps.googleusercontent.com', //'44535440585-rshs1j4t1jc4qnp295fqmkr7jt12tbrh.apps.googleusercontent.com',
     scopes: [
         // whatever scopes you need for your app, for example:
         //'https://www.googleapis.com/auth/drive',
@@ -99,7 +100,7 @@ angular.module('Ionic03', [
             abstract: false,
             templateUrl: 'templates/dbtest.html',
             controller: 'dbTestCtrl',
-            authenticate: true
+            authenticate: false
         })
         .state('app', {
             url: '/app',

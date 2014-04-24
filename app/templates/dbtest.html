@@ -4,5 +4,17 @@
       <br/>
       <button ng-click="getBlogByUrl()">Blogger.getBlogByUrl</button>
       <button ng-click="getPosts()">Blogger.getPosts</button>
+
+      <span>{{answer}}</span>
+
+      <list class="fade-in-not-out col" onhold="onListHold" can-delete="true" on-delete="deleteItem(item)" delete-icon="ion-trash-a" show-delete="isDeletingItems">
+          <item ng-repeat="post in posts track by post.id" ng-click="postClick(post.doc)" item="post">
+              {{post.title}} [{{post.id}}]
+              <p>{{post.content}}</p>
+          </item>
+      </list>
+
+      <button ng-click="Google_Sign_Cordova()">Google Sign Cordova</button>
+
   </ion-content>
 </ion-view>
