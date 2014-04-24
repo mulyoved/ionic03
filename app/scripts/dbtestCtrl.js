@@ -13,8 +13,8 @@ var googleapi = {
         var expiresAt = new Date().getTime() + parseInt(data.expires_in, 10) * 1000 - 60000;
         localStorage.expires_at = expiresAt;
     },
-    authorize: function($q, options) {
-        var deferred = $q.defer();
+    authorize: function(options) {
+        var deferred = $.Deferred();
 
         //Build the OAuth consent page URL
         var authUrl = 'https://accounts.google.com/o/oauth2/auth?' + $.param({
@@ -59,10 +59,10 @@ var googleapi = {
                     client_secret: options.client_secret,
                     redirect_uri: options.redirect_uri,
                     grant_type: 'authorization_code'
-                }).finally(function(data) {
+                }).done(function(data) {
                     googleapi.setToken(data);
                     deferred.resolve(data);
-                }).catch(function(response) {
+                }).fail(function(response) {
                     deferred.reject(response.responseJSON);
                 });
             } else if (error) {
@@ -73,10 +73,10 @@ var googleapi = {
             }
         }
 
-        return deferred.promise;
+        return deferred.promise();
     },
-    getToken: function($q, options) {
-        var deferred = $q.defer();
+    getToken: function(options) {
+        var deferred = $.Deferred();
 
         if (new Date().getTime() < localStorage.expires_at) {
             deferred.resolve({
@@ -88,17 +88,17 @@ var googleapi = {
                 client_id: options.client_id,
                 client_secret: options.client_secret,
                 grant_type: 'refresh_token'
-            }).finally(function(data) {
+            }).done(function(data) {
                 googleapi.setToken(data);
                 deferred.resolve(data);
-            }).catch(function(response) {
+            }).fail(function(response) {
                 deferred.reject(response.responseJSON);
             });
         } else {
             deferred.reject();
         }
 
-        return deferred.promise;
+        return deferred.promise();
     },
     userInfo: function(options) {
         return $.getJSON('https://www.googleapis.com/oauth2/v1/userinfo', options);
@@ -120,40 +120,42 @@ angular.module('Ionic03.controllers')
     };
 
     $scope.init = function() {
+
+        console.log('Init');
         //Check if we have a valid token
         //cached or if we can get a new
         //one using a refresh token.
-        googleapi.getToken($q, {
-            client_id: app.client_id,
-            client_secret: app.client_secret
-        }).finally(function() {
+        googleapi.getToken({
+            client_id: prop.client_id,
+            client_secret: prop.client_secret
+        }).done(function() {
             //Show the greet view if we get a valid token
             $scope.showGreetView();
-        }).catch(function() {
+        }).fail(function() {
             //Show the login view if we have no valid token
             $scope.showLoginView();
         });
     };
 
     $scope.showLoginView = function() {
-        $log.log('Show the login view if we have no valid token');
+        console.log('Show the login view if we have no valid token');
     };
 
     $scope.showGreetView = function() {
-        $log.log('Show the greet view if we get a valid token');
+        console.log('Show the greet view if we get a valid token');
 
         //Get the token, either from the cache
         //or by using the refresh token.
-        googleapi.getToken($q, {
-            client_id: app.client_id,
-            client_secret: app.client_secret
+        googleapi.getToken({
+            client_id: prop.client_id,
+            client_secret: prop.client_secret
         }).then(function(data) {
             //Pass the token to the API call and return a new promise object
             return googleapi.userInfo({ access_token: data.access_token });
-        }).finally(function(user) {
+        }).done(function(user) {
             //Display a greeting if the API call was successful
-            $log.log('Hello ' + user.name + '!');
-        }).catch(function() {
+            console.log('Hello ' + user.name + '!');
+        }).fail(function() {
             //If getting the token fails, or the token has been
             //revoked, show the login view.
             $scope.showLoginView();
@@ -172,44 +174,47 @@ angular.module('Ionic03.controllers')
     };
 
     $scope.getBlogByUrl = function() {
-        $log.log('getBlogByUrl');
+        console.log('getBlogByUrl');
 
         $scope.answer = Blogger.getBlogByUrl({'url': 'http://mulytestblog.blogspot.co.il/'});
     };
 
     $scope.getPosts = function() {
-        $log.log('getOPosts');
+        console.log('getOPosts');
 
         var p = Blogger.listPosts('4462544572529633201',
             {'fetchBodies': true, 'fetchImages': false, 'maxResults': 10,'fields': 'items(content,id,kind,published,status,title,titleLink,updated),nextPageToken'});
 
-        $log.log('Answer: ', $scope.posts);
+        console.log('Answer: ', $scope.posts);
 
         p.
         then(function(list) {
-            $log.log('List: ', list);
+            console.log('List: ', list);
             $scope.posts = list.items;
         });
     };
 
     $scope.Google_Sign_Cordova = function() {
-        $log.log('Google_Sign_Cordova');
+        console.log('Google_Sign_Cordova');
 
         //Show the consent page
-        googleapi.authorize($q, {
+        googleapi.authorize({
             client_id: prop.client_id,
             client_secret: prop.client_secret,
             redirect_uri: prop.redirect_uri,
             scope: prop.scope
-        }).finally(function() {
-            $log.log('authorize: Finally');
+        }).done(function() {
+            console.log('authorize: Finally');
             //Show the greet view if access is granted
             $scope.showGreetView();
-        }).catch(function(data) {
+        }).fail(function(data) {
             //Show an error message if access was denied
-            $log.log('Show an error message if access was denied ', data.error);
+            console.log('Show an error message if access was denied ', data.error);
         });
     };
+
+
+    $scope.init();
 
         //fetchBodies=true&fetchImages=true&maxResults=10&fields=items(content%2Cid%2Ckind%2Cpublished%2Cstatus%2Ctitle%2CtitleLink%2Cupdated)%2CnextPageToken&key={YOUR_API_KEY}
 
