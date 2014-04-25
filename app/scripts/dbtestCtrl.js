@@ -1,3 +1,27 @@
+//Todo: Login Page
+//on ready, start load and get token
+//if OK broadcast OK
+//if failed and need login broadcast failed
+
+//in app if received failed
+//in list view or add view - go to login
+//after login go to list view
+
+//service - syncronize database with blogger api
+//expose status - broadcast change in status
+//queue sync request
+// - var needSync
+// - var duringSync
+// - loop when finish sync
+// - success and needSync - do sync
+// - failed, turn on needSync and try again after some time out
+// -
+
+
+
+
+
+
 'use strict';
 
 angular.module('Ionic03.controllers')
@@ -130,6 +154,8 @@ angular.module('Ionic03.controllers')
     $scope.answer = '<empty>';
     $scope.posts = [];
 
+
+    //todo: move to app value/service
     var prop = {
         client_id: '44535440585-tej15rtq3jgao112ks9pe4v5tobr7nhd.apps.googleusercontent.com',
         client_secret: 'BCOBtps2R5GQHlGKb7mu7nQt',
@@ -138,7 +164,6 @@ angular.module('Ionic03.controllers')
     };
 
     $scope.init = function() {
-
         console.log('Init');
         //Check if we have a valid token
         //cached or if we can get a new
@@ -158,6 +183,8 @@ angular.module('Ionic03.controllers')
     };
 
     $scope.showLoginView = function() {
+        //todo: state go login
+        //todo: add google login page
         console.log('Show the login view if we have no valid token');
     };
 
@@ -192,6 +219,7 @@ angular.module('Ionic03.controllers')
         });
     };
 
+    //todo: hide this, make sure work on browser
     $scope.$on('event:google-plus-signin-success', function (event, authResult) {
         console.log('Send login to server or save into cookie');
     });
@@ -218,6 +246,7 @@ angular.module('Ionic03.controllers')
         });
     };
 
+    //todo: rename method name
     $scope.Google_Sign_Cordova = function() {
         console.log('Google_Sign_Cordova');
 
