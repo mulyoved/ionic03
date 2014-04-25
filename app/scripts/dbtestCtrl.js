@@ -119,21 +119,6 @@ angular.module('Ionic03.controllers')
             }
 
             return deferred.promise;
-        },
-        userInfo: function (options) {
-            var deferred = $q.defer();
-            console.log('API:getUserInfo ' + JSON.stringify(options));
-
-            $.getJSON('https://www.googleapis.com/oauth2/v1/userinfo', options
-            ).done(function(data) {
-                console.log('API:getUserInfo resolve: ' + JSON.stringify(data));
-                deferred.resolve(data);
-            }).fail(function(response) {
-                console.log('API:getUserInfo reject' + response);
-                deferred.reject(response.responseJSON);
-            });
-
-            return deferred.promise;
         }
     };
 
@@ -197,18 +182,12 @@ angular.module('Ionic03.controllers')
                 token_type: data.token_type
             };
             return GAPI.init_WithToken(token);
-        }).finally(function(user) {
-            //Display a greeting if the API call was successful
-            if (user) {
-                console.log('Hello ' + user.name + '!');
-            }
-            else {
-                console.log('Got token but user is null: ['+user+']');
-            }
+        }).finally(function() {
+            console.log('GAPI Initialized with Token from InAppBrowser Session');
         }).catch(function(err) {
             //If getting the token fails, or the token has been
             //revoked, show the login view.
-            console.log('getToken catch: '+err);
+            console.log('getToken failed catch: '+err);
             $scope.showLoginView();
         });
     };
@@ -222,12 +201,6 @@ angular.module('Ionic03.controllers')
 
     $scope.authorize = function () {
         GAPI.init();
-    };
-
-    $scope.getBlogByUrl = function() {
-        console.log('getBlogByUrl');
-
-        $scope.answer = Blogger.getBlogByUrl({'url': 'http://mulytestblog.blogspot.co.il/'});
     };
 
     $scope.getPosts = function() {
@@ -270,13 +243,6 @@ angular.module('Ionic03.controllers')
         });
     };
 
-
     $scope.init();
-
-        //fetchBodies=true&fetchImages=true&maxResults=10&fields=items(content%2Cid%2Ckind%2Cpublished%2Cstatus%2Ctitle%2CtitleLink%2Cupdated)%2CnextPageToken&key={YOUR_API_KEY}
-
-        //https://www.googleapis.com/blogger/v3/blogs/6225549217598152239/posts?fetchBodies=true&fetchImages=false&             fields=items(content%252Cid%252Ckind%252Cpublished%252Cstatus%252Ctitle%252CtitleLink%252Cupdated)%252CnextPageToken&maxResults=10
-        //https://www.googleapis.com/blogger/v3/blogs/6225549217598152239/posts?fetchBodies=true&fetchImages=true&maxResults=10&fields=items(content%2Cid%2Ckind%2Cpublished%2Cstatus%2Ctitle%2CtitleLink%2Cupdated)%2CnextPageToken&key
-
 });
 
