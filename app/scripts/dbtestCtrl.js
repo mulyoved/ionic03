@@ -5,7 +5,7 @@ angular.module('Ionic03.controllers')
 .service('GoogleApi', function($q, $http, localStorageService) {
     var googleapi = {
         setToken: function (data) {
-            console.log('API: setToken: [' + data + ']');
+            console.log('API: setToken: [' + JSON.stringify(data) + ']');
 
             //Cache the token
             localStorageService.add('access_token',data.access_token);
@@ -30,22 +30,19 @@ angular.module('Ionic03.controllers')
 
             console.log('authorize: [' + authUrl + ']');
 
-            if (true) {
-                //Open the OAuth consent page in the InAppBrowser
-                var authWindow = window.open(authUrl, '_blank', 'location=no,toolbar=no');
+            //Open the OAuth consent page in the InAppBrowser
+            var authWindow = window.open(authUrl, '_blank', 'location=no,toolbar=no');
 
-                //The recommendation is to use the redirect_uri "urn:ietf:wg:oauth:2.0:oob"
-                //which sets the authorization code in the browser's title. However, we can't
-                //access the title of the InAppBrowser.
-                //
-                //Instead, we pass a bogus redirect_uri of "http://localhost", which means the
-                //authorization code will get set in the url. We can access the url in the
-                //loadstart and loadstop events. So if we bind the loadstart event, we can
-                //find the authorization code and close the InAppBrowser after the user
-                //has granted us access to their data.
-                authWindow.addEventListener('loadstart', googleCallback);
-            }
-
+            //The recommendation is to use the redirect_uri "urn:ietf:wg:oauth:2.0:oob"
+            //which sets the authorization code in the browser's title. However, we can't
+            //access the title of the InAppBrowser.
+            //
+            //Instead, we pass a bogus redirect_uri of "http://localhost", which means the
+            //authorization code will get set in the url. We can access the url in the
+            //loadstart and loadstop events. So if we bind the loadstart event, we can
+            //find the authorization code and close the InAppBrowser after the user
+            //has granted us access to their data.
+            authWindow.addEventListener('loadstart', googleCallback);
 
             function googleCallback(e) {
                 console.log('googleCallback [' + e +']');
@@ -152,7 +149,7 @@ angular.module('Ionic03.controllers')
         client_id: '44535440585-tej15rtq3jgao112ks9pe4v5tobr7nhd.apps.googleusercontent.com',
         client_secret: 'BCOBtps2R5GQHlGKb7mu7nQt',
         redirect_uri: 'http://localhost',
-        scope: 'https://www.googleapis.com/auth/userinfo.profile',
+        scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/blogger'
     };
 
     $scope.init = function() {
@@ -190,7 +187,16 @@ angular.module('Ionic03.controllers')
         }).then(function(data) {
             //Pass the token to the API call and return a new promise object
             console.log('getToken then: '+data);
-            return GoogleApi.userInfo({ access_token: data.access_token });
+            //return GoogleApi.userInfo({ access_token: data.access_token });
+            var token = {
+                access_token: data.access_token,
+                client_id: prop.client_id,
+                cookie_policy: undefined,
+                expire_in: data.expire_in,
+                expire_at: new Date().getTime() + parseInt(data.expires_in, 10) * 1000 - 60000,
+                token_type: data.token_type
+            };
+            return GAPI.init_WithToken(token);
         }).finally(function(user) {
             //Display a greeting if the API call was successful
             if (user) {
