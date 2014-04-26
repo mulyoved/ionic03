@@ -1,11 +1,8 @@
 <ion-view title="DBTest">
     <ion-content class="has-header">
-        <button ng-click="authorize()">Authorize</button>
-        <br/>
-        <button ng-click="getBlogByUrl()">Blogger.getBlogByUrl</button>
         <button ng-click="getPosts()">Blogger.getPosts</button>
-
-        <span>{{answer}}</span>
+        <p>answer: {{answer}}</p>
+        <p>syncResult: {{syncResult}}</p>
 
         <list class="fade-in-not-out col" onhold="onListHold" can-delete="true" on-delete="deleteItem(item)" delete-icon="ion-trash-a" show-delete="isDeletingItems">
             <item ng-repeat="post in posts track by post.id" ng-click="postClick(post.doc)" item="post">
@@ -14,8 +11,14 @@
             </item>
         </list>
 
-        <button ng-click="Google_Sign_Cordova()">Google Sign Cordova</button>
-        <button ng-click="logout()">Logout</button>
+        <button ng-click="syncFromBlogger()">Sync From Blogger</button>
+        <button ng-click="syncToBlogger()">Sync To Blogger</button>
+        <button ng-click="createPost()">Create New Post</button>
+        <p>DataBase Operations</p>
+        <button ng-click="dumpDatabase()">Dump Database</button>
+        <button ng-click="deletedb()">Delete Database</button>
 
+
+        <button ng-click="logout()">Logout</button>
     </ion-content>
 </ion-view>

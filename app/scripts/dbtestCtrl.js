@@ -1,12 +1,3 @@
-//Todo: Login Page
-//on ready, start load and get token
-//if OK broadcast OK
-//if failed and need login broadcast failed
-
-//in app if received failed
-//in list view or add view - go to login
-//after login go to list view
-
 //service - syncronize database with blogger api
 //expose status - broadcast change in status
 //queue sync request
@@ -21,251 +12,11 @@
 
 
 
-
-'use strict';
-
 angular.module('Ionic03.controllers')
 
-.service('GoogleApi', function($rootScope, $q, $http, localStorageService, GoogleApp) {
-    var googleapi = {
-        setToken: function (data) {
-            console.log('GoogleApi: setToken', data);
-
-            //Cache the token
-            localStorageService.add('access_token',data.access_token);
-            //Cache the refresh token, if there is one
-            localStorageService.add('refresh_token', data.refresh_token || localStorageService.get('refresh_token'));
-            //Figure out when the token will expire by using the current
-            //time, plus the valid time (in seconds), minus a 1 minute buffer
-            var expiresAt = new Date().getTime() + parseInt(data.expires_in, 10) * 1000 - 60000;
-            localStorageService.add('expires_at', expiresAt);
-        },
-
-        clearToken: function () {
-            console.log('GoogleApi: clearToken');
-
-            localStorageService.remove('access_token');
-            localStorageService.remove('refresh_token');
-            localStorageService.remove('expires_at');
-        },
-
-        authorize: function (options) {
-            var deferred = $q.defer();
-
-            //Build the OAuth consent page URL
-            var authUrl = 'https://accounts.google.com/o/oauth2/auth?' + $.param({
-                client_id: options.client_id,
-                redirect_uri: options.redirect_uri,
-                response_type: 'code',
-                scope: options.scope
-            });
-
-            console.log('authorize: [' + authUrl + ']');
-
-            //Open the OAuth consent page in the InAppBrowser
-            var authWindow = window.open(authUrl, '_blank', 'location=no,toolbar=no');
-
-            //The recommendation is to use the redirect_uri "urn:ietf:wg:oauth:2.0:oob"
-            //which sets the authorization code in the browser's title. However, we can't
-            //access the title of the InAppBrowser.
-            //
-            //Instead, we pass a bogus redirect_uri of "http://localhost", which means the
-            //authorization code will get set in the url. We can access the url in the
-            //loadstart and loadstop events. So if we bind the loadstart event, we can
-            //find the authorization code and close the InAppBrowser after the user
-            //has granted us access to their data.
-            authWindow.addEventListener('loadstart', googleCallback);
-
-            function googleCallback(e) {
-                console.log('googleCallback [' + e +']');
-
-                var url = (typeof e.url !== 'undefined' ? e.url : e.originalEvent.url);
-                var code = /\?code=(.+)$/.exec(url);
-                var error = /\?error=(.+)$/.exec(url);
-
-                console.log('googleCallback url:[' + url +']');
-                console.log('googleCallback code:[' + code +']');
-                console.log('googleCallback error:[' + error +']');
-
-                if (code || error) {
-                    //Always close the browser when match is found
-                    console.log('googleCallback Close window');
-                    authWindow.close();
-                }
-
-                if (code) {
-                    //Exchange the authorization code for an access token
-                    $.post('https://accounts.google.com/o/oauth2/token', {
-                        code: code[1],
-                        client_id: options.client_id,
-                        client_secret: options.client_secret,
-                        redirect_uri: options.redirect_uri,
-                        grant_type: 'authorization_code'
-                }).done(function(data) {
-                        console.log('googleCallback finally, calling setToken' + data);
-                        googleapi.setToken(data);
-                        deferred.resolve(data);
-                }).fail(function(response) {
-                        console.log('googleCallback catch ' + response);
-                        console.log('googleCallback catch JSON:' + response.responseJSON);
-                        deferred.reject(response.responseJSON);
-                    });
-                } else if (error) {
-                    console.log('googleCallback error [' + error + ']');
-                    //The user denied access to the app
-                    deferred.reject({
-                        error: error[1]
-                    });
-                }
-            }
-
-            return deferred.promise;
-        },
-
-        getToken: function (options) {
-            var deferred = $q.defer();
-
-            if (new Date().getTime() < localStorageService.get('expires_at')) {
-                console.log('GoogleApi:getToken, Has a valid token in local storage');
-
-                deferred.resolve({
-                    access_token: localStorageService.get('access_token')
-                });
-            } else if (localStorageService.get('refresh_token')) {
-                console.log('GoogleApi:getToken, Request to refresh token');
-                $.post('https://accounts.google.com/o/oauth2/token', {
-                    refresh_token: localStorageService.get('refresh_token'),
-                    client_id: options.client_id,
-                    client_secret: options.client_secret,
-                    grant_type: 'refresh_token'
-                }).done(function(data) {
-                    console.log('GoogleApi:getToken, Got refresh token, save it');
-                    googleapi.setToken(data);
-                    deferred.resolve(data);
-                }).fail(function(response) {
-                    console.log('GoogleApi:getToken, Failed to get token: '+response.responseJSON);
-                    deferred.reject(response.responseJSON);
-                });
-            } else {
-                console.log('GoogleApi:getToken, Not found Token in local storage');
-                deferred.reject();
-            }
-
-            return deferred.promise;
-        },
-
-        logout: function() {
-            var deferred = $q.defer();
-
-            var token = localStorageService.get('access_token');
-            if (token) {
-                $.post('https://accounts.google.com/o/oauth2/revoke', {
-                    token: token
-                })
-                .done(function(data) {
-                    console.log('GoogleApi:logout');
-                    googleapi.clearToken();
-                    deferred.resolve(data);
-                }).fail(function(response) {
-                    console.log('GoogleApi:logout Failed (v2): ', response);
-                    googleapi.clearToken();
-                    //Return wierd errors, and maybe not correct but seem to do the work
-                    deferred.resolve();
-                    //deferred.reject(response.responseJSON);
-                });
-            }
-            else {
-                deferred.reject('Empty Token');
-            }
-
-            return deferred.promise;
-        }
-    };
-
-    return googleapi;
-})
-
 .controller('dbTestCtrl', function($scope, ConfigService, $log, $q, GAPI, Blogger, pouchdb, GoogleApi, DataSync) {
-    $scope.blogId = '4462544572529633201';
     $scope.answer = '<empty>';
-    $scope.posts = [];
-
-
-    //todo: move to app value/service
-    var prop = {
-        client_id: '44535440585-tej15rtq3jgao112ks9pe4v5tobr7nhd.apps.googleusercontent.com',
-        client_secret: 'BCOBtps2R5GQHlGKb7mu7nQt',
-        redirect_uri: 'http://localhost',
-        scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/blogger'
-    };
-
-    $scope.init = function() {
-        console.log('Init');
-        //Check if we have a valid token
-        //cached or if we can get a new
-        //one using a refresh token.
-        GoogleApi.getToken({
-            client_id: prop.client_id,
-            client_secret: prop.client_secret
-        }).finally(function() {
-            //Show the greet view if we get a valid token
-            console.log('getToken finally');
-            $scope.showGreetView();
-        }).catch(function() {
-            //Show the login view if we have no valid token
-            console.log('getToken catch');
-            $scope.showLoginView();
-        });
-    };
-
-    $scope.showLoginView = function() {
-        //todo: state go login
-        //todo: add google login page
-        console.log('Show the login view if we have no valid token');
-    };
-
-    $scope.showGreetView = function() {
-        console.log('Show the greet view if we get a valid token');
-
-        //Get the token, either from the cache
-        //or by using the refresh token.
-        GoogleApi.getToken({
-            client_id: prop.client_id,
-            client_secret: prop.client_secret
-        }).then(function(data) {
-            //Pass the token to the API call and return a new promise object
-            console.log('getToken then: '+data);
-            //return GoogleApi.userInfo({ access_token: data.access_token });
-            var token = {
-                access_token: data.access_token,
-                client_id: prop.client_id,
-                cookie_policy: undefined,
-                expire_in: data.expire_in,
-                expire_at: new Date().getTime() + parseInt(data.expires_in, 10) * 1000 - 60000,
-                token_type: data.token_type
-            };
-            return GAPI.init_WithToken(token);
-        }).finally(function() {
-            console.log('GAPI Initialized with Token from InAppBrowser Session');
-        }).catch(function(err) {
-            //If getting the token fails, or the token has been
-            //revoked, show the login view.
-            console.log('getToken failed catch: '+err);
-            $scope.showLoginView();
-        });
-    };
-
-    //todo: hide this, make sure work on browser
-    $scope.$on('event:google-plus-signin-success', function (event, authResult) {
-        console.log('Send login to server or save into cookie');
-    });
-    $scope.$on('event:google-plus-signin-failure', function (event,authResult) {
-        console.log('Auth failure or signout detected');
-    });
-
-    $scope.authorize = function () {
-        GAPI.init();
-    };
+    var blogdb = pouchdb.create('blogdb');
 
     $scope.getPosts = function() {
         console.log('getOPosts');
@@ -279,32 +30,6 @@ angular.module('Ionic03.controllers')
         then(function(list) {
             console.log('List: ', list);
             $scope.posts = list.items;
-        });
-    };
-
-    //todo: rename method name
-    $scope.Google_Sign_Cordova = function() {
-        console.log('Google_Sign_Cordova');
-
-        //Show the consent page
-        GoogleApi.authorize({
-            client_id: prop.client_id,
-            client_secret: prop.client_secret,
-            redirect_uri: prop.redirect_uri,
-            scope: prop.scope
-        }).finally(function() {
-            console.log('authorize: Finally');
-            //Show the greet view if access is granted
-            $scope.showGreetView();
-        }).catch(function(data) {
-            //Show an error message if access was denied
-            if (data) {
-                console.log('Show an error message if access was denied ', data.error);
-            }
-            else {
-                console.log('GoogleApi.authorize catch, but no data object');
-            }
-
         });
     };
 
@@ -323,6 +48,402 @@ angular.module('Ionic03.controllers')
 
     };
 
-    //$scope.init();
+    //Sync code start
+    $scope.blogId = '4462544572529633201';
+
+    var date2GAPIDate = function (date) {
+        var pad = function (amount, width) {
+            var padding = "";
+            while (padding.length < width - 1 && amount < Math.pow(10, width - padding.length - 1))
+                padding += "0";
+            return padding + amount.toString();
+        };
+
+        date = date ? date : new Date();
+        var offset = date.getTimezoneOffset();
+        return pad(date.getFullYear(), 4)
+            + "-" + pad(date.getMonth() + 1, 2)
+            + "-" + pad(date.getDate(), 2)
+            + "T" + pad(date.getHours(), 2)
+            + ":" + pad(date.getMinutes(), 2)
+            + ":" + pad(date.getSeconds(), 2)
+            + "." + pad(date.getMilliseconds(), 3)
+            + (offset > 0 ? "-" : "+")
+            + pad(Math.floor(Math.abs(offset) / 60), 2)
+            + ":" + pad(Math.abs(offset) % 60, 2);
+    };
+
+    var mapPost = function(doc) {
+        var timePublished = new Date(doc.published).getTime();
+        if (doc.kind.startsWith('delete#')) {
+            doc._id = 'D' + doc.id;
+        }
+        else if (doc.kind.endsWith('#post')) {
+            doc._id = 'P' + (2000000000000 - timePublished) + '#' + doc.id;  // for sorting
+        }
+        else {
+            //Split comments and posts
+            //doc._id = 'C' + doc.post.id + '#' + (timePublished) + '#' + doc.id;  // for sorting
+            doc._id = 'P' + (2000000000000 - timePublished) + '#' + doc.id;  // for sorting
+        }
+        //doc['time_published'] = timePublished;
+    };
+
+    var mapDb2Post = function(post) {
+        delete post._id;
+        delete post._rev;
+        delete post.key;
+        //delete post['time_published'];
+        //delete post['key'];
+
+        return post;
+    };
+
+    var bumpDate = function(gapiDate) {
+        var date = new Date(gapiDate);
+        date = new Date(date.getTime() + 1);
+
+        return date2GAPIDate(date);
+    };
+
+    var blogger_getModifiedDocuments = function(lastUpdate) {
+        var _bloggerList = [];
+
+        var params = {
+            'fetchBodies': true,
+            'fetchImages': false,
+            'maxResults': 10,
+            //'startDate': _lastUpdate.date,
+            'fields': 'items(content,id,kind,published,status,title,titleLink,updated),nextPageToken'
+        };
+
+        if (lastUpdate.length > 0) {
+            params.startDate = bumpDate(lastUpdate);
+        }
+
+        var promise = Blogger.listPosts($scope.blogId, params).
+        then(function(list) {
+            // Get all modified comments from Blogger
+            if ('items' in list && list.items.length > 0) {
+                _bloggerList = list.items;
+            }
+
+            var params = {
+                'fetchBodies': true,
+                'maxResults': 10,
+                //'startDate': _lastUpdate.date,
+                'fields': 'items(author/displayName,content,id,kind,post,published,updated),nextPageToken'
+            };
+
+            if (lastUpdate.length > 0) {
+                params.startDate = bumpDate(lastUpdate);
+            }
+
+            return Blogger.listCommentsByBlog($scope.blogId, params);
+        }).
+        then(function(list) {
+            // Get all documents from DB
+            if ('items' in list && list.items.length > 0) {
+                // Append list.items to _bloggerList
+                _bloggerList.push.apply(_bloggerList, list.items);
+            }
+
+            return _bloggerList;
+        });
+
+        return promise;
+    };
+
+    $scope.syncResult = '';
+    $scope.syncFromBlogger = function() {
+        $scope.syncResult = 'Start Sync';
+
+        var _lastUpdate;
+        var _lastUpdateChanged = false;
+        var _bloggerList = [];
+
+        //Update DB->Blogger
+        blogdb.get('lastUpdate').
+        // read last update time from database
+        then(function(lastUpdate) {
+            // Get last update from DB
+            $log.log('lastUpdate', lastUpdate);
+            _lastUpdate = lastUpdate;
+            if (!_lastUpdate.date) {
+                _lastUpdate.date = '';
+            }
+        }, function(reason) {
+            //$log.log('lastUpdate failed', reason);
+            _lastUpdate = { _id: 'lastUpdate', date: '' };
+        }).
+        then(function() {
+            // Get all modified posts from Blogger
+            return blogger_getModifiedDocuments(_lastUpdate.date);
+        }).
+        then(function(list) {
+            _bloggerList = list;
+
+            //Get all documents in database
+            if ('items' in list && list.items.length > 0) {
+                return blogdb.allDocs({include_docs: true, attachments: false});
+            }
+            else {
+                return [];
+            }
+        }).
+        then(function(alldocs) {
+            //Merge
+            var list = _bloggerList;
+
+            if (list.length > 0) {
+                //$log.log('list', list)
+                $log.log('Blogger -> got answer', list);
+                $log.log('DB -> alldocs', alldocs);
+
+                //create dictionary of saved item <id, item>
+                var savedItems = {};
+                angular.forEach(alldocs.rows, function(item) {
+                    savedItems[item.id] = item.doc;
+                });
+
+                var lastUpdate = _lastUpdate.date;
+                var toUpdate = [];
+                angular.forEach(list, function(item) {
+                    if (lastUpdate < item.updated) {
+                        lastUpdate = item.updated;
+                    }
+
+                    var needUpdate = false;
+                    var id = item.id;
+                    //Find saved item
+                    if (id in savedItems) {
+                        var savedItem = savedItems[id];
+                        if (item.updated !== savedItem.updated) {
+                            $log.log('Items are different blogger:%O data:%O', item, savedItem);
+                            needUpdate = true;
+                            item._rev = savedItem._rev;
+                        }
+                    }
+                    else {
+                        needUpdate = true;
+                    }
+
+                    if (needUpdate) {
+                        mapPost(item);
+                        item.key = item.id;
+                        toUpdate.push(item);
+                    }
+                });
+
+                _lastUpdate.date = lastUpdate;
+                if (toUpdate.length > 0) {
+                    _lastUpdateChanged = true;
+                    return blogdb.bulkDocs({'docs': toUpdate});
+                }
+            }
+            return 0;
+        }).then(function(answer) {
+            //Save last update date to DB
+            if (_lastUpdateChanged) {
+                $log.log('All saved', answer);
+                $log.log('Update last update', _lastUpdate);
+                return blogdb.post(_lastUpdate);
+            }
+            else {
+                $log.log('Nothing to update, all uptodate', answer);
+                return 0;
+            }
+        }).then(function(answer) {
+            $scope.syncResult = 'done';
+        }, function(reason) {
+            $log.error('Sync failed', reason);
+        });
+    };
+
+    var syncToBloggerDoc = function(_doc) {
+        console.log('syncToBloggerDoc', _doc);
+
+        var doc = _doc.value;
+        var orgDoc = JSON.parse(JSON.stringify(doc));
+        var promise;
+        $log.log('to Update', doc);
+
+        var kind = doc.kind;
+        var id = doc.id;
+        var isPost = kind.endsWith('#post');
+        mapDb2Post(doc);
+        $log.log('to Update Clean', doc);
+
+        if (id.startsWith('G')) {
+            delete doc.id;
+            delete doc.kind;
+
+            if (isPost) {
+                promise = Blogger.insertPosts($scope.blogId, doc);
+            }
+            else {
+                promise = Blogger.insertComments($scope.blogId, doc);
+            }
+            promise.
+                then(function(answer) {
+                    $log.log('insertPosts Answer:', answer);
+                    var item = answer;
+
+                    return blogdb.remove(orgDoc).
+                        then(function(answer) {
+                            mapPost(item);
+                            item.key = item.id;
+                            return blogdb.post(item);
+                        });
+                });
+        }
+        else {
+            promise = Blogger.updatePosts($scope.blogId, id, doc);
+            promise.
+                then(function(answer) {
+                    $log.log('updatePosts Answer:', answer);
+                    mapPost(item);
+                    item.key = item.id;
+                    return blogdb.post(item);
+                });
+        }
+
+        return promise;
+    };
+
+    var prommiseArray = function(arr, promise) {
+        var item = arr.pop();
+        var p = promise(item).
+            then(function(answer) {
+                $log.log('Success: ',answer);
+                if (arr.length > 0) {
+                    return prommiseArray(arr, promise);
+                }
+                else {
+                    return 0;
+                }
+            });
+
+        return p;
+    };
+
+    var proccessArray = function(arr, promise) {
+        var item = arr.pop();
+        if (item) {
+            var p = promise(item).
+                then(function (answer) {
+                    if (arr.length > 0) {
+                        return prommiseArray(arr, promise);
+                    }
+                    else {
+                        return 0;
+                    }
+                });
+
+            return p;
+        }
+        else {
+            return 0;
+        }
+    };
+
+    $scope.syncToBlogger = function() {
+        $log.log('syncToBlogger');
+
+        var queryFun = {
+            map: function(doc) { emit(doc.key, doc); }
+        };
+
+        var alldocs = blogdb.query(queryFun, {reduce: false, key: 'U'});
+
+        /*
+         var alldocs = blogdb.allDocs({
+         include_docs: true,
+         attachments: false,
+         keys: 'U'
+         });
+         */
+
+        alldocs.then(function(answer) {
+            $log.log('syncToBlogger ',answer);
+
+            if (answer.total_rows > 0) {
+                return proccessArray(answer.rows, syncToBloggerDoc);
+            }
+            else {
+                return 0;
+            }
+        }).
+        then(function(answer) {
+            $log.log('syncModifiedDocuments completed', answer);
+        }, function(reason) {
+            $log.error('syncModifiedDocuments Failed', reason)
+        })
+    };
+
+    $scope.createPost = function() {
+        $log.log('Add dummy post');
+        var time = new Date();
+
+        var post = {
+            id: 'G' + time.getTime(), // Generated ID
+            kind: 'db#post',
+            title: 'V2: ' + time.toString(),
+            content: 'Sample Content' + time.toString(),
+            published: date2GAPIDate(time),
+            key: 'U'
+        };
+
+        mapPost(post);
+        blogdb.post(post)
+        .then(function(answer) {
+            $log.log('Add Success', answer);
+        }, function(err) {
+            $log.error('Add Failed', err);
+        });
+    };
+
+    //---------------------
+    $scope.dumpDatabase = function() {
+        var alldocs = blogdb.allDocs({include_docs: true, attachments: true});
+
+        alldocs.then(function(answer) {
+            $log.log('All docs', answer);
+            $scope.syncResult = 'done:' + answer.total_rows;
+            //$scope.posts = answer.rows;
+            console.table(answer.rows);
+
+            r = [];
+            angular.forEach(answer.rows, function (doc) {
+                r.push(doc.doc);
+            });
+
+            console.log(r);
+            console.table(r);
+
+        }, function(reason) {
+            $log.error('readdb failed', reason);
+        });
+    };
+
+    $scope.deletedb = function() {
+        var alldocs = blogdb.allDocs({include_docs: true, attachments: true});
+
+        alldocs.then(function(answer) {
+            r = [];
+            angular.forEach(answer.rows, function (doc) {
+                r.push(blogdb.remove(doc.doc));
+            });
+
+            $log.log('Delete all', r);
+            return $q.all(r);
+        }).
+        then(function(answer) {
+            $log.log('Delete all', answer);
+        }, function(reason) {
+            $log.error('readdb failed', reason);
+        });
+    };
+
 });
 

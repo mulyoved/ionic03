@@ -50,4 +50,16 @@ angular.module('Ionic03.services',[])
             },
             mainScreen: 'dbtest' //'app.playlists'
         }
+    })
+    .factory('blogdb', function(pouchdb) {
+        console.log('Open pouchdb database');
+        var val = {
+            db: pouchdb.create('blogdb'),
+            recreate: function() {
+                val.db.destroy();
+                val.db = pouchdb.create('blogdb');
+            }
+        };
+
+        return val;
     });
