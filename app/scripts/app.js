@@ -18,36 +18,23 @@ angular.module('Ionic03', [
 ])
 
 
-.run(function ($ionicPlatform, $state, $rootScope, ConfigService) {
+.run(function ($ionicPlatform, $state, $rootScope, $urlRouter, ConfigService, DataSync) {
     $ionicPlatform.ready(function () {
         if (window.StatusBar) {
             StatusBar.styleDefault();
         }
-    });
 
-    $rootScope.$on('event:google-plus-signin-success', function (event, authResult) {
-        // Send login to server or save into cookie
-        console.log('event:google-plus-signin-success event:', event, 'authResult: ', authResult);
-        ConfigService.login = true;
-        ConfigService.authResult = authResult;
-        $state.go('app.playlists');
-    });
-
-    $rootScope.$on('event:google-plus-signin-failure', function (event, authResult) {
-        // Auth failure or signout detected
-        console.log('event:google-plus-signin-failure event:', event, 'authResult: ', authResult);
-        ConfigService.login = false;
-        ConfigService.authResult = authResult;
-        $state.go('login');
+        //start async load of GAPI/Auth2
+        DataSync.init();
     });
 
     $rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
-        console.log("$stateChangeStart", event, toState, toParams, fromState, fromParams);
-        console.log("toState.authenticate", toState);
+        //console.log("$stateChangeStart", event, toState, toParams, fromState, fromParams);
+        //console.log("toState.authenticate", toState);
 
         //http://arthur.gonigberg.com/2013/06/29/angularjs-role-based-auth/
         //https://medium.com/opinionated-angularjs/4e927af3a15f
-        if (true) {
+        if (false) {
 
             if (!ConfigService.login) {
                 if (toState.authenticate) {
@@ -57,16 +44,34 @@ angular.module('Ionic03', [
                 }
             }
             else if (toState.name == 'login') {
-                $state.transitionTo("app.playlists");
+                $state.transitionTo(ConfigService.mainScreen);
                 event.preventDefault();
             }
         }
 
     });
+
+    $rootScope.$on("event:DataSync:StatusChange", function (event) {
+        console.log('Recived DataSync:StatusChange', $state.is('login'), event);
+        if (DataSync.gapiLogin && $state.is('login')) {
+            $state.go(ConfigService.mainScreen);
+        }
+        else if (!DataSync.gapiLogin && !$state.is('login')) {
+            $state.go('login');
+        }
+
+    });
+
 })
 .value('GoogleApp', {
-    apiKey: 'BCOBtps2R5GQHlGKb7mu7nQt', //'AIzaSyA78RO9-B7qEr-WXJULOq3u-n4C7RS9wz4',
-    clientId: '44535440585-tej15rtq3jgao112ks9pe4v5tobr7nhd.apps.googleusercontent.com', //'44535440585-rshs1j4t1jc4qnp295fqmkr7jt12tbrh.apps.googleusercontent.com',
+    client_id: '44535440585-tej15rtq3jgao112ks9pe4v5tobr7nhd.apps.googleusercontent.com',
+    client_secret: 'BCOBtps2R5GQHlGKb7mu7nQt',
+    redirect_uri: 'http://localhost',
+    scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/blogger',
+
+    //GAPI On Browser
+    apiKey: 'AIzaSyA78RO9-B7qEr-WXJULOq3u-n4C7RS9wz4',
+    clientId: '44535440585-rshs1j4t1jc4qnp295fqmkr7jt12tbrh.apps.googleusercontent.com',
     scopes: [
         // whatever scopes you need for your app, for example:
         //'https://www.googleapis.com/auth/drive',
@@ -74,7 +79,8 @@ angular.module('Ionic03', [
         'https://www.googleapis.com/auth/userinfo.profile',
         'https://www.googleapis.com/auth/blogger'
     ]
-})
+
+    })
 /*
 .config(function ($httpProvider) {
     //http://victorblog.com/2012/12/20/make-angularjs-http-service-behave-like-jquery-ajax/
@@ -230,6 +236,7 @@ angular.module('Ionic03', [
             authenticate: true
         });
     // if none of the above states are matched, use this as the fallback
-    $urlRouterProvider.otherwise('/app/playlists');
+    //$urlRouterProvider.otherwise('/app/playlists');
+    $urlRouterProvider.otherwise('dbtest');
 });
 

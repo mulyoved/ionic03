@@ -3,7 +3,7 @@ angular.module('Ionic03.controllers')
 
 .controller('UnlockCtrl', function ($scope, ConfigService, localStorageService, $log, $state) {
     var storageKey = 'unlock_code';
-    var nextScreen = 'app.playlists';
+    var nextScreen = ConfigService.mainScreen;
     console.log('UnlockCtrl');
     $scope.dragIds = '';
     $scope.text = 'Welcome';

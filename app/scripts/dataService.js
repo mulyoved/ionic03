@@ -47,6 +47,7 @@ angular.module('Ionic03.services',[])
         return {
             blogName: function() {
                 return 'm&m&stars';
-            }
+            },
+            mainScreen: 'dbtest' //'app.playlists'
         }
     });

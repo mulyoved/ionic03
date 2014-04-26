@@ -26,10 +26,10 @@
 
 angular.module('Ionic03.controllers')
 
-.service('GoogleApi', function($q, $http, localStorageService) {
+.service('GoogleApi', function($rootScope, $q, $http, localStorageService, GoogleApp) {
     var googleapi = {
         setToken: function (data) {
-            console.log('API: setToken: [' + JSON.stringify(data) + ']');
+            console.log('GoogleApi: setToken', data);
 
             //Cache the token
             localStorageService.add('access_token',data.access_token);
@@ -118,27 +118,28 @@ angular.module('Ionic03.controllers')
             var deferred = $q.defer();
 
             if (new Date().getTime() < localStorageService.get('expires_at')) {
-                console.log('API:getToken, resolve');
+                console.log('GoogleApi:getToken, Has a valid token in local storage');
 
                 deferred.resolve({
                     access_token: localStorageService.get('access_token')
                 });
             } else if (localStorageService.get('refresh_token')) {
-                console.log('API:getToken, post');
+                console.log('GoogleApi:getToken, Request to refresh token');
                 $.post('https://accounts.google.com/o/oauth2/token', {
                     refresh_token: localStorageService.get('refresh_token'),
                     client_id: options.client_id,
                     client_secret: options.client_secret,
                     grant_type: 'refresh_token'
                 }).done(function(data) {
-                    console.log('API:getToken, done Call SetToken: '+data);
+                    console.log('GoogleApi:getToken, Got refresh token, save it');
                     googleapi.setToken(data);
                     deferred.resolve(data);
                 }).fail(function(response) {
-                    console.log('API:getToken, fail '+response);
+                    console.log('GoogleApi:getToken, Failed to get token: '+response.responseJSON);
                     deferred.reject(response.responseJSON);
                 });
             } else {
+                console.log('GoogleApi:getToken, Not found Token in local storage');
                 deferred.reject();
             }
 
@@ -272,6 +273,6 @@ angular.module('Ionic03.controllers')
         });
     };
 
-    $scope.init();
+    //$scope.init();
 });
 
