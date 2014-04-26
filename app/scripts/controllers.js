@@ -8,8 +8,10 @@ angular.module('Ionic03.controllers', [])
 .controller('LoginCtrl', function ($scope, $state, GoogleApp, GoogleApi, GAPI, ConfigService, DataSync) {
     console.log('LoginCtrl');
     $scope.googleClientId = GoogleApp.clientId;
+    $scope.loading = false;
 
     $scope.login = function() {
+        $scope.loading = true;
         console.log("Google Login: ", ionic.Platform.device(), ionic.Platform.isCordova());
 
         var p;
@@ -45,6 +47,7 @@ angular.module('Ionic03.controllers', [])
             else {
                 console.log('GoogleApi.authorize catch, but no data object');
             }
+            $scope.loading = false;
         });
 
     }

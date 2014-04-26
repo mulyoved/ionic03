@@ -1,3 +1,4 @@
 <ion-content has-header="false" class="super-center">
-    <button ng-click="login()" class="google-sign-button"></button>
+    <button ng-hide="loading" ng-click="login()" class="google-sign-button"></button>
+    <h1 ng-show="loading"><i class="ion-loading-c"></i></h1>
 </ion-content>
