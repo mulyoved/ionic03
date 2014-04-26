@@ -41,6 +41,14 @@ angular.module('Ionic03.controllers')
             localStorageService.add('expires_at', expiresAt);
         },
 
+        clearToken: function () {
+            console.log('GoogleApi: clearToken');
+
+            localStorageService.remove('access_token');
+            localStorageService.remove('refresh_token');
+            localStorageService.remove('expires_at');
+        },
+
         authorize: function (options) {
             var deferred = $q.defer();
 
@@ -144,13 +152,40 @@ angular.module('Ionic03.controllers')
             }
 
             return deferred.promise;
+        },
+
+        logout: function() {
+            var deferred = $q.defer();
+
+            var token = localStorageService.get('access_token');
+            if (token) {
+                $.post('https://accounts.google.com/o/oauth2/revoke', {
+                    token: token
+                })
+                .done(function(data) {
+                    console.log('GoogleApi:logout');
+                    googleapi.clearToken();
+                    deferred.resolve(data);
+                }).fail(function(response) {
+                    console.log('GoogleApi:logout Failed (v2): ', response);
+                    googleapi.clearToken();
+                    //Return wierd errors, and maybe not correct but seem to do the work
+                    deferred.resolve();
+                    //deferred.reject(response.responseJSON);
+                });
+            }
+            else {
+                deferred.reject('Empty Token');
+            }
+
+            return deferred.promise;
         }
     };
 
     return googleapi;
 })
 
-.controller('dbTestCtrl', function($scope, ConfigService, $log, $q, GAPI, Blogger, pouchdb, GoogleApi) {
+.controller('dbTestCtrl', function($scope, ConfigService, $log, $q, GAPI, Blogger, pouchdb, GoogleApi, DataSync) {
     $scope.blogId = '4462544572529633201';
     $scope.answer = '<empty>';
     $scope.posts = [];
@@ -271,6 +306,21 @@ angular.module('Ionic03.controllers')
             }
 
         });
+    };
+
+    $scope.logout = function() {
+        console.log('Logout');
+
+        GoogleApi.logout()
+        .then(function() {
+            //Reinit after we get new token
+            DataSync.init();
+
+            console.log('logout');
+        }, function(data) {
+            console.log('Logout failed', data);
+        });
+
     };
 
     //$scope.init();
