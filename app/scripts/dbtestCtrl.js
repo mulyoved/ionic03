@@ -14,8 +14,9 @@
 
 angular.module('Ionic03.controllers')
 
-.controller('dbTestCtrl', function($scope, ConfigService, $log, $q, GAPI, Blogger, pouchdb, GoogleApi, DataSync) {
+.controller('dbTestCtrl', function($scope, ConfigService, $log, $q, GAPI, Blogger, pouchdb, GoogleApi, DataSync, DataService, blogdb) {
     $scope.answer = '<empty>';
+    $scope.blogdb = blogdb;
 
     $scope.sync = function() {
         $log.log('sync');
@@ -38,6 +39,20 @@ angular.module('Ionic03.controllers')
     $scope.deletedb = function() {
         DataSync.deletedb();
     };
+
+    $scope.getPosts = function() {
+        var p = DataService.getItems();
+        p.then(function(answer) {
+            $log.log(answer);
+        }, function(err) {
+            $log.error(err);
+        });
+    };
+
+    $scope.show = function(item) {
+        $log.log(item);
+        return item.content;
+    }
 
 });
 

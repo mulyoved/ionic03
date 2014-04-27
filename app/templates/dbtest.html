@@ -16,8 +16,17 @@
         <p>DataBase Operations</p>
         <button ng-click="dumpDatabase()">Dump Database</button>
         <button ng-click="deletedb()">Delete Database</button>
+        <p>DataService Test</p>
+        <button ng-click="getPosts()">Get Posts</button>
 
+        <p>Database pouch-repeat</p>
+        <ul>
+            <li pouch-repeat="item in blogdb">
+                {{show(item)}}
+            </li>
+        </ul>
 
+        <p>Auth</p>
         <button ng-click="logout()">Logout</button>
     </ion-content>
 </ion-view>

@@ -250,13 +250,15 @@ angular.module('Ionic03.controllers')
         }
         else {
             promise = Blogger.updatePosts(blogId, id, doc);
-            promise.
-                then(function(answer) {
-                    $log.log('updatePosts Answer:', answer);
-                    mapPost(item);
-                    item.key = item.id;
-                    return blogdb.post(item);
-                });
+            promise
+            .then(function(answer) {
+                $log.log('updatePosts Answer:', answer);
+                //Not sure this is right, need to test
+                var item = answer.doc;
+                mapPost(item);
+                item.key = item.id;
+                return blogdb.post(item);
+            });
         }
 
         return promise;
@@ -332,7 +334,7 @@ angular.module('Ionic03.controllers')
 
     var dataSync = {
         gapiLogin: false,
-        needSync: true, // Dirty
+        needSync: false, // Dirty
         duringSync: false,
 
         init: function() {
@@ -362,18 +364,32 @@ angular.module('Ionic03.controllers')
         },
 
         sync: function() {
-            console.log('Start Sync');
-            syncToBlogger()
-            .then(function(answer) {
-                return syncFromBlogger();
-            }).then(function(answer) {
-                $log.log('syncModifiedDocuments completed', answer);
+            if (!dataSync.duringSync) {
+                dataSync.duringSync = true;
+                dataSync.needSync = false;
+                dataSync.error = null;
+                console.log('Start Sync');
                 $rootScope.$broadcast('event:DataSync:StatusChange');
-            }, function(reason) {
-                $log.error('syncModifiedDocuments Failed', reason)
-                $rootScope.$broadcast('event:DataSync:StatusChange');
-            })
-
+                syncToBlogger()
+                .then(function (answer) {
+                    return syncFromBlogger();
+                }).then(function (answer) {
+                    $log.log('syncModifiedDocuments completed', answer);
+                    dataSync.duringSync = false;
+                    dataSync.error = null;
+                    $rootScope.$broadcast('event:DataSync:StatusChange');
+                    $rootScope.$broadcast('event:DataSync:DataChange');
+                }, function (reason) {
+                    $log.error('syncModifiedDocuments Failed', reason);
+                    dataSync.duringSync = false;
+                    dataSync.needSync = true;
+                    dataSync.error = reason || 'Failed unknown reason';
+                    $rootScope.$broadcast('event:DataSync:StatusChange');
+                })
+            }
+            else {
+                $log.error('Calling sync while sync in progress');
+            }
         },
 
         createPost: function(title, content) {
@@ -392,6 +408,14 @@ angular.module('Ionic03.controllers')
             blogdb.post(post)
             .then(function(answer) {
                 $log.log('Add Success', answer);
+                //Trigger db change
+                //Start Sync
+
+                //todo: uncomment temp to see unsync item from database in list
+                //dataSync.needSync = true;
+                    $log.log('Data Sync $broadcast DataChange');
+                    $rootScope.$broadcast('event:DataSync:DataChange');
+                $rootScope.$broadcast('event:DataSync:StatusChange');
             }, function(err) {
                 $log.error('Add Failed', err);
             });
@@ -443,15 +467,11 @@ angular.module('Ionic03.controllers')
     };
 
     //Todo:
-    //arrange status
-    //icons
-    //pull to refresh
-    //Display in list
+    //handle comments
+    //handle images
     //test on device
     //Decied how to limit database size
     //Old comments - load all - bypass database?
-
-
 
     return dataSync;
 });

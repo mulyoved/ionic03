@@ -54,7 +54,7 @@ angular.module('Ionic03.controllers', [])
 
 })
 
-.controller('AddCtrl', function ($scope, ConfigService, $ionicNavBarDelegate, item) {
+.controller('AddCtrl', function ($scope, ConfigService, $ionicNavBarDelegate, DataService, item) {
     $scope.title = ConfigService.blogName();
     $scope.item = item;
 
@@ -62,8 +62,7 @@ angular.module('Ionic03.controllers', [])
 
         console.log('Going to save: ', $scope.item);
 
-        console.log('Save');
-        item.save(item);
+        DataService.saveItem(item);
         $ionicNavBarDelegate.back();
     };
 
@@ -77,14 +76,97 @@ angular.module('Ionic03.controllers', [])
     }
 })
 
-.controller('PlaylistsCtrl', function ($scope, ConfigService, $ionicNavBarDelegate, $ionicViewService, items) {
+.controller('PlaylistsCtrl', function ($rootScope, $scope, $state, $log, ConfigService,
+                                       $ionicNavBarDelegate, $ionicViewService, DataSync, DataService, items) {
+
+    var iconError = 'icon ion-alert';
+    var iconOk = 'ion-ios7-star-outline';
+    var iconSync = 'ion-looping';
+    var startRefresh = true;
+
+    $log.log('!!!! PlaylistsCtrl ', items);
+
+    var updateIcon = function() {
+        if (!DataSync.gapiLogin || DataSync.error) {
+            $scope.syncIcon = iconError;
+        }
+        else if (DataSync.duringSync) {
+            $scope.syncIcon = iconSync;
+        }
+        else if (DataSync.needSync) {
+            $scope.syncIcon = iconError;
+        }
+        else {
+            $scope.syncIcon = iconOk;
+        }
+
+        if (startRefresh && !DataSync.duringSync) {
+            $scope.$broadcast('scroll.refreshComplete');
+            startRefresh = false;
+        }
+
+        $log.log('Updated icon ', $scope.syncIcon);
+    };
+
+    $scope.sync = function() {
+        if ($scope.syncIcon === iconError) {
+            $state.go('app.diagnostic');
+        }
+        else if (!DataSync.duringSync) {
+            DataSync.sync();
+        }
+    };
+
     $scope.title = ConfigService.blogName();
     $ionicNavBarDelegate.showBackButton(false);
     $ionicViewService.clearHistory();
+    $scope.syncIcon = "ok";
 
-    $scope.playlists = items;
+    var updateItemList = function() {
+        var p = DataService.getItems();
+        p.then(function (answer) {
+            $scope.items = answer;
+            $log.log('PlaylistsCtrl: DataService.getItems: Set PlayList !', answer);
+        }, function (err) {
+            $log.error('DataService.getItems Failed ', err);
+        });
+    };
 
+    $scope.$on("event:DataSync:StatusChange", function (event) {
+        $log.log('PlaylistsCtrl: Recived: event:DataSync:StatusChange');
+        updateIcon();
+    });
 
+    $scope.$on("event:DataSync:DataChange", function (event) {
+        $log.log('PlaylistsCtrl: Recived: event:DataSync:DataChange');
+        updateItemList();
+    });
+
+    $scope.doRefresh = function() {
+        console.log('Refreshing!');
+        startRefresh = true;
+        DataSync.sync();
+    };
+
+    $scope.show = function(item) {
+        $log.log(item);
+        return item.doc.content;
+    };
+
+    $scope.items = items;
+    updateIcon();
+    updateItemList();
+
+})
+
+.controller('DiagnosticCtrl', function ($scope, ConfigService, DataSync) {
+    $scope.gapiLogin = DataSync.gapiLogin;
+    $scope.error = DataSync.error;
+    $scope.duringSync = DataSync.duringSync;
+    $scope.needSync = DataSync.needSync;
+    $scope.sync = function() {
+        DataSync.sync();
+    }
 })
 
 .controller('PlaylistCtrl', function ($scope, ConfigService, item) {

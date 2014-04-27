@@ -3,15 +3,25 @@
       <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
   </ion-nav-buttons>
   <ion-nav-buttons side="right">
+      <a class="button button-icon icon ion-alert" ng-class="syncIcon" ng-click="sync()"></a>
       <a class="button button-icon icon ion-plus-round" href="#/app/add"></a>
   </ion-nav-buttons>
   <ion-content class="has-header">
+
+    <ion-refresher on-refresh="doRefresh()"
+        pulling-text="Pull to refresh..."
+        refreshing-icon="">
+    </ion-refresher>
+
     <ion-list>
-      <ion-item ng-repeat="playlist in playlists" href="#/app/playlists/{{playlist.id}}">
-          <h1>{{playlist.title}}</h1>
+      <div class="item item-body post-item" ng-repeat="item in items.rows" href="#/app/playlists/{{item.id}}">
+          <!-- <h1>{{show(playlist)}}</h1> -->
+          <pre>{{item.doc.content}}</pre>
+          <!--
           <img ng-if="playlist.image" ng-src="{{playlist.image}}"></img>
           <div ng-if="playlist.text">{{playlist.text}}</div>
-      </ion-item>
+          -->
+      </div> <!-- ion-item -->
     </ion-list>
   </ion-content>
 </ion-view>

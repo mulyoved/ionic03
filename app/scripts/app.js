@@ -18,7 +18,7 @@ angular.module('Ionic03', [
 ])
 
 
-.run(function ($ionicPlatform, $state, $rootScope, $urlRouter, ConfigService, DataSync) {
+.run(function ($ionicPlatform, $state, $rootScope, $urlRouter, $log, $ionicPopup, ConfigService, DataSync) {
     $ionicPlatform.ready(function () {
         if (window.StatusBar) {
             StatusBar.styleDefault();
@@ -52,7 +52,7 @@ angular.module('Ionic03', [
     });
 
     $rootScope.$on("event:DataSync:StatusChange", function (event) {
-        console.log('Recived DataSync:StatusChange', $state.is('login'), event);
+        console.log('APP Recived DataSync:StatusChange', $state.is('login'), event);
         if (DataSync.gapiLogin && $state.is('login')) {
             $state.go(ConfigService.mainScreen);
         }
@@ -60,6 +60,24 @@ angular.module('Ionic03', [
             $state.go('login');
         }
 
+        if (DataSync.needSync && !DataSync.duringSync && DataSync.gapiLogin && !DataSync.error) {
+            DataSync.sync();
+        }
+        else if (DataSync.error) {
+            if (!DataSync.error.done) {
+                $log.error('Sync error', DataSync.error);
+
+                DataSync.error.done = true;
+
+                var err = DataSync.error.data.error.message || 'Unknown';
+
+                $ionicPopup.alert({
+                    title: 'Blogger Sync Problem',
+                    content: err
+                }).then(function(res) {
+                });
+            }
+        }
     });
 
 })
@@ -234,10 +252,20 @@ angular.module('Ionic03', [
                 }
             },
             authenticate: true
+        })
+        .state('app.diagnostic', {
+            url: '/diagnostic',
+            views: {
+                'menuContent': {
+                    templateUrl: 'templates/diagnostic.html',
+                    controller: 'DiagnosticCtrl'
+                }
+            },
+            authenticate: false
         });
     // if none of the above states are matched, use this as the fallback
-    //$urlRouterProvider.otherwise('/app/playlists');
-    $urlRouterProvider.otherwise('dbtest');
+    $urlRouterProvider.otherwise('/app/playlists');
+    //$urlRouterProvider.otherwise('dbtest');
 });
 
 if (typeof String.prototype.startsWith != 'function') {
