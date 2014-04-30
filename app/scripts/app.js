@@ -11,7 +11,6 @@ angular.module('Ionic03', [
     'Ionic03.controllers',
     'Ionic03.services',
     'Ionic03.directives',
-    'directive.g+signin',
     'gapi',
     'pouchdb',
     'LocalStorageModule'
