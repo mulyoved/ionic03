@@ -3,10 +3,15 @@
         <a class="button button-icon icon ion-android-close" ng-click="cancel()"></a>
     </ion-nav-buttons>
     <ion-nav-buttons side="right">
-        <a class="button button-icon icon ion-android-camera" ng-click="picture()"></a>
-        <a class="button button-icon icon ion-android-send" ng-click="save()"></a>
+        <button class="button button-icon" ng-click="picture()">
+            <i class="icon ion-android-camera"></i>
+        </button><button class="button button-icon" ng-click="save()">
+            <i class="icon ion-android-send"></i>
+        </button>
     </ion-nav-buttons>
   <ion-content class="has-header fill-content">
-      <textarea id="addpost" class="super-fill screen-pad" placeholder="Post content" ng-model="item.text"></textarea>
+      <div class="screen-pad" ng-class="{ 'super-fill': applyClass }">
+        <textarea id="addpost" class="fill-textarea" placeholder="Post content" ng-model="item.text"></textarea>
+      </div>
   </ion-content>
 </ion-view>

@@ -1,10 +1,13 @@
-<ion-view title="{{title}}">
+<ion-view align-title="left" title="{{title}}">
   <ion-nav-buttons side="left">
       <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
   </ion-nav-buttons>
   <ion-nav-buttons side="right">
-      <a class="button button-icon icon ion-alert" ng-class="syncIcon" ng-click="sync()"></a>
-      <a class="button button-icon icon ion-plus-round" href="#/app/add"></a>
+      <button class="button button-icon" ng-click="sync()">
+        <i class="icon ion-alert" ng-class="syncIcon"></i>
+      </button><button class="button button-icon" ng-click="add()">
+        <i class="icon ion-plus-round"></i>
+      </button>
   </ion-nav-buttons>
   <ion-content class="has-header">
 
@@ -14,9 +17,8 @@
     </ion-refresher>
 
     <ion-list>
-      <div class="item item-body post-item" ng-repeat="item in items.rows" href="#/app/playlists/{{item.id}}">
-          <!-- <h1>{{show(playlist)}}</h1> -->
-          <pre>{{item.doc.content}}</pre>
+      <div class="item item-body post-item" ng-repeat="item in items.rows track by item.id" href="#/app/playlists/{{item.id}}">
+          <div class="blog-content" ng-bind-html="show(item)"></div>
           <!--
           <img ng-if="playlist.image" ng-src="{{playlist.image}}"></img>
           <div ng-if="playlist.text">{{playlist.text}}</div>

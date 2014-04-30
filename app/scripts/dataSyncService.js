@@ -2,10 +2,10 @@
 
 angular.module('Ionic03.controllers')
 
-.service('DataSync', function($rootScope, $q, $http, localStorageService, GoogleApp, GoogleApi, GAPI, blogdb, Blogger, $log) {
+.service('DataSync', function($rootScope, $q, $http, localStorageService, GoogleApp, GoogleApi, GAPI, blogdb, Blogger, ConfigService, $log) {
 
         //Sync code start
-    var blogId = '4462544572529633201';
+    var blogId = ConfigService.blogId; // '4462544572529633201';
 
     var date2GAPIDate = function (date) {
         var pad = function (amount, width) {
@@ -468,8 +468,8 @@ angular.module('Ionic03.controllers')
 
     //Todo:
     //handle comments
-    //handle images
     //test on device
+    //Post images
     //Decied how to limit database size
     //Old comments - load all - bypass database?
 

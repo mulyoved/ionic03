@@ -1,5 +1,16 @@
 <ion-view title="DBTest">
     <ion-content class="has-header">
+        <button ng-click="htmlParserTest()">HTML Parser Test</button>
+
+        <h1>Input:</h1>
+        <pre>{{ input }}</pre>
+        <pre ng-bind-html="input"></pre>
+        <h1>Results:</h1>
+        <pre>{{ results }}</pre>
+        <pre ng-bind-html="results"></pre>
+
+
+        <p>-------------------------------------------------------------------------------------------------------------</p>
         <button ng-click="getPosts()">Blogger.getPosts</button>
         <p>answer: {{answer}}</p>
         <p>syncResult: {{syncResult}}</p>

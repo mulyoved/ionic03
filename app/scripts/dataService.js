@@ -13,9 +13,13 @@ angular.module('Ionic03.services',[])
             authResult: null,
             isLogin: false,
             saveItem: function(item) {
-                $log.log('DataService: Save Item', item);
                 var time = new Date();
-                DataSync.createPost('', item.text);
+
+                var text = item.text;
+                text = text.replace(/\n/g, '<br />');
+                $log.log('DataService: Save Item', item, text);
+                DataSync.createPost('', text);
+                //editItem.text = '';
             },
             getItems: function() {
                 $log.log('DataService: getItems');
@@ -42,7 +46,8 @@ angular.module('Ionic03.services',[])
             blogName: function() {
                 return 'm&m&stars';
             },
-            mainScreen: 'dbtest' //'app.playlists'
+            mainScreen: 'app.playlists',
+            blogId: '4462544572529633201' //'4355243139467288758'
         }
     })
     .factory('blogdb', function(pouchdb) {

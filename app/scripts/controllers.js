@@ -12,10 +12,10 @@ angular.module('Ionic03.controllers', [])
 
     $scope.login = function() {
         $scope.loading = true;
-        console.log("Google Login: ", ionic.Platform.device(), ionic.Platform.isCordova());
+        console.log("Google Login: ", ionic.Platform.device(), ionic.Platform.isWebView());
 
         var p;
-        if (ionic.Platform.isCordova()) {
+        if (ionic.Platform.isWebView()) {
             //Show the consent page
             p = GoogleApi.authorize({
                 client_id: GoogleApp.client_id,
@@ -31,7 +31,7 @@ angular.module('Ionic03.controllers', [])
 
         p.then(function (data) {
             console.log('Authorize: Success', data);
-            if (!ionic.Platform.isCordova()) {
+            if (!ionic.Platform.isWebView()) {
                 GoogleApi.setToken(data.oauthToken);
             }
 
@@ -54,7 +54,7 @@ angular.module('Ionic03.controllers', [])
 
 })
 
-.controller('AddCtrl', function ($scope, ConfigService, $ionicNavBarDelegate, DataService, item) {
+.controller('AddCtrl', function ($scope, ConfigService, $ionicNavBarDelegate, DataService, $timeout, item) {
     $scope.title = ConfigService.blogName();
     $scope.item = item;
 
@@ -73,11 +73,18 @@ angular.module('Ionic03.controllers', [])
 
     $scope.picture = function () {
         console.log('TBD');
-    }
+    };
+
+    //not sure why, seem like bug in chrom, textinput is not working correctly
+    //force some resize fix the problem
+    $timeout(function() {
+        $scope.applyClass = true;
+    }, 20);
 })
 
 .controller('PlaylistsCtrl', function ($rootScope, $scope, $state, $log, ConfigService,
-                                       $ionicNavBarDelegate, $ionicViewService, DataSync, DataService, items) {
+                                       $ionicNavBarDelegate, $ionicViewService, DataSync, DataService, HTMLReformat,
+                                       items) {
 
     var iconError = 'icon ion-alert';
     var iconOk = 'ion-ios7-star-outline';
@@ -117,6 +124,10 @@ angular.module('Ionic03.controllers', [])
         }
     };
 
+    $scope.add = function() {
+        $state.go('app.add');
+    };
+
     $scope.title = ConfigService.blogName();
     $ionicNavBarDelegate.showBackButton(false);
     $ionicViewService.clearHistory();
@@ -149,8 +160,9 @@ angular.module('Ionic03.controllers', [])
     };
 
     $scope.show = function(item) {
-        $log.log(item);
-        return item.doc.content;
+        var results = HTMLReformat.reformat(item.doc.content);
+        //$log.log(item);
+        return results;
     };
 
     $scope.items = items;
@@ -166,6 +178,20 @@ angular.module('Ionic03.controllers', [])
     $scope.needSync = DataSync.needSync;
     $scope.sync = function() {
         DataSync.sync();
+    }
+})
+
+.controller('ExceptionCtrl', function ($rootScope, $scope) {
+    console.log('ExceptionCtrl');
+
+    if ($rootScope.err) {
+        $scope.exception = $rootScope.err.exception;
+        $scope.cause = $rootScope.err.cause;
+    }
+    else {
+        $scope.exception = 'unknown';
+        $scope.cause = 'unknown';
+
     }
 })
 

@@ -66,16 +66,19 @@ angular.module('Ionic03', [
         else if (DataSync.error) {
             if (!DataSync.error.done) {
                 $log.error('Sync error', DataSync.error);
-
                 DataSync.error.done = true;
+                if (DataSync.error.status == 401) {
+                    $status.go('login');
+                }
+                else {
+                    var err = DataSync.error.data.error.message || 'Unknown';
 
-                var err = DataSync.error.data.error.message || 'Unknown';
-
-                $ionicPopup.alert({
-                    title: 'Blogger Sync Problem',
-                    content: err
-                }).then(function(res) {
-                });
+                    $ionicPopup.alert({
+                        title: 'Blogger Sync Problem',
+                        content: err
+                    }).then(function (res) {
+                    });
+                }
             }
         }
     });
@@ -98,7 +101,29 @@ angular.module('Ionic03', [
         'https://www.googleapis.com/auth/blogger'
     ]
 
-    })
+})
+
+
+.config(function($provide){
+
+    $provide.decorator("$exceptionHandler", function($delegate, $injector){
+        return function(exception, cause){
+            var $rootScope = $injector.get("$rootScope");
+            var $state = $injector.get("$state");
+            //$rootScope.addError({message:"Exception", reason:exception});
+            console.log('My exception handler', exception, cause);
+
+            $rootScope.err = {
+                exception: exception,
+                cause: cause };
+
+            $state.go('exception_page');
+
+            $delegate(exception, cause);
+        };
+    });
+
+})
 /*
 .config(function ($httpProvider) {
     //http://victorblog.com/2012/12/20/make-angularjs-http-service-behave-like-jquery-ajax/
@@ -171,6 +196,13 @@ angular.module('Ionic03', [
             abstract: false,
             templateUrl: 'templates/login.html',
             controller: 'LoginCtrl',
+            authenticate: false
+        })
+        .state('exception_page', {
+            url: '/exception',
+            abstract: false,
+            templateUrl: 'templates/exceptionPage.html',
+            controller: 'ExceptionCtrl',
             authenticate: false
         })
         .state('dbtest', {

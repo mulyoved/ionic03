@@ -41,5 +41,27 @@ To install the InAppBrowser plugin (if necessary)...
 
 `cordova plugin add org.apache.cordova.inappbrowser`
 
+Q: How to reset the emulator
 
+A: Android (from cmd not bash) delete and recreate
 
+Q: Work with grunt
+
+A:
+
+`grunt cordova`
+
+`grunt emulate:android`
+
+`adb logcat CordovaLog:D *:S`
+
+=Todo:=
+1. Post Image, do wee need to format it like blogger?
+
+2. Allow to select blog
+
+3. Auto sync, retry and such
+
+4. Sync is not perfect - how it handle modified post?
+
+5.
