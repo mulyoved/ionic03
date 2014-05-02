@@ -4,15 +4,20 @@ var express = require('express'),
     main = require('./main'),
     app = express();
 
-app.use(express.logger("dev"));
+var bodyParser = require('body-parser');
+var methodOverride = require('method-override');
+var morgan  = require('morgan');
 
-app.use(express.bodyParser({
+app.use(express.static(__dirname + '/public'));
+app.use(morgan());
+
+app.use(bodyParser({
     uploadDir: __dirname + '/uploads',
     keepExtensions: true
 }));
 
-app.use(express.methodOverride());
-app.use(app.router);
+app.use(methodOverride());
+//app.use(app.router);
 app.use(express.static(path.join(__dirname, './uploads')));
 
 app.post('/images', main.addImage); // endpoint to post new images

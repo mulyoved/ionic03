@@ -20,6 +20,9 @@ exports.getImages = function(req, res, next) {
 };
 
 exports.addImage = function(req, res, next) {
+    debugger;
+
+
     var file = req.files.file,
         filePath = file.path,
         lastIndex = filePath.lastIndexOf("/"),

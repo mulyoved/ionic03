@@ -1,7 +1,7 @@
 var imageUpload = require('./imageUpload');
 var parseString = require('xml2js').parseString;
 
-imageUpload.upload('D:/js/PictureFeed/server/uploads/8140-1yodndb.jpg', { 
+imageUpload.upload('C:/js/ionic03/docs/GoogleSign_Error.png', {
         albumId:'5965097735673433505', 
         userId: 'mulyoved',
         token: 'ya29.1.AADtN_UPuNv2J7l6hsVcdkxrWTxRR6vjVYL6KAFsa2z0d_riWNqVgZhtxA_o-9g' 
