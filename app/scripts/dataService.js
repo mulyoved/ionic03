@@ -46,8 +46,11 @@ angular.module('Ionic03.services',[])
             blogName: function() {
                 return 'm&m&stars';
             },
-            mainScreen: 'app.playlists',
-            blogId: '4462544572529633201' //'4355243139467288758'
+            imageUploadServerURL: 'http://10.0.2.2:3000',
+
+            //mainScreen: 'app.playlists',
+            mainScreen: 'dbtest',
+                blogId: '4462544572529633201' //'4355243139467288758'
         }
     })
     .factory('blogdb', function(pouchdb) {

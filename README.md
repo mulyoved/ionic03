@@ -25,21 +25,16 @@ A: Install the InAppBrowser plugin
 
 [Get Log From Android Emulator](file:///D:/Mobile/Android/android-sdk/docs/tools/debugging/debugging-log.html)
 
-
-Get log from device
-
-`adb logcat CordovaLog:D *:S`
-
-For development in local browser we need to have this origin: `http://127.0.0.1:9000/`
-
-For Android emulator seem to work with `http://localhost:63342` or `http://127.0.0.1:9000/`
-but maybe we need `http://localhost`
-
 `cordova plugins`
 
 To install the InAppBrowser plugin (if necessary)...
 
 `cordova plugin add org.apache.cordova.inappbrowser`
+
+
+Get log from device
+
+`adb logcat CordovaLog:D *:S`
 
 Q: How to reset the emulator
 
@@ -55,8 +50,87 @@ A:
 
 `adb logcat CordovaLog:D *:S`
 
-=Todo:=
+[File upload Example](http://coenraets.org/blog/2013/09/how-to-upload-pictures-from-a-phonegap-application-to-node-js-and-other-servers-2/)
+
+Add Plugins
+
+`cordova plugin add org.apache.cordova.device`
+
+`cordova plugin add org.apache.cordova.console`
+
+`cordova plugin add org.apache.cordova.file`
+
+`cordova plugin add org.apache.cordova.file-transfer`
+
+`cordova plugin add org.apache.cordova.camera`
+
+$ cordova plugins ls
+[ 'org.apache.cordova.camera',
+  'org.apache.cordova.console',
+  'org.apache.cordova.device',
+  'org.apache.cordova.file',
+  'org.apache.cordova.file-transfer',
+  'org.apache.cordova.inappbrowser' ]
+
+`cordova build`
+
+`cordova serve android`
+
+`cordova emulate android`
+
+I fixed it ????
+
+line 1062
+
+            var message = messages.substr(spaceIdx + 1, msgLen);
+            if (msgLen) {
+                messages = messages.slice(spaceIdx + msgLen + 1);
+                processMessage(message);
+            }
+            else {
+                messages = '';
+            }
+
+            if (messages) {
+                messagesFromNative[0] = messages;
+            } else {
+                messagesFromNative.shift();
+            }
+`
+#Ripple
+Work Great!
+
+`ripple emulate --path platforms/android/assets/www`
+
+#NPM Tricks
+
+`npm uninstall express`
+
+`npm view express versions`
+
+#Mongodb
+
+`"D:\Program Files\MongoDB 2.6 Standard\bin\mongod" --dbpath D:\Mobile\data\db`
+
+`npm install express@3.5.2`
+
+#Google API
+
+`https://developers.google.com/oauthplayground/`
+
+#Todo
 1. Post Image, do wee need to format it like blogger?
+- Node
+    done - Upload image to picasa
+    done - Pass token + album to node from app
+    done - return URL to App: parse xml and grab media:content url=
+    use gapi token
+    configure album, maybe create if not exists? (node side)
+    configure user name (gapi)
+    move the take image to 'add post' screen
+    format feed URL to read images as needed
+    publish node on Heroku
+    Test end to end image publish
 
 2. Allow to select blog
 
@@ -64,4 +138,3 @@ A:
 
 4. Sync is not perfect - how it handle modified post?
 
-5.

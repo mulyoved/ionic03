@@ -1,15 +1,12 @@
 <ion-view title="DBTest">
     <ion-content class="has-header">
-        <button ng-click="htmlParserTest()">HTML Parser Test</button>
-
-        <h1>Input:</h1>
-        <pre>{{ input }}</pre>
-        <pre ng-bind-html="input"></pre>
-        <h1>Results:</h1>
-        <pre>{{ results }}</pre>
-        <pre ng-bind-html="results"></pre>
-
-
+        <button ng-click="cameraTest()">Camera  Test</button>
+        <p>answer: {{upload_answer}}</p>
+        <p>-------------------------------------------------------------------------------------------------------------</p>
+        <button ng-click="picasaWebAPI()">Picasa Web API</button>
+        <p>answer: {{picasa_answer}}</p>
+        <p>-------------------------------------------------------------------------------------------------------------</p>
+        <button ng-click="raiseError()">Raise Error</button>
         <p>-------------------------------------------------------------------------------------------------------------</p>
         <button ng-click="getPosts()">Blogger.getPosts</button>
         <p>answer: {{answer}}</p>
@@ -39,5 +36,18 @@
 
         <p>Auth</p>
         <button ng-click="logout()">Logout</button>
+
+        <p>-------------------------------------------------------------------------------------------------------------</p>
+        <button ng-click="htmlParserTest()">HTML Parser Test</button>
+
+        <h1>Input:</h1>
+        <pre>{{ input }}</pre>
+        <pre ng-bind-html="input"></pre>
+        <h1>Results:</h1>
+        <pre>{{ results }}</pre>
+        <pre ng-bind-html="results"></pre>
+
+
+
     </ion-content>
 </ion-view>

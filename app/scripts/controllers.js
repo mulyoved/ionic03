@@ -12,10 +12,10 @@ angular.module('Ionic03.controllers', [])
 
     $scope.login = function() {
         $scope.loading = true;
-        console.log("Google Login: ", ionic.Platform.device(), ionic.Platform.isWebView());
+        console.log("Google Login: ", ionic.Platform.device(), ionic.Platform.platform(), ionic.Platform.isWebView());
 
         var p;
-        if (ionic.Platform.isWebView()) {
+        if (ionic.Platform.isWebView() && ionic.Platform.platform() !== 'generic' /* ripple */) {
             //Show the consent page
             p = GoogleApi.authorize({
                 client_id: GoogleApp.client_id,
@@ -181,7 +181,7 @@ angular.module('Ionic03.controllers', [])
     }
 })
 
-.controller('ExceptionCtrl', function ($rootScope, $scope) {
+.controller('ExceptionCtrl', function ($rootScope, $scope, $state, ConfigService) {
     console.log('ExceptionCtrl');
 
     if ($rootScope.err) {
@@ -191,7 +191,11 @@ angular.module('Ionic03.controllers', [])
     else {
         $scope.exception = 'unknown';
         $scope.cause = 'unknown';
+    }
 
+    $scope.goback = function() {
+        console.log('goback');
+        $state.go(ConfigService.mainScreen);
     }
 })
 

@@ -83,11 +83,16 @@ angular.module('Ionic03', [
     });
 
 })
+.config(['$httpProvider', function($httpProvider) {
+    $httpProvider.defaults.useXDomain = true;
+    delete $httpProvider.defaults.headers.common['X-Requested-With'];
+}
+])
 .value('GoogleApp', {
     client_id: '44535440585-tej15rtq3jgao112ks9pe4v5tobr7nhd.apps.googleusercontent.com',
     client_secret: 'BCOBtps2R5GQHlGKb7mu7nQt',
     redirect_uri: 'http://localhost',
-    scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/blogger',
+    scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/blogger https://picasaweb.google.com/data/',
 
     //GAPI On Browser
     apiKey: 'AIzaSyA78RO9-B7qEr-WXJULOq3u-n4C7RS9wz4',
@@ -97,7 +102,8 @@ angular.module('Ionic03', [
         //'https://www.googleapis.com/auth/drive',
         //'https://www.googleapis.com/auth/youtube',
         'https://www.googleapis.com/auth/userinfo.profile',
-        'https://www.googleapis.com/auth/blogger'
+        'https://www.googleapis.com/auth/blogger',
+        'https://picasaweb.google.com/data/'
     ]
 
 })
@@ -197,13 +203,6 @@ angular.module('Ionic03', [
             controller: 'LoginCtrl',
             authenticate: false
         })
-        .state('exception_page', {
-            url: '/exception',
-            abstract: false,
-            templateUrl: 'templates/exceptionPage.html',
-            controller: 'ExceptionCtrl',
-            authenticate: false
-        })
         .state('dbtest', {
             url: '/dbtest',
             abstract: false,
@@ -284,6 +283,13 @@ angular.module('Ionic03', [
             },
             authenticate: true
         })
+        .state('exception_page', {
+            url: '/exception',
+            templateUrl: 'templates/exceptionPage.html',
+            controller: 'ExceptionCtrl',
+            authenticate: false
+        })
+
         .state('app.diagnostic', {
             url: '/diagnostic',
             views: {
@@ -295,8 +301,8 @@ angular.module('Ionic03', [
             authenticate: false
         });
     // if none of the above states are matched, use this as the fallback
-    $urlRouterProvider.otherwise('/app/playlists');
-    //$urlRouterProvider.otherwise('dbtest');
+    //$urlRouterProvider.otherwise('/app/playlists');
+    $urlRouterProvider.otherwise('dbtest');
 });
 
 if (typeof String.prototype.startsWith != 'function') {
