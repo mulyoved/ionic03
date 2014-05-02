@@ -1,0 +1,13 @@
+{
+  "name": "pictogram",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "",
+    "mongodb": "",
+    "xml2js": "~0.4.2"
+  }
+}
