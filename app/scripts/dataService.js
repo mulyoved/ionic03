@@ -48,9 +48,12 @@ angular.module('Ionic03.services',[])
             },
             imageUploadServerURL: 'http://10.0.2.2:3000',
 
+            // Todo: Problem need the server to get or create the albumId based on blogId/Name, if album not found need to create or album is full need to create a new one (limit 2000 images)
+            albumId: '5965097735673433505',
+
             //mainScreen: 'app.playlists',
             mainScreen: 'dbtest',
-                blogId: '4462544572529633201' //'4355243139467288758'
+            blogId: '4462544572529633201' //'4355243139467288758'
         }
     })
     .factory('blogdb', function(pouchdb) {

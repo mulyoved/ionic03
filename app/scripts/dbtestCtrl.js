@@ -55,6 +55,14 @@ angular.module('Ionic03.controllers')
         return item.content;
     };
 
+    $scope.logout = function() {
+        GoogleApi.logout();
+    };
+
+    $scope.clearToken = function() {
+        GoogleApi.clearToken();
+    };
+
     //-------------------------------------------------------------------
     $scope.htmlParserTest = function () {
         $log.log('htmlParserTest');
@@ -201,7 +209,7 @@ angular.module('Ionic03.controllers')
 
     //------------------------------------------------------------------------------------------
 
-    var upload = function (imageURI) {
+    var upload = function (imageURI, callback) {
         console.log('upload [' + imageURI+']');
 
         var ft = new FileTransfer(),
@@ -213,9 +221,11 @@ angular.module('Ionic03.controllers')
         options.chunkedMode = false;
         options.params = { // Whatever you populate options.params with, will be available in req.body at the server-side.
             description: "Uploaded from my phone",
-            token: 'ya29.1.AADtN_UPuNv2J7l6hsVcdkxrWTxRR6vjVYL6KAFsa2z0d_riWNqVgZhtxA_o-9g',
-            albumId: '5965097735673433505',
-            userId: 'mulyoved'
+            token: GoogleApp.oauthToken.access_token,
+            bloggerId: ConfigService.blogId,            // not used for now, server should use it later
+            blogName: ConfigService.blogName(),         // not used for now, server should use it later to create album
+            albumId: ConfigService.albumId,
+            userId: 'default' //https://developers.google.com/picasa-web/faq_gdata#using_default
         };
 
         console.log('upload options: [' + options+']');
@@ -223,13 +233,17 @@ angular.module('Ionic03.controllers')
         console.log('upload serverURL: [' + ConfigService.imageUploadServerURL+']');
         ft.upload(imageURI, ConfigService.imageUploadServerURL + "/images",
             function (e) {
-                console.log('Upload sucess: ***********************');
-                console.log(JSON.stringify(e));
-                console.log('Upload sucess: ***********************');
-                //result.entry['media:group'][0]['media:content'][0].$.url
+                var response = angular.fromJson(e.response);
+                var imageUrl = response.entry['media:group'][0]['media:content'][0].$.url;
+                console.log(imageUrl);
+
+                callback(null, imageUrl);
+                //imageUrl;
             },
-            function (e) {
-                alert("Upload failed");
+            function (err) {
+                console.error('Upload Failed: ', err);
+                //alert("Upload failed");
+                callback(err, null);
             }, options);
     };
 
@@ -248,7 +262,15 @@ angular.module('Ionic03.controllers')
         navigator.camera.getPicture(
             function (imageURI) {
                 console.log(imageURI);
-                upload(imageURI);
+                upload(imageURI, function(err, imageUrl) {
+                    if (!err) {
+                        $log.log('Upload Success', url);
+                    }
+                    else {
+                        $log.error('Upload failed', err);
+                    }
+
+                });
             },
             function (message) {
                 // We typically get here because the use canceled the photo operation. Fail silently.

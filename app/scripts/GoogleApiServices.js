@@ -78,7 +78,7 @@ angular.module('Ionic03.controllers')
                         redirect_uri: options.redirect_uri,
                         grant_type: 'authorization_code'
                     }).done(function(data) {
-                        console.log('googleCallback finally, calling setToken' + data);
+                       console.log('googleCallback finally, calling setToken' + data);
                         googleapi.setToken(data);
                         deferred.resolve(data);
                     }).fail(function(response) {
@@ -155,7 +155,31 @@ angular.module('Ionic03.controllers')
             }
 
             return deferred.promise;
+        },
+
+        getUserInfo: function() {
+            var deferred = $q.defer();
+
+            var token = localStorageService.get('access_token');
+            if (token) {
+                $.getJSON('https://www.googleapis.com/oauth2/v1/userinfo', { access_token: token })
+                .done(function(data) {
+                    console.log('GoogleApi:getUserInfo', data);
+                    deferred.resolve(data);
+                }).fail(function(response) {
+                    console.log('GoogleApi:getUserInfo Failed (v2): ', response);
+                    deferred.reject(response);
+                });
+            }
+            else {
+                deferred.reject('Empty Token');
+            }
+
+            return deferred.promise;
         }
+
+
+
     };
 
     return googleapi;

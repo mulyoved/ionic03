@@ -37,7 +37,11 @@ angular.module('Ionic03.controllers', [])
 
             //Reinit after we get new token
             DataSync.init();
-
+            /*
+            return GoogleApi.getUserInfo();
+        }).then(function(userInfo) {
+            //Get and save user name
+            */
             $state.go(ConfigService.mainScreen);
         }, function (data) {
             //Show an error message if access was denied

@@ -3,9 +3,11 @@
 ##Ionic Commands
 [Generator](https://github.com/diegonetto/generator-ionic)
 
-to copy all files to www older `grunt cordova`
+##Grunt Process
 
-run `grunt emulate:android`
+`grunt cordova`
+
+`grunt emulate:android`
 
 
 
@@ -124,12 +126,13 @@ Work Great!
     done - Upload image to picasa
     done - Pass token + album to node from app
     done - return URL to App: parse xml and grab media:content url=
-    use gapi token
-    configure album, maybe create if not exists? (node side)
-    configure user name (gapi)
-    move the take image to 'add post' screen
+    done use gapi token
+    done configure album, maybe create if not exists? (node side)
+    done configure user name (gapi)
     format feed URL to read images as needed
-    publish node on Heroku
+    move the take image to 'add post' screen
+    write test to server code
+    publish node on Heroku or Blue
     Test end to end image publish
 
 2. Allow to select blog
@@ -138,3 +141,5 @@ Work Great!
 
 4. Sync is not perfect - how it handle modified post?
 
+#Debug
+`chrome:inspect`

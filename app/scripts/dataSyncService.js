@@ -346,6 +346,7 @@ angular.module('Ionic03.controllers')
                 var token = {
                     access_token: data.access_token,
                     client_id: GoogleApp.client_id,
+                    userName: data.userName,
                     cookie_policy: undefined,
                     expire_in: data.expire_in,
                     expire_at: new Date().getTime() + parseInt(data.expires_in, 10) * 1000 - 60000,
