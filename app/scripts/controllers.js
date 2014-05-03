@@ -15,7 +15,7 @@ angular.module('Ionic03.controllers', [])
         console.log("Google Login: ", ionic.Platform.device(), ionic.Platform.platform(), ionic.Platform.isWebView());
 
         var p;
-        if (ionic.Platform.isWebView() && ionic.Platform.platform() !== 'generic' /* ripple */) {
+        if (ionic.Platform.isWebView()) {
             //Show the consent page
             p = GoogleApi.authorize({
                 client_id: GoogleApp.client_id,
@@ -56,34 +56,6 @@ angular.module('Ionic03.controllers', [])
 
     }
 
-})
-
-.controller('AddCtrl', function ($scope, ConfigService, $ionicNavBarDelegate, DataService, $timeout, item) {
-    $scope.title = ConfigService.blogName();
-    $scope.item = item;
-
-    $scope.save = function () {
-
-        console.log('Going to save: ', $scope.item);
-
-        DataService.saveItem(item);
-        $ionicNavBarDelegate.back();
-    };
-
-    $scope.cancel = function () {
-        console.log('Cancel');
-        $ionicNavBarDelegate.back();
-    };
-
-    $scope.picture = function () {
-        console.log('TBD');
-    };
-
-    //not sure why, seem like bug in chrom, textinput is not working correctly
-    //force some resize fix the problem
-    $timeout(function() {
-        $scope.applyClass = true;
-    }, 20);
 })
 
 .controller('PlaylistsCtrl', function ($rootScope, $scope, $state, $log, ConfigService,

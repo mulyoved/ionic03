@@ -18,12 +18,9 @@
 
     <ion-list>
       <div class="item item-body post-item" ng-repeat="item in items.rows track by item.id" href="#/app/playlists/{{item.id}}">
-          <div class="blog-content" ng-bind-html="show(item)"></div>
-          <!--
-          <img ng-if="playlist.image" ng-src="{{playlist.image}}"></img>
-          <div ng-if="playlist.text">{{playlist.text}}</div>
-          -->
-      </div> <!-- ion-item -->
+          <!-- <div class="blog-content" ng-bind-html="show(item)"></div> -->
+          <p class="blog-content">{{item.doc.content}}</p>
+      </div>
     </ion-list>
   </ion-content>
 </ion-view>

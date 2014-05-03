@@ -5,9 +5,7 @@
 
 ##Grunt Process
 
-`grunt cordova`
-
-`grunt emulate:android`
+`grunt copy:all && grunt emulate:android`
 
 
 
@@ -119,27 +117,6 @@ Work Great!
 #Google API
 
 `https://developers.google.com/oauthplayground/`
-
-#Todo
-1. Post Image, do wee need to format it like blogger?
-- Node
-    done - Upload image to picasa
-    done - Pass token + album to node from app
-    done - return URL to App: parse xml and grab media:content url=
-    done use gapi token
-    done configure album, maybe create if not exists? (node side)
-    done configure user name (gapi)
-    format feed URL to read images as needed
-    move the take image to 'add post' screen
-    write test to server code
-    publish node on Heroku or Blue
-    Test end to end image publish
-
-2. Allow to select blog
-
-3. Auto sync, retry and such
-
-4. Sync is not perfect - how it handle modified post?
 
 #Debug
 `chrome:inspect`

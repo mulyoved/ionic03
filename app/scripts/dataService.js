@@ -12,14 +12,12 @@ angular.module('Ionic03.services',[])
         return {
             authResult: null,
             isLogin: false,
-            saveItem: function(item) {
+            saveItem: function(text) {
                 var time = new Date();
 
-                var text = item.text;
                 text = text.replace(/\n/g, '<br />');
-                $log.log('DataService: Save Item', item, text);
+                $log.log('DataService: Save Item', text);
                 DataSync.createPost('', text);
-                //editItem.text = '';
             },
             getItems: function() {
                 $log.log('DataService: getItems');

@@ -3,10 +3,10 @@
  */
 angular.module('Ionic03.services')
 .service('HTMLReformat', function($log) {
-    var dbg = false;
 
     var reformat = function(input) {
         var results = "";
+        var dbg = false;
 
         HTMLParser(input, {
             start: function (tag, attrs, unary) {
@@ -49,7 +49,40 @@ angular.module('Ionic03.services')
         return results;
     };
 
+    var extractLocalImages = function(input) {
+        var results = [];
+        var dbg = true;
+
+        HTMLParser(input, {
+            start: function (tag, attrs, unary) {
+                if (dbg) $log.log('start:', tag, attrs, unary);
+
+                if (tag === 'img') {
+                    for (var i = 0; i < attrs.length; i++) {
+                        if (attrs[i].name === 'src') {
+                            results.push(attrs[i].value);
+                        }
+                    }
+                }
+            },
+            end: function (tag) {
+                if (dbg) $log.log('end:', tag);
+            },
+            chars: function (text) {
+                if (dbg) $log.log('chars:', text);
+            },
+            comment: function (text) {
+                if (dbg) $log.log('comment:', text);
+            }
+        });
+
+        if (dbg) $log.log('Result', results);
+
+        return results;
+    };
+
     return {
-        reformat: reformat
+        reformat: reformat,
+        extractLocalImages: extractLocalImages
     }
 });

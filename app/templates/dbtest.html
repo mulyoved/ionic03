@@ -1,7 +1,13 @@
 <ion-view title="DBTest">
     <ion-content class="has-header">
-        <button ng-click="cameraTest()">Camera  Test</button>
+        <p>version 2:<a href="#/app/playlists">Main</a></p>
+
+        <p>-------------------------------------------------------------------------------------------------------------</p>
+        <button ng-click="cameraUploadTest()">Camera Upload Test</button>
+        <button ng-click="cameraLocalTest()">Camera Local Test</button>
+        <button ng-click="urlFormatTest()">URL Format Test</button>
         <p>answer: {{upload_answer}}</p>
+        <p><div class="blog-content" ng-bind-html="upload_answer"></div></p>
         <p>-------------------------------------------------------------------------------------------------------------</p>
         <button ng-click="picasaWebAPI()">Picasa Web API</button>
         <p>answer: {{picasa_answer}}</p>
@@ -21,6 +27,7 @@
 
         <button ng-click="sync()">Sync</button>
         <button ng-click="createPost()">Create New Post</button>
+        <button ng-click="createImagePost()">Create Image Post</button>
         <p>DataBase Operations</p>
         <button ng-click="dumpDatabase()">Dump Database</button>
         <button ng-click="deletedb()">Delete Database</button>

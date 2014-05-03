@@ -18,7 +18,7 @@ exports.upload = function(fileName, options,callback) {
                     'GData-Version': '2',
                     'Authorization':'Bearer' + ' ' + token,
                     "Content-Type":'image/jpeg',
-                    'Content-Length':data.length,
+                    //'Content-Length':data.length,
                     "MIME-version":"1.0"},
                 body:data,
                 uri:rootUrl

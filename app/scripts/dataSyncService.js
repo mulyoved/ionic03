@@ -2,7 +2,8 @@
 
 angular.module('Ionic03.controllers')
 
-.service('DataSync', function($rootScope, $q, $http, localStorageService, GoogleApp, GoogleApi, GAPI, blogdb, Blogger, ConfigService, $log) {
+.service('DataSync', function($rootScope, $q, $http, localStorageService, $log,
+                              GoogleApp, GoogleApi, GAPI, blogdb, Blogger, ConfigService, HTMLReformat) {
 
         //Sync code start
     var blogId = ConfigService.blogId; // '4462544572529633201';
@@ -211,55 +212,82 @@ angular.module('Ionic03.controllers')
         return p;
     };
 
+    var uploadImages = function(doc) {
+        var deferred = $q.defer();
+
+        $log.log('uploadImages', doc);
+        var images = HTMLReformat.extractLocalImages(doc.content);
+        if (images && images.length > 0) {
+            p = [];
+            for (var i = 0; i < images.length; i++) {
+                var image = images[i];
+                if (image.startsWith('file://')) {
+                    p.push(MiscServices.uploadImage(image));
+
+                    //todo: more work on this
+                }
+            }
+        }
+
+        deferred.resolve(doc);
+
+        return deferred.promise;
+    };
+
     var syncToBloggerDoc = function(_doc) {
         console.log('syncToBloggerDoc', _doc);
-
         var doc = _doc.value;
-        var orgDoc = JSON.parse(JSON.stringify(doc));
-        var promise;
-        $log.log('to Update', doc);
 
-        var kind = doc.kind;
-        var id = doc.id;
-        var isPost = kind.endsWith('#post');
-        mapDb2Post(doc);
-        $log.log('to Update Clean', doc);
+        var orgDoc = JSON.parse(JSON.stringify(doc)); //clone
+        var promise = uploadImages(doc);
+        var opMode;
 
-        if (id.startsWith('G')) {
-            delete doc.id;
-            delete doc.kind;
+        promise.then(function(doc) {
+            $log.log('to Update', doc);
 
-            if (isPost) {
-                promise = Blogger.insertPosts(blogId, doc);
+            var kind = doc.kind;
+            var id = doc.id;
+            var isPost = kind.endsWith('#post');
+            mapDb2Post(doc);
+            $log.log('to Update Clean', doc);
+
+            if (id.startsWith('G')) {
+                opMode = 'insert';
+                delete doc.id;
+                delete doc.kind;
+
+                if (isPost) {
+                    return Blogger.insertPosts(blogId, doc);
+                }
+                else {
+                    return Blogger.insertComments(blogId, doc);
+                }
             }
             else {
-                promise = Blogger.insertComments(blogId, doc);
+                opMode = 'update';
+                return Blogger.updatePosts(blogId, id, doc);
             }
-            promise.
-                then(function(answer) {
-                    $log.log('insertPosts Answer:', answer);
-                    var item = answer;
+        }).then(function(answer) {
+            if (opMode === 'insert') {
+                $log.log('insertPosts Answer:', answer);
+                var item = answer;
 
-                    return blogdb.remove(orgDoc).
-                        then(function(answer) {
-                            mapPost(item);
-                            item.key = item.id;
-                            return blogdb.post(item);
-                        });
-                });
-        }
-        else {
-            promise = Blogger.updatePosts(blogId, id, doc);
-            promise
-            .then(function(answer) {
+                return blogdb.remove(orgDoc).
+                    then(function(answer) {
+                        mapPost(item);
+                        item.key = item.id;
+                        return blogdb.post(item);
+                    });
+            }
+            else {
                 $log.log('updatePosts Answer:', answer);
                 //Not sure this is right, need to test
                 var item = answer.doc;
                 mapPost(item);
                 item.key = item.id;
                 return blogdb.post(item);
-            });
-        }
+            }
+        });
 
         return promise;
     };
@@ -469,8 +497,6 @@ angular.module('Ionic03.controllers')
 
     //Todo:
     //handle comments
-    //test on device
-    //Post images
     //Decied how to limit database size
     //Old comments - load all - bypass database?
 
