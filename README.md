@@ -3,6 +3,16 @@
 ##Ionic Commands
 [Generator](https://github.com/diegonetto/generator-ionic)
 
+##Update Ionic
+
+[Generator](https://github.com/diegonetto/generator-ionic)
+
+ `npm install -g generator-ionic`
+
+Select Y for overwriting your Gruntfile.js and bower.json to stay up-to-date with the latest workflow
+Compare them to make sure no packages was removed
+Select Compass = Y
+
 ##Grunt Process
 
 `grunt copy:all && grunt emulate:android`

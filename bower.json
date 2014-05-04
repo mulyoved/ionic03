@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "dependencies": {
     "angular": "~1.2.12",
-    "ionic": "v1.0.0-beta.2",
+    "ionic": "v1.0.0-beta.3",
     "angular-local-storage": "~0.0.1",
     "ngGAPI": "git@github.com:christiansmith/ngGAPI.git",
     "angular-pouchdb": "~0.1.5"

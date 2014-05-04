@@ -14,11 +14,20 @@
     done icon for unsync posts
     done publish node on Heroku or Blue using https://www.codeship.io/
     Test end to end image publish
-    upgrade Ionic version + document how
-    try to post comment using v2 version API
+    done upgrade Ionic version + document how
+    cannot be done - try to post comment using v2 version API
 
 2. Allow to select blog
+3. Auto sync, retry and such, delay
+4. Limit Database size
+5. Load More - Infinit list, when beyond database use blogger directly, cache as HTML?
 
-3. Auto sync, retry and such
+6. Menu
+    Select Blog
+    Switch blog, just use different database?
 
-4. Sync is not perfect - how it handle modified post?
+7. Alerts
+8. Hidden Images
+9. Alerts - Notifications
+10. Test on older Android - Which version will be used
+11. Testing with Protector
