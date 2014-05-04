@@ -70,7 +70,16 @@ angular.module('Ionic03', [
                     $status.go('login');
                 }
                 else {
-                    var err = DataSync.error.data.error.message || 'Unknown';
+                    var err = 'Unknown';
+                    if (DataSync.error.data) {
+                        err = DataSync.error.data.error.message || 'Unknown';
+                    }
+                    else if (DataSync.error.message) {
+                        err = DataSync.error.message;
+                    }
+                    else if (typeof DataSync.error === 'string') {
+                        err = DataSync.error;
+                    }
 
                     $ionicPopup.alert({
                         title: 'Blogger Sync Problem',
@@ -89,13 +98,16 @@ angular.module('Ionic03', [
 }
 ])
 .value('GoogleApp', {
-    client_id: '44535440585-tej15rtq3jgao112ks9pe4v5tobr7nhd.apps.googleusercontent.com',
+
+    //client_id: '44535440585-tej15rtq3jgao112ks9pe4v5tobr7nhd.apps.googleusercontent.com', // localhost
+    client_id: '44535440585-tej15rtq3jgao112ks9pe4v5tobr7nhd.apps.googleusercontent.com', //127.0.0.1
     client_secret: 'BCOBtps2R5GQHlGKb7mu7nQt',
     redirect_uri: 'http://localhost',
     scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/blogger https://picasaweb.google.com/data/',
 
     //GAPI On Browser
     apiKey: 'AIzaSyA78RO9-B7qEr-WXJULOq3u-n4C7RS9wz4',
+    //clientId: '44535440585-tej15rtq3jgao112ks9pe4v5tobr7nhd.apps.googleusercontent.com',
     clientId: '44535440585-rshs1j4t1jc4qnp295fqmkr7jt12tbrh.apps.googleusercontent.com',
     scopes: [
         // whatever scopes you need for your app, for example:
@@ -242,7 +254,7 @@ angular.module('Ionic03', [
             views: {
                 'menuContent': {
                     templateUrl: 'templates/playlists.html',
-                    controller: 'PlaylistsCtrl'
+                    controller: 'PostListCtrl'
                 }
             },
             resolve: {

@@ -3,9 +3,9 @@
 angular.module('Ionic03.controllers')
 
 .service('DataSync', function($rootScope, $q, $http, localStorageService, $log,
-                              GoogleApp, GoogleApi, GAPI, blogdb, Blogger, ConfigService, HTMLReformat) {
+                          GoogleApp, GoogleApi, GAPI, blogdb, Blogger, ConfigService, HTMLReformat, MiscServices) {
 
-        //Sync code start
+    //Sync code start
     var blogId = ConfigService.blogId; // '4462544572529633201';
 
     var date2GAPIDate = function (date) {
@@ -218,33 +218,44 @@ angular.module('Ionic03.controllers')
         $log.log('uploadImages', doc);
         var images = HTMLReformat.extractLocalImages(doc.content);
         if (images && images.length > 0) {
-            p = [];
-            for (var i = 0; i < images.length; i++) {
-                var image = images[i];
-                if (image.startsWith('file://')) {
-                    p.push(MiscServices.uploadImage(image));
+            var imageUpload = [];
+            angular.forEach(images, function (image) {
+                imageUpload.push(MiscServices.uploadImage(image));
+            });
 
-                    //todo: more work on this
+            $q.all(imageUpload).then(function UploadImageResults(utlList) {
+                $log.log('uploadImages Answer', utlList);
+                for (var i = 0; i < images.length; i++) {
+                    var image = images[i];
+                    var url = utlList[i];
+                    $log.log('URI -> URL', image, url);
                 }
-            }
-        }
+                var text = HTMLReformat.replaceLocalImages(doc.content, images, utlList);
+                $log.log('Replace document', doc.content, text);
+                doc.content = text;
 
-        deferred.resolve(doc);
+                deferred.resolve(doc);
+            }, function(err) {
+                deferred.reject(err);
+            });
+        } else {
+            deferred.resolve(doc);
+        }
 
         return deferred.promise;
     };
 
     var syncToBloggerDoc = function(_doc) {
         console.log('syncToBloggerDoc', _doc);
+
         var doc = _doc.value;
+        var orgDoc = JSON.parse(JSON.stringify(doc));
+        var deferred = $q.defer();
+        var promise;
+        $log.log('to Update', doc);
 
-        var orgDoc = JSON.parse(JSON.stringify(doc)); //clone
-        var promise = uploadImages(doc);
-        var opMode;
-
-        promise.then(function(doc) {
-            $log.log('to Update', doc);
-
+        uploadImages(doc)
+        .then(function(doc) {
             var kind = doc.kind;
             var id = doc.id;
             var isPost = kind.endsWith('#post');
@@ -252,60 +263,52 @@ angular.module('Ionic03.controllers')
             $log.log('to Update Clean', doc);
 
             if (id.startsWith('G')) {
-                opMode = 'insert';
                 delete doc.id;
                 delete doc.kind;
 
                 if (isPost) {
-                    return Blogger.insertPosts(blogId, doc);
+                    promise = Blogger.insertPosts(blogId, doc);
                 }
                 else {
-                    return Blogger.insertComments(blogId, doc);
+                    promise = Blogger.insertComments(blogId, doc);
                 }
-            }
-            else {
-                opMode = 'update';
-                return Blogger.updatePosts(blogId, id, doc);
-            }
-        }).then(function(answer) {
-            if (opMode === 'insert') {
-                $log.log('insertPosts Answer:', answer);
-                var item = answer;
+                promise.
+                    then(function (answer) {
+                        $log.log('insertPosts Answer:', answer);
+                        var item = answer;
 
-                return blogdb.remove(orgDoc).
-                    then(function(answer) {
+                        return blogdb.remove(orgDoc);
+                    }).then(function(answer) {
                         mapPost(item);
                         item.key = item.id;
                         return blogdb.post(item);
+                    }).then(function(answer) {
+                        deferred.resolve(answer);
+                    }, function(err) {
+                        deferred.reject(err);
                     });
             }
             else {
-                $log.log('updatePosts Answer:', answer);
-                //Not sure this is right, need to test
-                var item = answer.doc;
-                mapPost(item);
-                item.key = item.id;
-                return blogdb.post(item);
+                promise = Blogger.updatePosts(blogId, id, doc);
+                promise
+                    .then(function (answer) {
+                        $log.log('updatePosts Answer:', answer);
+                        //Not sure this is right, need to test
+                        var item = answer.doc;
+                        mapPost(item);
+                        item.key = item.id;
+                        blogdb.post(item).then(function (answer) {
+                            deferred.resolve(answer);
+                        });
+                    }, function (err) {
+                        deferred.reject(err);
+                    });
             }
+        }, function(err) {
+            deferred.reject(err);
         });
 
-        return promise;
-    };
-
-    var prommiseArray = function(arr, promise) {
-        var item = arr.pop();
-        var p = promise(item).
-            then(function(answer) {
-                $log.log('Success: ',answer);
-                if (arr.length > 0) {
-                    return prommiseArray(arr, promise);
-                }
-                else {
-                    return 0;
-                }
-            });
-
-        return p;
+        return deferred.promise;
     };
 
     var proccessArray = function(arr, promise) {
@@ -314,7 +317,7 @@ angular.module('Ionic03.controllers')
             var p = promise(item).
                 then(function (answer) {
                     if (arr.length > 0) {
-                        return prommiseArray(arr, promise);
+                        return proccessArray(arr, promise);
                     }
                     else {
                         return 0;
@@ -329,6 +332,7 @@ angular.module('Ionic03.controllers')
     };
 
     var syncToBlogger = function() {
+        var deferred = $q.defer();
         $log.log('syncToBlogger');
 
         var queryFun = {
@@ -350,14 +354,22 @@ angular.module('Ionic03.controllers')
             $log.log('syncToBlogger ',answer);
 
             if (answer.total_rows > 0) {
-                return proccessArray(answer.rows, syncToBloggerDoc);
+                return proccessArray(answer.rows, syncToBloggerDoc)
+                .then(function(doc) {
+                    $log.log('syncToBlogger syncToBloggerDoc Answer',answer);
+                    deferred.resolve(doc);
+                }, function(err) {
+                    $log.log('syncToBlogger syncToBloggerDoc Error',err);
+                    deferred.reject(err);
+                })
             }
             else {
-                return 0;
+                $log.log('syncToBlogger Nothing to upload');
+                deferred.resolve(0);
             }
         });
 
-        return p;
+        return deferred.promise;
     };
 
     var dataSync = {
@@ -374,7 +386,6 @@ angular.module('Ionic03.controllers')
                 var token = {
                     access_token: data.access_token,
                     client_id: GoogleApp.client_id,
-                    userName: data.userName,
                     cookie_policy: undefined,
                     expire_in: data.expire_in,
                     expire_at: new Date().getTime() + parseInt(data.expires_in, 10) * 1000 - 60000,
@@ -400,21 +411,22 @@ angular.module('Ionic03.controllers')
                 console.log('Start Sync');
                 $rootScope.$broadcast('event:DataSync:StatusChange');
                 syncToBlogger()
-                .then(function (answer) {
-                    return syncFromBlogger();
-                }).then(function (answer) {
-                    $log.log('syncModifiedDocuments completed', answer);
-                    dataSync.duringSync = false;
-                    dataSync.error = null;
-                    $rootScope.$broadcast('event:DataSync:StatusChange');
-                    $rootScope.$broadcast('event:DataSync:DataChange');
-                }, function (reason) {
-                    $log.error('syncModifiedDocuments Failed', reason);
-                    dataSync.duringSync = false;
-                    dataSync.needSync = true;
-                    dataSync.error = reason || 'Failed unknown reason';
-                    $rootScope.$broadcast('event:DataSync:StatusChange');
-                })
+                    .then(function (answer) {
+                        return syncFromBlogger();
+                    })
+                    .then(function (answer) {
+                        $log.log('syncModifiedDocuments completed', answer);
+                        dataSync.duringSync = false;
+                        dataSync.error = null;
+                        $rootScope.$broadcast('event:DataSync:StatusChange');
+                        $rootScope.$broadcast('event:DataSync:DataChange');
+                    }, function (reason) {
+                        $log.error('syncModifiedDocuments Failed', reason);
+                        dataSync.duringSync = false;
+                        dataSync.needSync = true;
+                        dataSync.error = reason || 'Failed unknown reason';
+                        $rootScope.$broadcast('event:DataSync:StatusChange');
+                    })
             }
             else {
                 $log.error('Calling sync while sync in progress');
@@ -435,19 +447,19 @@ angular.module('Ionic03.controllers')
 
             mapPost(post);
             blogdb.post(post)
-            .then(function(answer) {
-                $log.log('Add Success', answer);
-                //Trigger db change
-                //Start Sync
+                .then(function(answer) {
+                    $log.log('Add Success', answer);
+                    //Trigger db change
+                    //Start Sync
 
-                //todo: uncomment temp to see unsync item from database in list
-                //dataSync.needSync = true;
+                    //todo: uncomment temp to see unsync item from database in list
+                    //dataSync.needSync = true;
                     $log.log('Data Sync $broadcast DataChange');
                     $rootScope.$broadcast('event:DataSync:DataChange');
-                $rootScope.$broadcast('event:DataSync:StatusChange');
-            }, function(err) {
-                $log.error('Add Failed', err);
-            });
+                    $rootScope.$broadcast('event:DataSync:StatusChange');
+                }, function(err) {
+                    $log.error('Add Failed', err);
+                });
         },
 
         //---------------------
@@ -455,43 +467,43 @@ angular.module('Ionic03.controllers')
             var alldocs = blogdb.allDocs({include_docs: true, attachments: true});
 
             alldocs
-            .then(function(answer) {
-                $log.log('All docs', answer);
-                //$scope.syncResult = 'done:' + answer.total_rows;
-                //$scope.posts = answer.rows;
-                //console.table(answer.rows);
+                .then(function(answer) {
+                    $log.log('All docs', answer);
+                    //$scope.syncResult = 'done:' + answer.total_rows;
+                    //$scope.posts = answer.rows;
+                    //console.table(answer.rows);
 
-                var r = [];
-                angular.forEach(answer.rows, function (doc) {
-                    r.push(doc.doc);
+                    var r = [];
+                    angular.forEach(answer.rows, function (doc) {
+                        r.push(doc.doc);
+                    });
+
+                    //console.log(r);
+                    console.table(r);
+
+                }, function(reason) {
+                    $log.error('readdb failed', reason);
                 });
-
-                //console.log(r);
-                console.table(r);
-
-            }, function(reason) {
-                $log.error('readdb failed', reason);
-            });
         },
 
         deletedb: function() {
             var alldocs = blogdb.allDocs({include_docs: true, attachments: true});
 
             alldocs
-            .then(function(answer) {
-                var r = [];
-                angular.forEach(answer.rows, function (doc) {
-                    r.push(blogdb.remove(doc.doc));
-                });
+                .then(function(answer) {
+                    var r = [];
+                    angular.forEach(answer.rows, function (doc) {
+                        r.push(blogdb.remove(doc.doc));
+                    });
 
-                $log.log('Delete all', r);
-                return $q.all(r);
-            }).
-            then(function(answer) {
-                $log.log('Delete all', answer);
-            }, function(reason) {
-                $log.error('readdb failed', reason);
-            });
+                    $log.log('Delete all', r);
+                    return $q.all(r);
+                }).
+                then(function(answer) {
+                    $log.log('Delete all', answer);
+                }, function(reason) {
+                    $log.error('readdb failed', reason);
+                });
         }
     };
 

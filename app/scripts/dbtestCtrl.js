@@ -19,7 +19,7 @@ angular.module('Ionic03.controllers')
     $scope.answer = '<empty>';
     $scope.blogdb = blogdb;
 
-    $scope.sync = function () {
+    $scope.sync = function sync () {
         $log.log('sync');
 
         DataSync.sync();
@@ -32,14 +32,17 @@ angular.module('Ionic03.controllers')
         DataSync.createPost('V2: ' + time.toString(), 'Sample Content' + time.toString());
     };
 
-    $scope.createImagePost = function () {
-        $log.log('createImagePost');
+    $scope.createImagePost = function createImagePost() {
         var time = new Date();
 
         var url = 'file://lh6.googleusercontent.com/-oJNCUlvzVKs/U2UqdZsnctI/AAAAAAAAKHk/0aM2vyiZoJ4/%25255BUNSET%25255D.jpg';
-        text = HTMLReformat.reformat(MiscServices.formatImageUrl(url));
+        text = MiscServices.formatImageUrl(url);
 
-        DataSync.createPost('title', text);
+        var url2 = 'file://lh3.googleusercontent.com/-xsaM7gQNcBg/U2YxNj8agEI/AAAAAAAAKIw/F73t2TAsK_E/%25255BUNSET%25255D.jpg';
+        text2 = MiscServices.formatImageUrl(url2);
+
+        $log.log('createImagePost', text);
+        DataSync.createPost('title v2', text);
     };
 
     //---------------------

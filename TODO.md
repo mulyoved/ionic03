@@ -7,13 +7,15 @@
     done configure album, maybe create if not exists? (node side)
     done configure user name (gapi)
     done format feed URL to read images as needed
-    move the take image to 'add post' screen
-    move upload to sync code
-    if image added that all the post - close the screen - show image URI in post
+    done move the take image to 'add post' screen
+    done move upload to sync code
+    done if image added that all the post - close the screen - show image URI in post
     done write test to server code
-    publish node on Heroku or Blue using https://www.codeship.io/
+    done icon for unsync posts
+    done publish node on Heroku or Blue using https://www.codeship.io/
     Test end to end image publish
     upgrade Ionic version + document how
+    try to post comment using v2 version API
 
 2. Allow to select blog
 

@@ -44,7 +44,7 @@ angular.module('Ionic03.services',[])
             blogName: function() {
                 return 'm&m&stars';
             },
-            imageUploadServerURL: 'http://10.0.2.2:3000',
+            imageUploadServerURL: 'http://picasawebapibridge.herokuapp.com', //http://10.0.2.2:3000',
 
             // Todo: Problem need the server to get or create the albumId based on blogId/Name, if album not found need to create or album is full need to create a new one (limit 2000 images)
             albumId: '5965097735673433505',
