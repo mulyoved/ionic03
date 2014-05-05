@@ -18,7 +18,7 @@ angular.module('Ionic03.controllers')
             then(function (imageURI) {
                 if (imageURI) {
                     $log.log('Got image URI', imageURI);
-                    var text = HTMLReformat.reformat(MiscServices.formatImageUrl(imageURI));
+                    var text = MiscServices.formatImageUrl(imageURI);
                     //$scope.upload_answer = text;
                     savePost(text);
                 }

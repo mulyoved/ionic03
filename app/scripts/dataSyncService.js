@@ -272,10 +272,12 @@ angular.module('Ionic03.controllers')
                 else {
                     promise = Blogger.insertComments(blogId, doc);
                 }
+
+                var item;
                 promise.
                     then(function (answer) {
                         $log.log('insertPosts Answer:', answer);
-                        var item = answer;
+                        item = answer;
 
                         return blogdb.remove(orgDoc);
                     }).then(function(answer) {

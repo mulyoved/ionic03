@@ -17,17 +17,31 @@
     done upgrade Ionic version + document how
     cannot be done - try to post comment using v2 version API
 
-2. Allow to select blog
-3. Auto sync, retry and such, delay
-4. Limit Database size
-5. Load More - Infinit list, when beyond database use blogger directly, cache as HTML?
+1. done - test post with 2 images from dbtest
+
+done smaller icons
+done convert image to http (now http2)
+done have href in a
+
+test 1 image upload ok 2nd not, improve code to upload only the 2nd image
 
 6. Menu
     Select Blog
     Switch blog, just use different database?
 
+2. Allow to select blog
+3. Auto sync, retry and such, delay
+4. Limit Database size
+5. Load More - Infinit list, when beyond database use blogger directly, cache as HTML?
+
+
 7. Alerts
 8. Hidden Images
-9. Alerts - Notifications
+9. Alerts - Notifications -
+    http://plugreg.com/plugin/phonegap-build/PushPlugin or
+    https://github.com/Pushwoosh/phonegap-cordova-push-notifications
+    https://github.com/katzer/cordova-plugin-local-notifications
+
 10. Test on older Android - Which version will be used
 11. Testing with Protector
+12. lock screen and retrigger request on power button, app switch

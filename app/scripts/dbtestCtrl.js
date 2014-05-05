@@ -42,7 +42,7 @@ angular.module('Ionic03.controllers')
         text2 = MiscServices.formatImageUrl(url2);
 
         $log.log('createImagePost', text);
-        DataSync.createPost('title v2', text);
+        DataSync.createPost('title v3', '2Images<br>'+text+'<br>'+text2);
     };
 
     //---------------------

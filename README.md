@@ -129,4 +129,4 @@ Work Great!
 `https://developers.google.com/oauthplayground/`
 
 #Debug
-`chrome:inspect`
+`about:inspect`
