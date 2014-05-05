@@ -2,11 +2,11 @@ angular.module('Ionic03.controllers')
 
 .controller('AddCtrl', function (
         $scope, ConfigService, $ionicNavBarDelegate, $timeout, $log,
-        DataService, MiscServices, HTMLReformat,
+        DataService, DataSync, MiscServices, HTMLReformat,
         item) {
 
     function savePost(text) {
-        DataService.saveItem(text);
+        DataSync.savePost(text);
         $ionicNavBarDelegate.back();
     }
 
@@ -28,7 +28,7 @@ angular.module('Ionic03.controllers')
             });
     }
 
-    $scope.title = ConfigService.blogName();
+    $scope.title = ConfigService.blogName;
     $scope.item = item;
 
     $scope.save = function () {

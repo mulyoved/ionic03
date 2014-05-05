@@ -3,10 +3,7 @@
 angular.module('Ionic03.controllers')
 
 .service('DataSync', function($rootScope, $q, $http, localStorageService, $log,
-                          GoogleApp, GoogleApi, GAPI, blogdb, Blogger, ConfigService, HTMLReformat, MiscServices) {
-
-    //Sync code start
-    var blogId = ConfigService.blogId; // '4462544572529633201';
+                          GoogleApp, GoogleApi, GAPI, DataService, Blogger, ConfigService, HTMLReformat, MiscServices) {
 
     var date2GAPIDate = function (date) {
         var pad = function (amount, width) {
@@ -78,7 +75,8 @@ angular.module('Ionic03.controllers')
             params.startDate = bumpDate(lastUpdate);
         }
 
-        var promise = Blogger.listPosts(blogId, params).
+        $log.log('Retrive posts from blogId', ConfigService.blogId);
+        var promise = Blogger.listPosts(ConfigService.blogId, params).
             then(function(list) {
                 // Get all modified comments from Blogger
                 if ('items' in list && list.items.length > 0) {
@@ -96,7 +94,7 @@ angular.module('Ionic03.controllers')
                     params.startDate = bumpDate(lastUpdate);
                 }
 
-                return Blogger.listCommentsByBlog(blogId, params);
+                return Blogger.listCommentsByBlog(ConfigService.blogId, params);
             }).
             then(function(list) {
                 // Get all documents from DB
@@ -117,7 +115,7 @@ angular.module('Ionic03.controllers')
         var _bloggerList = [];
 
         //Update DB->Blogger
-        var p = blogdb.get('lastUpdate').
+        var p = DataService.blogdb().get('lastUpdate').
         // read last update time from database
         then(function(lastUpdate) {
             // Get last update from DB
@@ -139,7 +137,7 @@ angular.module('Ionic03.controllers')
 
             //Get all documents in database
             if ('items' in list && list.items.length > 0) {
-                return blogdb.allDocs({include_docs: true, attachments: false});
+                return DataService.blogdb().allDocs({include_docs: true, attachments: false});
             }
             else {
                 return [];
@@ -192,7 +190,7 @@ angular.module('Ionic03.controllers')
                 _lastUpdate.date = lastUpdate;
                 if (toUpdate.length > 0) {
                     _lastUpdateChanged = true;
-                    return blogdb.bulkDocs({'docs': toUpdate});
+                    return DataService.blogdb().bulkDocs({'docs': toUpdate});
                 }
             }
             return 0;
@@ -201,7 +199,7 @@ angular.module('Ionic03.controllers')
             if (_lastUpdateChanged) {
                 $log.log('All saved', answer);
                 $log.log('Update last update', _lastUpdate);
-                return blogdb.post(_lastUpdate);
+                return DataService.blogdb().post(_lastUpdate);
             }
             else {
                 $log.log('Nothing to update, all uptodate', answer);
@@ -267,10 +265,10 @@ angular.module('Ionic03.controllers')
                 delete doc.kind;
 
                 if (isPost) {
-                    promise = Blogger.insertPosts(blogId, doc);
+                    promise = Blogger.insertPosts(ConfigService.blogId, doc);
                 }
                 else {
-                    promise = Blogger.insertComments(blogId, doc);
+                    promise = Blogger.insertComments(ConfigService.blogId, doc);
                 }
 
                 var item;
@@ -279,11 +277,11 @@ angular.module('Ionic03.controllers')
                         $log.log('insertPosts Answer:', answer);
                         item = answer;
 
-                        return blogdb.remove(orgDoc);
+                        return DataService.blogdb().remove(orgDoc);
                     }).then(function(answer) {
                         mapPost(item);
                         item.key = item.id;
-                        return blogdb.post(item);
+                        return DataService.blogdb().post(item);
                     }).then(function(answer) {
                         deferred.resolve(answer);
                     }, function(err) {
@@ -291,7 +289,7 @@ angular.module('Ionic03.controllers')
                     });
             }
             else {
-                promise = Blogger.updatePosts(blogId, id, doc);
+                promise = Blogger.updatePosts(ConfigService.blogId, id, doc);
                 promise
                     .then(function (answer) {
                         $log.log('updatePosts Answer:', answer);
@@ -299,7 +297,7 @@ angular.module('Ionic03.controllers')
                         var item = answer.doc;
                         mapPost(item);
                         item.key = item.id;
-                        blogdb.post(item).then(function (answer) {
+                        DataService.blogdb().post(item).then(function (answer) {
                             deferred.resolve(answer);
                         });
                     }, function (err) {
@@ -341,10 +339,10 @@ angular.module('Ionic03.controllers')
             map: function(doc) { emit(doc.key, doc); }
         };
 
-        var alldocs = blogdb.query(queryFun, {reduce: false, key: 'U'});
+        var alldocs = DataService.blogdb().query(queryFun, {reduce: false, key: 'U'});
 
         /*
-         var alldocs = blogdb.allDocs({
+         var alldocs = DataService.blogdb().allDocs({
          include_docs: true,
          attachments: false,
          keys: 'U'
@@ -435,6 +433,14 @@ angular.module('Ionic03.controllers')
             }
         },
 
+        savePost: function(text) {
+            var time = new Date();
+
+            text = text.replace(/\n/g, '<br />');
+            $log.log('DataService: Save Item', text);
+            dataSync.createPost('', text);
+        },
+
         createPost: function(title, content) {
             var time = new Date();
 
@@ -448,7 +454,7 @@ angular.module('Ionic03.controllers')
             };
 
             mapPost(post);
-            blogdb.post(post)
+            DataService.blogdb().post(post)
                 .then(function(answer) {
                     $log.log('Add Success', answer);
                     //Trigger db change
@@ -466,7 +472,7 @@ angular.module('Ionic03.controllers')
 
         //---------------------
         dumpDatabase: function() {
-            var alldocs = blogdb.allDocs({include_docs: true, attachments: true});
+            var alldocs = DataService.blogdb().allDocs({include_docs: true, attachments: true});
 
             alldocs
                 .then(function(answer) {
@@ -486,16 +492,17 @@ angular.module('Ionic03.controllers')
                 }, function(reason) {
                     $log.error('readdb failed', reason);
                 });
-        },
+        }
 
+        /*
         deletedb: function() {
-            var alldocs = blogdb.allDocs({include_docs: true, attachments: true});
+            var alldocs = DataService.blogdb().allDocs({include_docs: true, attachments: true});
 
             alldocs
                 .then(function(answer) {
                     var r = [];
                     angular.forEach(answer.rows, function (doc) {
-                        r.push(blogdb.remove(doc.doc));
+                        r.push(DataService.blogdb().remove(doc.doc));
                     });
 
                     $log.log('Delete all', r);
@@ -507,6 +514,7 @@ angular.module('Ionic03.controllers')
                     $log.error('readdb failed', reason);
                 });
         }
+        */
     };
 
     //Todo:

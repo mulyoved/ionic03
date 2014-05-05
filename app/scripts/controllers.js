@@ -86,7 +86,7 @@ angular.module('Ionic03.controllers', [])
     }
 })
 
-.controller('BlogListCtrl', function ($scope, $state, $log, ConfigService, BlogListSync, items) {
+.controller('BlogListCtrl', function ($scope, $state, $log, ConfigService, DataService, BlogListSync, items) {
     $scope.items = items;
 
     $scope.doRefresh = function() {
@@ -105,6 +105,7 @@ angular.module('Ionic03.controllers', [])
 
     $scope.selectBlog = function(item) {
         $log.log('SelectBlog', item);
+        DataService.selectBlog(item);
         $state.go(ConfigService.mainScreen);
     };
 
@@ -115,7 +116,7 @@ angular.module('Ionic03.controllers', [])
 })
 
 .controller('PlaylistCtrl', function ($scope, ConfigService, item) {
-    $scope.title = ConfigService.blogName();
+    $scope.title = ConfigService.blogName;
     console.log(item);
 });
 

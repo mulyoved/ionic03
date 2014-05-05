@@ -45,7 +45,7 @@ angular.module('Ionic03.controllers')
         $state.go('app.add');
     };
 
-    $scope.title = ConfigService.blogName();
+    $scope.title = ConfigService.blogName;
     $ionicNavBarDelegate.showBackButton(false);
     $ionicViewService.clearHistory();
     $scope.syncIcon = "ok";

@@ -35,7 +35,7 @@ angular.module('Ionic03.controllers')
                         description: "Uploaded from my phone",
                         token: GoogleApp.oauthToken.access_token,
                         bloggerId: ConfigService.blogId,            // not used for now, server should use it later
-                        blogName: ConfigService.blogName(),         // not used for now, server should use it later to create album
+                        blogName: ConfigService.blogName,         // not used for now, server should use it later to create album
                         albumId: ConfigService.albumId,
                         userId: 'default' //https://developers.google.com/picasa-web/faq_gdata#using_default
                     };

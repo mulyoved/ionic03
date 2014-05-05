@@ -17,7 +17,7 @@ angular.module('Ionic03', [
 ])
 
 
-.run(function ($ionicPlatform, $state, $rootScope, $urlRouter, $log, $ionicPopup, ConfigService, DataSync) {
+.run(function ($ionicPlatform, $state, $rootScope, $urlRouter, $log, $ionicPopup, ConfigService, DataService, DataSync) {
     $ionicPlatform.ready(function () {
         if (window.StatusBar) {
             StatusBar.styleDefault();
@@ -91,6 +91,8 @@ angular.module('Ionic03', [
         }
     });
 
+    //Todo: read from local storage
+    DataService.selectBlog({ id: '4462544572529633201', name: 'Unknown'});
 })
 .config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.useXDomain = true;

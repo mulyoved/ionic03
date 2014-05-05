@@ -26,10 +26,10 @@ done have href in a
 done test 1 image upload ok 2nd not, improve code to upload only the 2nd image
 
 6. Menu
-    Select Blog
-    Switch blog, just use different database?
+    done Select Blog
+    done Switch blog, just use different database?
 
-2. Allow to select blog
+2. done - Allow to select blog
 3. Auto sync, retry and such, delay
 4. Limit Database size
 5. Load More - Infinit list, when beyond database use blogger directly, cache as HTML?
@@ -41,6 +41,8 @@ done test 1 image upload ok 2nd not, improve code to upload only the 2nd image
     http://plugreg.com/plugin/phonegap-build/PushPlugin or
     https://github.com/Pushwoosh/phonegap-cordova-push-notifications
     https://github.com/katzer/cordova-plugin-local-notifications
+    http://aerogear.org/
+    http://forum.ionicframework.com/t/pushnotification-guide-for-android/3756
 
 10. Test on older Android - Which version will be used
 11. Testing with Protector

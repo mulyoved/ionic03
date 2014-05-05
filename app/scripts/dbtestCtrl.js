@@ -13,11 +13,10 @@ angular.module('Ionic03.controllers')
 .controller('dbTestCtrl', function(
     $scope, ConfigService, $log, $q,
     GAPI, Blogger, pouchdb, GoogleApi, GoogleApp, DataSync,
-    DataService, blogdb, HTMLReformat, MiscServices, BlogListSync,
+    DataService, HTMLReformat, MiscServices, BlogListSync,
     $http) {
 
     $scope.answer = '<empty>';
-    $scope.blogdb = blogdb;
 
     $scope.sync = function sync () {
         $log.log('sync');
@@ -73,7 +72,7 @@ angular.module('Ionic03.controllers')
     };
 
     $scope.deletedb = function () {
-        DataSync.deletedb();
+        DataService.deletedb();
     };
 
     $scope.getPosts = function () {
@@ -327,4 +326,16 @@ angular.module('Ionic03.controllers')
             $log.error('getBlogListFromStorage Error', err);
         });
     };
+
+    $scope.SelectBlog = function(idx) {
+        BlogListSync.getBlogList()
+            .then(function(answer) {
+                var blog = answer[idx];
+                DataService.selectBlog(blog);
+                $log.log('Selected Blog', idx, blog, ConfigService);
+            }).catch(function(err) {
+                $log.error('SelectBlog Error', err);
+            });
+
+    }
 });
