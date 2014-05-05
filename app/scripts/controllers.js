@@ -86,7 +86,36 @@ angular.module('Ionic03.controllers', [])
     }
 })
 
+.controller('BlogListCtrl', function ($scope, $state, $log, ConfigService, BlogListSync, items) {
+    $scope.items = items;
+
+    $scope.doRefresh = function() {
+        console.log('Refreshing!');
+        BlogListSync.loadBlogList()
+        .then(function(answer) {
+            $log.log('loadBlogList Completed Refresh Items', answer);
+            console.table(answer);
+            $scope.items = answer;
+            $scope.$broadcast('scroll.refreshComplete');
+        }).catch(function(err) {
+            $log.error('loadBlogList Error', err);
+            $scope.$broadcast('scroll.refreshComplete');
+        });
+    };
+
+    $scope.selectBlog = function(item) {
+        $log.log('SelectBlog', item);
+        $state.go(ConfigService.mainScreen);
+    };
+
+    $scope.blogInfo = function(item) {
+        $log.log('BlogInfo', item);
+    };
+
+})
+
 .controller('PlaylistCtrl', function ($scope, ConfigService, item) {
     $scope.title = ConfigService.blogName();
     console.log(item);
 });
+

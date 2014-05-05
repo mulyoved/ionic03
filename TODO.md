@@ -23,7 +23,7 @@ done smaller icons
 done convert image to http (now http2)
 done have href in a
 
-test 1 image upload ok 2nd not, improve code to upload only the 2nd image
+done test 1 image upload ok 2nd not, improve code to upload only the 2nd image
 
 6. Menu
     Select Blog

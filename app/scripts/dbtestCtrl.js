@@ -13,7 +13,7 @@ angular.module('Ionic03.controllers')
 .controller('dbTestCtrl', function(
     $scope, ConfigService, $log, $q,
     GAPI, Blogger, pouchdb, GoogleApi, GoogleApp, DataSync,
-    DataService, blogdb, HTMLReformat, MiscServices,
+    DataService, blogdb, HTMLReformat, MiscServices, BlogListSync,
     $http) {
 
     $scope.answer = '<empty>';
@@ -32,7 +32,16 @@ angular.module('Ionic03.controllers')
         DataSync.createPost('V2: ' + time.toString(), 'Sample Content' + time.toString());
     };
 
-    $scope.createImagePost = function createImagePost() {
+    $scope.createImagePost1 = function createImagePost() {
+        var time = new Date();
+
+        var url = 'file://lh6.googleusercontent.com/-oJNCUlvzVKs/U2UqdZsnctI/AAAAAAAAKHk/0aM2vyiZoJ4/%25255BUNSET%25255D.jpg';
+        text = MiscServices.formatImageUrl(url);
+        $log.log('createImagePost', text);
+        DataSync.createPost('title v3', '1Images<br>'+text);
+    };
+
+    $scope.createImagePost2 = function createImagePost() {
         var time = new Date();
 
         var url = 'file://lh6.googleusercontent.com/-oJNCUlvzVKs/U2UqdZsnctI/AAAAAAAAKHk/0aM2vyiZoJ4/%25255BUNSET%25255D.jpg';
@@ -43,6 +52,19 @@ angular.module('Ionic03.controllers')
 
         $log.log('createImagePost', text);
         DataSync.createPost('title v3', '2Images<br>'+text+'<br>'+text2);
+    };
+
+    $scope.createImagePost2error = function createImagePost() {
+        var time = new Date();
+
+        var url = 'file://lh6.googleusercontent.com/-oJNCUlvzVKs/U2UqdZsnctI/AAAAAAAAKHk/0aM2vyiZoJ4/%25255BUNSET%25255D.jpg';
+        text = MiscServices.formatImageUrl(url);
+
+        var url2 = 'file://error_lh3.googleusercontent.com/-xsaM7gQNcBg/U2YxNj8agEI/AAAAAAAAKIw/F73t2TAsK_E/%25255BUNSET%25255D.jpg';
+        text2 = MiscServices.formatImageUrl(url2);
+
+        $log.log('createImagePost', text);
+        DataSync.createPost('title v3', '2Images Error<br>'+text+'<br>'+text2);
     };
 
     //---------------------
@@ -98,6 +120,7 @@ angular.module('Ionic03.controllers')
         $scope.results = results;
 
     };
+    //-------------------------------------------------------------------
 
 
     $scope.raiseError = function () {
@@ -107,6 +130,7 @@ angular.module('Ionic03.controllers')
 
     };
 
+    //-------------------------------------------------------------------
     $scope.picasa_answer = 'undefined';
     $scope.picasaWebAPI = function () {
         $log.log('picasaWebAPI');
@@ -265,5 +289,42 @@ angular.module('Ionic03.controllers')
         var url = 'https://lh6.googleusercontent.com/-oJNCUlvzVKs/U2UqdZsnctI/AAAAAAAAKHk/0aM2vyiZoJ4/%25255BUNSET%25255D.jpg';
         text = HTMLReformat.reformat(MiscServices.formatImageUrl(url));
         $scope.upload_answer = text;
-    }
+    };
+
+    //---------------------------------------------------------
+    $scope.getBlogList = function() {
+        $log.log('getBlogList');
+
+        Blogger.listBlogsByUser('mulyoved')
+        .then(function(answer) {
+            $log.log('listBlogsByUser', answer);
+            console.table(answer.items);
+        }).catch(function(err) {
+            $log.error('listBlogsByUser Error', err);
+        });
+    };
+
+    $scope.loadBlogList = function() {
+        BlogListSync.loadBlogList()
+        .then(function(answer) {
+            $log.log('loadBlogList Completed', answer);
+            console.table(answer);
+        }).catch(function(err) {
+            $log.error('loadBlogList Error', err);
+        });
+    };
+
+    $scope.clearBlogListFromStorage = function() {
+        BlogListSync.clearStorage();
+    };
+
+    $scope.getBlogListFromStorage = function() {
+        BlogListSync.getBlogList()
+        .then(function(answer) {
+            $log.log('getBlogListFromStorage Completed', answer);
+            console.table(answer);
+        }).catch(function(err) {
+            $log.error('getBlogListFromStorage Error', err);
+        });
+    };
 });

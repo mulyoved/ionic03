@@ -36,6 +36,18 @@ angular.module('Ionic03.services',[])
             },
             getCurrentNewItem: function() {
                 return editItem;
+            },
+            selectBlog: function(blog) {
+                $log.log('Select BLog', blog);
+
+                //Switch database, remobe blogdb and make it property of Config, access from controlers by var
+                //reimplement delete database to actually drop and create
+                //test all
+                //Change configuration items like title
+                //Trigger Sync of new database
+                //Problem, unsync old database, save list of unsync database
+                //
+                //after sync, sync more database, have database property of the sync function
             }
         }
     })

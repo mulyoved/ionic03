@@ -230,11 +230,17 @@ angular.module('Ionic03', [
             authenticate: true
         })
 
-        .state('app.search', {
-            url: '/search',
+        .state('app.bloglist', {
+            url: '/bloglist',
             views: {
                 'menuContent': {
-                    templateUrl: 'templates/search.html'
+                    templateUrl: 'templates/bloglist.html',
+                    controller: 'BlogListCtrl'
+                }
+            },
+            resolve: {
+                items: function (BlogListSync) {
+                    return BlogListSync.getBlogList();
                 }
             },
             authenticate: true

@@ -1,6 +1,11 @@
 <ion-view title="DBTest">
     <ion-content class="has-header">
         <p>version 2:<a href="#/app/playlists">Main</a></p>
+        <p>-------------------------------------------------------------------------------------------------------------</p>
+        <button ng-click="getBlogList()">Get Blog List</button>
+        <button ng-click="clearBlogListFromStorage()">Clear Blog List from Storage</button>
+        <button ng-click="loadBlogList()">Load Blog List to Storage</button>
+        <button ng-click="getBlogListFromStorage()">List Blog List from Storage, load if not exists</button>
 
         <p>-------------------------------------------------------------------------------------------------------------</p>
         <button ng-click="cameraUploadTest()">Camera Upload Test</button>
@@ -27,7 +32,9 @@
 
         <button ng-click="sync()">Sync</button>
         <button ng-click="createPost()">Create New Post</button>
-        <button ng-click="createImagePost()">Create Image Post</button>
+        <button ng-click="createImagePost1()">Create 1 Image Post</button>
+        <button ng-click="createImagePost2()">Create 2 Image Post</button>
+        <button ng-click="createImagePost2error()">Create 2 Image Post with Error</button>
         <p>DataBase Operations</p>
         <button ng-click="dumpDatabase()">Dump Database</button>
         <button ng-click="deletedb()">Delete Database</button>

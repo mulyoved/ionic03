@@ -16,10 +16,10 @@ angular.module('Ionic03.controllers')
             return text;
         },
         uploadImage: function (imageURI) {
-            console.log('uploadImage', imageURI);
-
             var deferred = $q.defer();
             if (typeof FileTransfer != 'undefined') {
+                console.log('uploadImage', imageURI);
+
                 var ft = new FileTransfer();
                 var options = new FileUploadOptions();
 
@@ -81,7 +81,12 @@ angular.module('Ionic03.controllers')
                     }, options);
             }
             else {
-                if (imageURI.startsWith('file://')) {
+                if (imageURI.startsWith('file://error_')) {
+                    $log.log('Failed to uploaded image', imageURI);
+                    deferred.reject('Failed to upload image');
+                }
+                else if (imageURI.startsWith('file://')) {
+                    $log.log('Uploaded image', imageURI);
                     var url = 'http://' + imageURI.substring(7);
                     deferred.resolve(url);
                 }
