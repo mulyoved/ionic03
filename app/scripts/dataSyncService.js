@@ -60,51 +60,66 @@ angular.module('Ionic03.controllers')
         return date2GAPIDate(date);
     };
 
-    var blogger_getModifiedDocuments = function(lastUpdate) {
-        var _bloggerList = [];
-
+    function getComments(blogId, postId) {
         var params = {
-            'fetchBodies': true,
-            'fetchImages': false,
-            'maxResults': 100,
-            //'startDate': _lastUpdate.date,
-            'fields': 'items(content,id,kind,published,status,title,titleLink,updated),nextPageToken'
+            fetchBodies: true,
+            //'maxResults': 10,
+            //'startDate': _lastUpdate.date, // set by code later
+            'fields': 'items(author/displayName,content,id,kind,post,published,updated),nextPageToken'
         };
+        $log.log('Going to request comments', params);
+        return Blogger.listComments(blogId, postId, params);
+    }
 
-        if (lastUpdate.length > 0) {
-            params.startDate = bumpDate(lastUpdate);
-        }
+    var blogger_getModifiedDocuments = function(lastUpdate) {
+    var _bloggerList = [];
 
-        $log.log('Retrive posts from blogId', ConfigService.blogId);
-        var promise = Blogger.listPosts(ConfigService.blogId, params).
-            then(function(list) {
-                // Get all modified comments from Blogger
-                if ('items' in list && list.items.length > 0) {
-                    _bloggerList = list.items;
-                }
+    var params = {
+        'fetchBodies': true,
+        'fetchImages': false,
+        'orderBy': 'published',
+        //'startDate': _lastUpdate.date, // set by code later
+        'fields': 'items(content,id,kind,published,status,title,titleLink,updated),nextPageToken'
+    };
 
-                var params = {
-                    'fetchBodies': true,
-                    'maxResults': 100,
-                    //'startDate': _lastUpdate.date,
-                    'fields': 'items(author/displayName,content,id,kind,post,published,updated),nextPageToken'
-                };
+    if (lastUpdate.length > 0) {
+        params.startDate = bumpDate(lastUpdate);
+    }
+    else {
+        params.maxResults = ConfigService.initialSyncLimit;
+    }
 
-                if (lastUpdate.length > 0) {
-                    params.startDate = bumpDate(lastUpdate);
-                }
+    $log.log('Retrive posts from blogId', ConfigService.blogId);
+    var promise = Blogger.listPosts(ConfigService.blogId, params).
+        then(function(list) {
 
-                return Blogger.listCommentsByBlog(ConfigService.blogId, params);
-            }).
-            then(function(list) {
+            // Get all modified comments from Blogger
+            var lastDate = null;
+            if ('items' in list && list.items.length > 0) {
+                _bloggerList = list.items;
+                $log.log('Received From blogger Posts: ', list.items.length, list);
+
+                //Create query for each post comments
+                var r = [];
+                angular.forEach(list.items, function(item) {
+                    r.push(getComments(ConfigService.blogId, item.id));
+                });
+                return $q.all(r);
+            }
+        }).
+        then(function(list) {
+            angular.forEach(list, function(postComments) {
+                $log.log('Received From blogger Comments: ', postComments);
                 // Get all documents from DB
-                if ('items' in list && list.items.length > 0) {
+                if ('items' in postComments && postComments.items.length > 0) {
+                    $log.log('Received From blogger Comments: ', postComments.items.length, postComments);
                     // Append list.items to _bloggerList
-                    _bloggerList.push.apply(_bloggerList, list.items);
+                    _bloggerList.push.apply(_bloggerList, postComments.items);
                 }
-
-                return _bloggerList;
             });
+
+            return _bloggerList;
+        });
 
         return promise;
     };

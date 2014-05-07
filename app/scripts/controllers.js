@@ -118,5 +118,33 @@ angular.module('Ionic03.controllers', [])
 .controller('PlaylistCtrl', function ($scope, ConfigService, item) {
     $scope.title = ConfigService.blogName;
     console.log(item);
+})
+
+.controller('testInfinitScrollCtrl', function ($scope, $timeout, $log) {
+    $log.log('testInfinitScrollCtrl');
+
+    $scope.noMoreItemsAvailable = false;
+
+    var addItemes = function() {
+        for (var i=0; i<10; i++) {
+            $scope.items.push({ id: $scope.items.length});
+        }
+    };
+
+    $scope.loadMore = function() {
+
+        $timeout(function() {
+            addItemes();
+
+            if ($scope.items.length >= 99) {
+                $scope.noMoreItemsAvailable = true;
+            }
+            $log.log('Load More: Total', $scope.items.length);
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+        }, 5000);
+    };
+
+    $scope.items = [];
+    addItemes();
 });
 

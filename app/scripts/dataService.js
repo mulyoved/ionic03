@@ -19,15 +19,26 @@ angular.module('Ionic03.services',[])
         return {
             authResult: null,
             isLogin: false,
-            getItems: function() {
+            getItems: function(limit, lastItem) {
+                limit = limit || 10;
                 $log.log('DataService: getItems');
 
-                var alldocs = _blogdb.allDocs({
+                var options = {
                     include_docs: true,
                     attachments: true,
                     startkey: 'P0',
-                    endkey: 'PZ'
-                });
+                    endkey: 'PZ',
+                    limit: limit
+                };
+
+                if (lastItem) {
+                    options.startkey = lastItem._id;
+                    options.skip = 1;
+                }
+
+                $log.log('DataService:getItems - Query Database', options);
+
+                var alldocs = _blogdb.allDocs(options);
 
                 return alldocs;
             },
@@ -90,6 +101,7 @@ angular.module('Ionic03.services',[])
 
             //mainScreen: 'app.playlists',
             mainScreen: 'dbtest',
-            blogId: '4462544572529633201' //'4355243139467288758'
+            blogId: '4462544572529633201', //'4355243139467288758'
+            initialSyncLimit: 100,
         }
     });

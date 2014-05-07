@@ -2,6 +2,17 @@
     <ion-content class="has-header">
         <p>version 2:<a href="#/app/playlists">Main</a></p>
         <p>-------------------------------------------------------------------------------------------------------------</p>
+        <p><a href="#/testInfinitScroll">testInfinitScroll</a></p>
+        <p>-------------------------------------------------------------------------------------------------------------</p>
+        <p>DataBase Operations</p>
+        <button ng-click="dumpDatabase()">Dump Database</button>
+        <button ng-click="deletedb()">Delete Database</button>
+        <p>DataService Test</p>
+        <button ng-click="getPosts(1000)">Get 1000 Posts All</button>
+        <button ng-click="getPosts(10)">Get Posts 1st 10 Posts (db)</button>
+        <button ng-click="getPosts(10, true)">Get Posts next 10 Posts (db)</button>
+        <pre>{{answer_GetPosts}}</pre>
+        <p>-------------------------------------------------------------------------------------------------------------</p>
         <button ng-click="getBlogList()">Get Blog List</button>
         <button ng-click="clearBlogListFromStorage()">Clear Blog List from Storage</button>
         <button ng-click="loadBlogList()">Load Blog List to Storage</button>
@@ -22,7 +33,6 @@
         <p>-------------------------------------------------------------------------------------------------------------</p>
         <button ng-click="raiseError()">Raise Error</button>
         <p>-------------------------------------------------------------------------------------------------------------</p>
-        <button ng-click="getPosts()">Blogger.getPosts</button>
         <p>answer: {{answer}}</p>
         <p>syncResult: {{syncResult}}</p>
 
@@ -38,11 +48,7 @@
         <button ng-click="createImagePost1()">Create 1 Image Post</button>
         <button ng-click="createImagePost2()">Create 2 Image Post</button>
         <button ng-click="createImagePost2error()">Create 2 Image Post with Error</button>
-        <p>DataBase Operations</p>
-        <button ng-click="dumpDatabase()">Dump Database</button>
-        <button ng-click="deletedb()">Delete Database</button>
-        <p>DataService Test</p>
-        <button ng-click="getPosts()">Get Posts</button>
+        <p>-------------------------------------------------------------------------------------------------------------</p>
         <p>Auth</p>
         <button ng-click="logout()">Logout</button>
         <button ng-click="clearToken()">Clear Local Token</button>

@@ -2,7 +2,7 @@ angular.module('Ionic03.controllers')
 
 .controller('PostListCtrl', function (
         $rootScope, $scope, $state, $log, ConfigService,
-        $ionicNavBarDelegate, $ionicViewService, DataSync, DataService, HTMLReformat,
+        $ionicNavBarDelegate, $ionicViewService, $ionicScrollDelegate, DataSync, DataService, HTMLReformat,
         items) {
 
     var iconError = 'icon ion-alert';
@@ -50,15 +50,53 @@ angular.module('Ionic03.controllers')
     $ionicViewService.clearHistory();
     $scope.syncIcon = "ok";
 
-    var updateItemList = function() {
-        var p = DataService.getItems();
+    var updateItemList = function(isLoadMore, lastItem) {
+        var scrollPos = $ionicScrollDelegate.getScrollPosition();
+
+        var top = 0;
+        if (scrollPos) {
+            top = scrollPos.top;
+        }
+        var limit = top + 10;
+        $log.log('updateItemList', scrollPos, limit, lastItem, $scope.items);
+
+
+        //Todo: back scroll to the middle?
+        var p = DataService.getItems(10, lastItem);
         p.then(function (answer) {
-            $scope.items = answer;
             $log.log('PostListCtrl: DataService.getItems: Set PlayList !', answer);
+
+            if (lastItem) {
+                angular.forEach(answer.rows, function(item) {
+                    $scope.items.push(item);
+                });
+            }
+            else {
+                $scope.items = answer.rows;
+            }
+
+            if (isLoadMore) {
+                $scope.$broadcast('scroll.infiniteScrollComplete');
+            }
         }, function (err) {
+            if (isLoadMore) {
+                $scope.$broadcast('scroll.infiniteScrollComplete');
+            }
+
             $log.error('DataService.getItems Failed ', err);
         });
     };
+
+    $scope.loadMore = function() {
+        if ($scope.items.length>0) {
+            updateItemList(true, $scope.items[$scope.items.length - 1].doc);
+        }
+        else {
+            updateItemList(true);
+        }
+
+    };
+
 
     $scope.$on("event:DataSync:StatusChange", function (event) {
         $log.log('PostListCtrl: Recived: event:DataSync:StatusChange');
@@ -67,7 +105,7 @@ angular.module('Ionic03.controllers')
 
     $scope.$on("event:DataSync:DataChange", function (event) {
         $log.log('PostListCtrl: Recived: event:DataSync:DataChange');
-        updateItemList();
+        updateItemList(false); // load only as needed items in case of update
     });
 
     $scope.doRefresh = function() {
@@ -86,8 +124,9 @@ angular.module('Ionic03.controllers')
         return item.doc.key === 'U';
     };
 
-    $scope.items = items;
+    $scope.noMoreItemsAvailable = false;
+    $scope.items = items.rows;
     updateIcon();
-    updateItemList();
+    updateItemList(false);
 
 });

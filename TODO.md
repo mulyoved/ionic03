@@ -30,9 +30,13 @@ done test 1 image upload ok 2nd not, improve code to upload only the 2nd image
     done Switch blog, just use different database?
 
 2. done - Allow to select blog
-3. Auto sync, retry and such, delay
 4. Limit Database size
-5. Load More - Infinit list, when beyond database use blogger directly, cache as HTML?
+5. Load More - Infinit list, when beyond database use blogger directly
+    - http://ionicframework.com/docs/api/directive/ionInfiniteScroll/
+    - play with load more list
+    - see if can add more items dynamicly without saving in database
+    - check delete old records from database
+3. Auto sync, retry and such, delay
 
 
 7. Alerts

@@ -75,9 +75,31 @@ angular.module('Ionic03.controllers')
         DataService.deletedb();
     };
 
-    $scope.getPosts = function () {
-        var p = DataService.getItems();
+    $scope.lastItem = null;
+    $scope.getPosts = function (limit, next) {
+        if (!next) {
+            $scope.lastItem = null;
+        }
+        var p = DataService.getItems(limit, $scope.lastItem);
         p.then(function (answer) {
+            $log.log('getPosts', answer);
+            if (answer.rows && answer.rows.length>0) {
+                var doc0 = answer.rows[0].doc;
+                var doc1 = answer.rows[answer.rows.length - 1].doc;
+
+                var date0 = new Date(doc0.updated);
+                var date1 = new Date(doc1.updated);
+
+                $scope.answer_GetPosts = String.format('Retrieved {0} Items\nStart: {1} ID:{2}\nEnd:{3} ID:{4}',
+                    answer.rows.length,
+                    date0.toDateString(), doc0._id,
+                    date1.toDateString(), doc1._id);
+
+                $scope.lastItem = doc1;
+            }
+            else {
+                $scope.answer_GetPosts = 'None found';
+            }
             $log.log(answer);
         }, function (err) {
             $log.error(err);

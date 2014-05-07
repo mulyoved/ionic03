@@ -224,6 +224,14 @@ angular.module('Ionic03', [
             controller: 'dbTestCtrl',
             authenticate: false
         })
+        .state('testInfinitScroll', {
+            url: '/testInfinitScroll',
+            abstract: false,
+            templateUrl: 'templates/testInfinitScroll.html',
+            controller: 'testInfinitScrollCtrl',
+            authenticate: false
+        })
+
         .state('app', {
             url: '/app',
             abstract: true,
@@ -267,7 +275,7 @@ angular.module('Ionic03', [
             },
             resolve: {
                 items: function (DataService) {
-                    return DataService.getItems();
+                    return DataService.getItems(20);
                 }
             },
             authenticate: true
@@ -337,3 +345,16 @@ if (typeof String.prototype.endsWith != 'function') {
     };
 }
 
+//http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
+//Sample: String.format('{0} is dead, but {1} is alive! {0} {2}', 'ASP', 'ASP.NET');
+if (!String.format) {
+    String.format = function(format) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        return format.replace(/{(\d+)}/g, function(match, number) {
+            return typeof args[number] != 'undefined'
+                ? args[number]
+                : 'undefined'
+                ;
+        });
+    };
+}
