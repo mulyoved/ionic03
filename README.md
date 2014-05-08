@@ -7,7 +7,11 @@
 
 [Generator](https://github.com/diegonetto/generator-ionic)
 
+
  `npm install -g generator-ionic`
+
+ `npm update -g cordova`
+ `npm update -g plugman`
 
 Select Y for overwriting your Gruntfile.js and bower.json to stay up-to-date with the latest workflow
 Compare them to make sure no packages was removed

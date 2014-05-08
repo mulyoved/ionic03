@@ -27,6 +27,11 @@ angular.module('Ionic03.controllers')
             + ":" + pad(Math.abs(offset) % 60, 2);
     };
 
+    var ConvertDateToKey = function(date) {
+        var timePublished = new Date(date).getTime();
+        return 'P' + (2000000000000 - timePublished) + '#';
+    };
+
     var mapPost = function(doc) {
         var timePublished = new Date(doc.published).getTime();
         if (doc.kind.startsWith('delete#')) {
@@ -71,55 +76,62 @@ angular.module('Ionic03.controllers')
         return Blogger.listComments(blogId, postId, params);
     }
 
-    var blogger_getModifiedDocuments = function(lastUpdate) {
-    var _bloggerList = [];
+    var blogger_getModifiedDocuments = function(startDate, endDate, limit) {
+        var _bloggerList = [];
 
-    var params = {
-        'fetchBodies': true,
-        'fetchImages': false,
-        'orderBy': 'published',
-        //'startDate': _lastUpdate.date, // set by code later
-        'fields': 'items(content,id,kind,published,status,title,titleLink,updated),nextPageToken'
-    };
+        var params = {
+            'fetchBodies': true,
+            'fetchImages': false,
+            'orderBy': 'published',
+            //'startDate': _lastUpdate.date, // set by code later
+            'fields': 'items(content,id,kind,published,status,title,titleLink,updated),nextPageToken'
+        };
 
-    if (lastUpdate.length > 0) {
-        params.startDate = bumpDate(lastUpdate);
-    }
-    else {
-        params.maxResults = ConfigService.initialSyncLimit;
-    }
 
-    $log.log('Retrive posts from blogId', ConfigService.blogId);
-    var promise = Blogger.listPosts(ConfigService.blogId, params).
-        then(function(list) {
+        if (startDate && startDate.length > 0) {
+            //Start date use the publish field, so we will not get updated posts
+            params.startDate = bumpDate(startDate);
+        }
+        else {
+            params.maxResults = limit;
+        }
 
-            // Get all modified comments from Blogger
-            var lastDate = null;
-            if ('items' in list && list.items.length > 0) {
-                _bloggerList = list.items;
-                $log.log('Received From blogger Posts: ', list.items.length, list);
+        if (endDate) {
+            //todo: may get duplicate, fix it by skip
+            params.endDate = endDate;
+        }
 
-                //Create query for each post comments
-                var r = [];
-                angular.forEach(list.items, function(item) {
-                    r.push(getComments(ConfigService.blogId, item.id));
-                });
-                return $q.all(r);
-            }
-        }).
-        then(function(list) {
-            angular.forEach(list, function(postComments) {
-                $log.log('Received From blogger Comments: ', postComments);
-                // Get all documents from DB
-                if ('items' in postComments && postComments.items.length > 0) {
-                    $log.log('Received From blogger Comments: ', postComments.items.length, postComments);
-                    // Append list.items to _bloggerList
-                    _bloggerList.push.apply(_bloggerList, postComments.items);
+        $log.log('Retrive posts from blogId', ConfigService.blogId, startDate, endDate, limit, params);
+        var promise = Blogger.listPosts(ConfigService.blogId, params).
+            then(function(list) {
+
+                // Get all modified comments from Blogger
+                var lastDate = null;
+                if ('items' in list && list.items.length > 0) {
+                    _bloggerList = list.items;
+                    $log.log('Received From blogger Posts: ', list.items.length, list);
+
+                    //Create query for each post comments
+                    var r = [];
+                    angular.forEach(list.items, function(item) {
+                        r.push(getComments(ConfigService.blogId, item.id));
+                    });
+                    return $q.all(r);
                 }
-            });
+            }).
+            then(function(list) {
+                angular.forEach(list, function(postComments) {
+                    $log.log('Received From blogger Comments: ', postComments);
+                    // Get all documents from DB
+                    if ('items' in postComments && postComments.items.length > 0) {
+                        $log.log('Received From blogger Comments: ', postComments.items.length, postComments);
+                        // Append list.items to _bloggerList
+                        _bloggerList.push.apply(_bloggerList, postComments.items);
+                    }
+                });
 
-            return _bloggerList;
-        });
+                return _bloggerList;
+            });
 
         return promise;
     };
@@ -145,14 +157,32 @@ angular.module('Ionic03.controllers')
         }).
         then(function() {
             // Get all modified posts from Blogger
-            return blogger_getModifiedDocuments(_lastUpdate.date);
+            return blogger_getModifiedDocuments(_lastUpdate.date, null, ConfigService.initialSyncLimit);
         }).
         then(function(list) {
             _bloggerList = list;
+            $log.log('blogger_getModifiedDocuments returned ', list, list.length);
 
             //Get all documents in database
-            if ('items' in list && list.items.length > 0) {
-                return DataService.blogdb().allDocs({include_docs: true, attachments: false});
+            if (list.length > 0) {
+                //todo: try to improve bu limit documents by key
+                //find earlist date in records so we can retrive only the relevant documents from the database
+                var maxDate = list[0].published;
+                angular.forEach(list, function(item) {
+                    //$log.log('Item from blogger: ', item);
+                    if (maxDate < item.published) {
+                        maxDate = item.published;
+                    }
+                });
+
+                var maxKey = ConvertDateToKey(maxDate)+'z';
+                $log.log('Query database for exsting document in the same date range as recived from blogger', maxDate, maxKey);
+                return DataService.blogdb().allDocs({
+                    include_docs: true,
+                    attachments: false,
+                    startkey: 'P0',
+                    endkey: maxKey
+                });
             }
             else {
                 return [];
@@ -483,6 +513,12 @@ angular.module('Ionic03.controllers')
                 }, function(err) {
                     $log.error('Add Failed', err);
                 });
+        },
+        getItems: function(lastItem) {
+            $log.log('DataSyncService:getItems', lastItem);
+
+            var published = lastItem.published;
+            return blogger_getModifiedDocuments(null, published, 10);
         },
 
         //---------------------

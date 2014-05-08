@@ -13,8 +13,8 @@ angular.module('Ionic03.controllers')
 .controller('dbTestCtrl', function(
     $scope, ConfigService, $log, $q,
     GAPI, Blogger, pouchdb, GoogleApi, GoogleApp, DataSync,
-    DataService, HTMLReformat, MiscServices, BlogListSync,
-    $http) {
+    DataService, HTMLReformat, MiscServices, BlogListSync
+    ) {
 
     $scope.answer = '<empty>';
 
@@ -76,6 +76,23 @@ angular.module('Ionic03.controllers')
     };
 
     $scope.lastItem = null;
+    $scope.getPostsFromBlogger = function() {
+        var lastItem = $scope.lastItem;
+        $log.log('Get from blogger, next batch of recors', lastItem);
+
+        DataSync.getItems(lastItem)
+            .then(function(answer) {
+                $log.log('Blogger returned:',answer);
+
+                //todo normlize the results
+                //set $scope.lastItem
+                //check for duplicates and do skip as needed
+                //integrate into main list
+            }).catch(function(err) {
+                $log.error('Blogger error', err);
+            });
+    };
+
     $scope.getPosts = function (limit, next) {
         if (!next) {
             $scope.lastItem = null;

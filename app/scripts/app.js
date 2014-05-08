@@ -109,8 +109,8 @@ angular.module('Ionic03', [
 
     //GAPI On Browser
     apiKey: 'AIzaSyA78RO9-B7qEr-WXJULOq3u-n4C7RS9wz4',
-    //clientId: '44535440585-tej15rtq3jgao112ks9pe4v5tobr7nhd.apps.googleusercontent.com',
-    clientId: '44535440585-rshs1j4t1jc4qnp295fqmkr7jt12tbrh.apps.googleusercontent.com',
+    //clientId: '44535440585-tej15rtq3jgao112ks9pe4v5tobr7nhd.apps.googleusercontent.com', // spy-js
+    clientId: '44535440585-rshs1j4t1jc4qnp295fqmkr7jt12tbrh.apps.googleusercontent.com', // grunt serve
     scopes: [
         // whatever scopes you need for your app, for example:
         //'https://www.googleapis.com/auth/drive',

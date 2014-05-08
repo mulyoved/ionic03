@@ -50,19 +50,16 @@ angular.module('Ionic03.controllers')
     $ionicViewService.clearHistory();
     $scope.syncIcon = "ok";
 
-    var updateItemList = function(isLoadMore, lastItem) {
+    var loadItems = function(isLoadMore, lastItem) {
         var scrollPos = $ionicScrollDelegate.getScrollPosition();
-
-        var top = 0;
-        if (scrollPos) {
-            top = scrollPos.top;
+        var limit = 10;
+        if (!lastItem && scrollPos && scrollPos.top > 0) {
+            limit = $scope.items.length;
         }
-        var limit = top + 10;
-        $log.log('updateItemList', scrollPos, limit, lastItem, $scope.items);
-
+        $log.log('loadItems', lastItem, $scope.items, limit);
 
         //Todo: back scroll to the middle?
-        var p = DataService.getItems(10, lastItem);
+        var p = DataService.getItems(limit, lastItem);
         p.then(function (answer) {
             $log.log('PostListCtrl: DataService.getItems: Set PlayList !', answer);
 
@@ -89,10 +86,10 @@ angular.module('Ionic03.controllers')
 
     $scope.loadMore = function() {
         if ($scope.items.length>0) {
-            updateItemList(true, $scope.items[$scope.items.length - 1].doc);
+            loadItems(true, $scope.items[$scope.items.length - 1].doc);
         }
         else {
-            updateItemList(true);
+            loadItems(true);
         }
 
     };
@@ -105,7 +102,7 @@ angular.module('Ionic03.controllers')
 
     $scope.$on("event:DataSync:DataChange", function (event) {
         $log.log('PostListCtrl: Recived: event:DataSync:DataChange');
-        updateItemList(false); // load only as needed items in case of update
+        loadItems(false); // load only as needed items in case of update
     });
 
     $scope.doRefresh = function() {
@@ -127,6 +124,6 @@ angular.module('Ionic03.controllers')
     $scope.noMoreItemsAvailable = false;
     $scope.items = items.rows;
     updateIcon();
-    updateItemList(false);
+    loadItems(false);
 
 });
