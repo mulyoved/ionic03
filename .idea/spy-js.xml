@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SpyJsConfiguration">
+    <event-filters>
+      <event-filter name="Not My Code" />
+      <event-filter name="No mousemove">
+        <event-filter-conditions>
+          <event-filter-condition value="mousemove" />
+          <event-filter-condition type="file" value="http://localhost:9000/ionic03/app/bower_components/ionic/release/js/ionic.js" />
+          <event-filter-condition type="file" value="http://localhost:9000/ionic03/app/bower_components/angular/angular.js" />
+          <event-filter-condition type="file" value="http://localhost:9000/ionic03/app/bower_components/pouchdb/dist/pouchdb-nightly.js" />
+          <event-filter-condition type="file" value="http://localhost:9000/ionic03/app/bower_components/ionic/release/js/ionic-angular.js" />
+          <event-filter-condition type="file" value="http://localhost:9000/ionic03/app/bower_components/angular-sanitize/angular-sanitize.js" />
+          <event-filter-condition value="script: htmlReformatService" />
+          <event-filter-condition value="script: miscServices" />
+          <event-filter-condition value="script: blogListSyncService" />
+          <event-filter-condition value="script: dataSyncService" />
+          <event-filter-condition value="script: dbtestCtrl" />
+          <event-filter-condition value="script: GoogleApiServices" />
+          <event-filter-condition value="script: unlockCtrl" />
+          <event-filter-condition value="script: addPostControler" />
+          <event-filter-condition value="script: postListControler" />
+          <event-filter-condition value="script: controllers" />
+          <event-filter-condition value="script: app" />
+          <event-filter-condition value="script: dataService" />
+          <event-filter-condition value="script: GestureDebugDirective" />
+          <event-filter-condition value="script: htmlparser" />
+          <event-filter-condition value="script: jquery-1.10.1" />
+          <event-filter-condition value="script: gapi" />
+          <event-filter-condition value="script: angular-pouchdb" />
+          <event-filter-condition value="script: angular-local-storage" />
+          <event-filter-condition value="script: angular-ui-router" />
+          <event-filter-condition value="script: angular-animate" />
+        </event-filter-conditions>
+      </event-filter>
+      <event-filter name="script:">
+        <event-filter-conditions>
+          <event-filter-condition value="script: *" />
+        </event-filter-conditions>
+      </event-filter>
+    </event-filters>
+  </component>
+</project>
+
