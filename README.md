@@ -138,3 +138,11 @@ Work Great!
 #Test
 
 http://attackofzach.com/setting-up-a-project-using-karma-with-mocha-and-chai/
+
+router problems https://github.com/angular-ui/ui-router/issues/212
+
+e2e protractor test requiring oauth authentication
+http://stackoverflow.com/questions/20959748/e2e-protractor-test-requiring-oauth-authentication
+
+Hands on Protractor, E2E Testing for AngularJS
+http://blog.liftoffllc.in/2013/12/hands-on-protractor-e2e-testing-for.html

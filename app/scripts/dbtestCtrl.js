@@ -8,17 +8,17 @@
 // - failed, turn on needSync and try again after some time out
 // -
 
-angular.module('Ionic03.controllers')
+angular.module('Ionic03.dbTestCtrl', [])
 
 .controller('dbTestCtrl', function(
     $scope, ConfigService, $log, $q,
     GAPI, Blogger, pouchdb, GoogleApi, GoogleApp, DataSync,
-    DataService, HTMLReformat, MiscServices, BlogListSync
-    ) {
-
+    DataService, HTMLReformat, MiscServices, BlogListSync, RetrieveItemsService
+    )
+{
     $scope.answer = '<empty>';
 
-    $scope.sync = function sync () {
+    $scope.sync = function sync() {
         $log.log('sync');
 
         DataSync.sync();
@@ -37,7 +37,7 @@ angular.module('Ionic03.controllers')
         var url = 'file://lh6.googleusercontent.com/-oJNCUlvzVKs/U2UqdZsnctI/AAAAAAAAKHk/0aM2vyiZoJ4/%25255BUNSET%25255D.jpg';
         text = MiscServices.formatImageUrl(url);
         $log.log('createImagePost', text);
-        DataSync.createPost('title v3', '1Images<br>'+text);
+        DataSync.createPost('title v3', '1Images<br>' + text);
     };
 
     $scope.createImagePost2 = function createImagePost() {
@@ -50,7 +50,7 @@ angular.module('Ionic03.controllers')
         text2 = MiscServices.formatImageUrl(url2);
 
         $log.log('createImagePost', text);
-        DataSync.createPost('title v3', '2Images<br>'+text+'<br>'+text2);
+        DataSync.createPost('title v3', '2Images<br>' + text + '<br>' + text2);
     };
 
     $scope.createImagePost2error = function createImagePost() {
@@ -63,7 +63,7 @@ angular.module('Ionic03.controllers')
         text2 = MiscServices.formatImageUrl(url2);
 
         $log.log('createImagePost', text);
-        DataSync.createPost('title v3', '2Images Error<br>'+text+'<br>'+text2);
+        DataSync.createPost('title v3', '2Images Error<br>' + text + '<br>' + text2);
     };
 
     //---------------------
@@ -75,52 +75,118 @@ angular.module('Ionic03.controllers')
         DataService.deletedb();
     };
 
-    $scope.lastItem = null;
-    $scope.getPostsFromBlogger = function() {
-        var lastItem = $scope.lastItem;
-        $log.log('Get from blogger, next batch of recors', lastItem);
+    $scope.db_showItems = [];
+    $scope.blog_showItems = [];
+    $scope.db_lastItem = null;
+    $scope.blog_lastItem = null;
+    $scope.getPostsFromBlogger = function () {
+        var lastItem = $scope.blog_lastItem;
+        $log.log('Get from blogger, next batch of records', lastItem);
 
         DataSync.getItems(lastItem)
-            .then(function(answer) {
-                $log.log('Blogger returned:',answer);
-
-                //todo normlize the results
-                //set $scope.lastItem
-                //check for duplicates and do skip as needed
-                //integrate into main list
-            }).catch(function(err) {
+            .then(function (answer) {
+                processBlogItems(answer);
+            }).catch(function (err) {
                 $log.error('Blogger error', err);
             });
     };
 
-    $scope.getPosts = function (limit, next) {
-        if (!next) {
-            $scope.lastItem = null;
+    var processBlogItems = function (answer, currentItemList) {
+        //Add ID Sort & Skip duplicates
+        RetrieveItemsService._syncLists($scope.blog_showItems, answer);
+
+        if (startOffset) {
+            var doc0 = answer[startOffset];
+            var doc1 = answer[answer.length - 1];
+
+            var date0 = new Date(doc0.updated);
+            var date1 = new Date(doc1.updated);
+
+            $log.log('Doc0', doc0);
+
+            $scope.answer_GetPosts = String.format('Retrieved {0} Items\nStart: {1} ID:{2}\nEnd:{3} ID:{4}',
+                answer.length,
+                date0.toDateString(), doc0.id,
+                date1.toDateString(), doc1.id);
+
+            $scope.blog_lastItem = doc1;
+
+            //Add Items to view
+            var i;
+            var j;
+            for (i = 0; i < answer.length; i++) {
+                var doc = answer[i];
+                for (j = 0; j < $scope.db_showItems.length; j++) {
+                    if ($scope.db_showItems[j].id === doc.id) {
+                        doc.match = j;
+                    }
+                }
+            }
         }
-        var p = DataService.getItems(limit, $scope.lastItem);
+    };
+
+    var processDbItems = function(answer, addAlsoToBlog) {
+        $log.log('getPosts', answer);
+        if (answer.rows && answer.rows.length > 0) {
+            var doc0 = answer.rows[0].doc;
+            var doc1 = answer.rows[answer.rows.length - 1].doc;
+
+            var date0 = new Date(doc0.updated);
+            var date1 = new Date(doc1.updated);
+
+            $log.log('Doc0', doc0);
+
+            $scope.answer_GetPosts = String.format('Retrieved {0} Items\nStart: {1} ID:{2}\nEnd:{3} ID:{4}',
+                answer.rows.length,
+                date0.toDateString(), doc0._id,
+                date1.toDateString(), doc1._id);
+
+            var i;
+            for (i = 0; i < answer.rows.length; i++) {
+                var doc = answer.rows[i].doc;
+                doc.match = $scope.db_showItems.length;
+                $scope.db_showItems.push(doc);
+                if (addAlsoToBlog) {
+                    $scope.blog_showItems.push(doc);
+                }
+            }
+        }
+        else {
+            $scope.answer_GetPosts = 'None found';
+        }
+        $log.log(answer);
+    };
+
+    $scope.getPostsDB = function (limit, next) {
+        if (!next) {
+            $scope.db_lastItem = null;
+        }
+        var p = DataService.getItems(limit, $scope.db_lastItem);
         p.then(function (answer) {
-            $log.log('getPosts', answer);
-            if (answer.rows && answer.rows.length>0) {
-                var doc0 = answer.rows[0].doc;
+            processDbItems(answer, !next);
+
+            if (answer.rows.length > 0) {
                 var doc1 = answer.rows[answer.rows.length - 1].doc;
-
-                var date0 = new Date(doc0.updated);
-                var date1 = new Date(doc1.updated);
-
-                $scope.answer_GetPosts = String.format('Retrieved {0} Items\nStart: {1} ID:{2}\nEnd:{3} ID:{4}',
-                    answer.rows.length,
-                    date0.toDateString(), doc0._id,
-                    date1.toDateString(), doc1._id);
-
-                $scope.lastItem = doc1;
+                $scope.db_lastItem = doc1;
+                if (!next) {
+                    $scope.blog_lastItem = doc1;
+                }
             }
-            else {
-                $scope.answer_GetPosts = 'None found';
-            }
-            $log.log(answer);
+
         }, function (err) {
             $log.error(err);
         });
+    };
+
+    $scope.getPosts = function(limit, next) {
+        RetrieveItemsService.loadItems(limit, next)
+            .then(function(answer) {
+                $scope.db_showItems = answer;
+                $scope.RetrieveItemsService_Status = RetrieveItemsService.getStatus();
+            })
+            .catch(function(err) {
+                $log.error(err);
+            });
     };
 
     $scope.show = function (item) {

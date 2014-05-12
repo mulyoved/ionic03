@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('Ionic03.controllers')
+angular.module('Ionic03.BlogListSync', [])
 
 .service('BlogListSync', function($rootScope, $q, localStorageService, $log,
                           GoogleApp, GoogleApi, GAPI, Blogger, ConfigService) {

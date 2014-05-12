@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('Ionic03.controllers')
+angular.module('Ionic03.MiscServices', [])
 
 .service('MiscServices', function(GoogleApp, ConfigService, $q, $log) {
     var service = {

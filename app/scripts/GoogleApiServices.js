@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('Ionic03.controllers')
+angular.module('Ionic03.GoogleApi', [])
 
 .service('GoogleApi', function($rootScope, $q, $http, localStorageService, GoogleApp) {
     var googleapi = {
@@ -123,7 +123,7 @@ angular.module('Ionic03.controllers')
                     deferred.reject(response.responseJSON);
                 });
             } else {
-                console.log('GoogleApi:getToken, Not found Token in local storage');
+                //console.log('GoogleApi:getToken, Not found Token in local storage');
                 deferred.reject();
             }
 

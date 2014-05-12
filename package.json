@@ -37,12 +37,15 @@
     "karma-requirejs": "~0.2.1",
     "mocha": "~1.18.2",
     "sinon": "~1.9.1",
-    "karma-sinon": "~1.0.3"
+    "karma-sinon": "~1.0.3",
+    "karma-jasmine": "~0.1.5",
+    "chai-as-promised": "~4.1.1"
   },
   "engines": {
     "node": ">=0.10.0"
   },
   "scripts": {
-    "test": "grunt test"
+    "test-grunt-old": "grunt test",
+    "test": "karma start test/karma.conf.js"
   }
 }

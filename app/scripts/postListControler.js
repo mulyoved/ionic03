@@ -1,4 +1,4 @@
-angular.module('Ionic03.controllers')
+angular.module('Ionic03.PostListCtrl', [])
 
 .controller('PostListCtrl', function (
         $rootScope, $scope, $state, $log, ConfigService,

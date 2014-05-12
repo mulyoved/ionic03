@@ -9,8 +9,17 @@
 angular.module('Ionic03', [
     'ionic',
     'Ionic03.controllers',
+    'Ionic03.AddCtrl',
+    'Ionic03.BlogListSync',
+    'Ionic03.DataSync',
+    'Ionic03.dbTestCtrl',
+    'Ionic03.GoogleApi',
+    'Ionic03.MiscServices',
+    'Ionic03.PostListCtrl',
+    'Ionic03.UnlockCtrl',
     'Ionic03.services',
     'Ionic03.directives',
+    'Ionic03.RetrieveItemsService',
     'gapi',
     'pouchdb',
     'LocalStorageModule'
@@ -199,7 +208,7 @@ angular.module('Ionic03', [
 */
 .config(function ($stateProvider, $urlRouterProvider, localStorageServiceProvider) {
 
-    console.log('$stateProvider config');
+    //console.log('$stateProvider config');
     localStorageServiceProvider.setPrefix('Ionic03');
 
     $stateProvider
@@ -329,7 +338,8 @@ angular.module('Ionic03', [
             authenticate: false
         });
     // if none of the above states are matched, use this as the fallback
-    //$urlRouterProvider.otherwise('/app/playlists');
+
+        //$urlRouterProvider.otherwise('/app/playlists');
     $urlRouterProvider.otherwise('dbtest');
 });
 

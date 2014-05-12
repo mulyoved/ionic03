@@ -1,4 +1,4 @@
-angular.module('Ionic03.controllers')
+angular.module('Ionic03.AddCtrl', [])
 
 .controller('AddCtrl', function (
         $scope, ConfigService, $ionicNavBarDelegate, $timeout, $log,

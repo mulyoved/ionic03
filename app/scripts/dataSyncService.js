@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('Ionic03.controllers')
+angular.module('Ionic03.DataSync', [])
 
 .service('DataSync', function($rootScope, $q, $http, localStorageService, $log,
                           GoogleApp, GoogleApi, GAPI, DataService, Blogger, ConfigService, HTMLReformat, MiscServices) {
@@ -58,9 +58,10 @@ angular.module('Ionic03.controllers')
         return post;
     };
 
-    var bumpDate = function(gapiDate) {
+    var bumpDate = function(gapiDate, milisecodsOffset) {
+        milisecodsOffset = milisecodsOffset || 1;
         var date = new Date(gapiDate);
-        date = new Date(date.getTime() + 1);
+        date = new Date(date.getTime() + milisecodsOffset);
 
         return date2GAPIDate(date);
     };
@@ -72,7 +73,7 @@ angular.module('Ionic03.controllers')
             //'startDate': _lastUpdate.date, // set by code later
             'fields': 'items(author/displayName,content,id,kind,post,published,updated),nextPageToken'
         };
-        $log.log('Going to request comments', params);
+        //$log.log('Going to request comments', params);
         return Blogger.listComments(blogId, postId, params);
     }
 
@@ -101,7 +102,7 @@ angular.module('Ionic03.controllers')
             params.endDate = endDate;
         }
 
-        $log.log('Retrive posts from blogId', ConfigService.blogId, startDate, endDate, limit, params);
+        //$log.log('Retrive posts from blogId', ConfigService.blogId, startDate, endDate, limit, params);
         var promise = Blogger.listPosts(ConfigService.blogId, params).
             then(function(list) {
 
@@ -109,7 +110,7 @@ angular.module('Ionic03.controllers')
                 var lastDate = null;
                 if ('items' in list && list.items.length > 0) {
                     _bloggerList = list.items;
-                    $log.log('Received From blogger Posts: ', list.items.length, list);
+                    //$log.log('Received From blogger Posts: ', list.items.length, list);
 
                     //Create query for each post comments
                     var r = [];
@@ -121,10 +122,10 @@ angular.module('Ionic03.controllers')
             }).
             then(function(list) {
                 angular.forEach(list, function(postComments) {
-                    $log.log('Received From blogger Comments: ', postComments);
+                    //$log.log('Received From blogger Comments: ', postComments);
                     // Get all documents from DB
                     if ('items' in postComments && postComments.items.length > 0) {
-                        $log.log('Received From blogger Comments: ', postComments.items.length, postComments);
+                        //$log.log('Received From blogger Comments: ', postComments.items.length, postComments);
                         // Append list.items to _bloggerList
                         _bloggerList.push.apply(_bloggerList, postComments.items);
                     }
@@ -423,7 +424,7 @@ angular.module('Ionic03.controllers')
         duringSync: false,
 
         init: function() {
-            GoogleApi.getToken({
+            return GoogleApi.getToken({
                 client_id: GoogleApp.client_id,
                 client_secret: GoogleApp.client_secret
             }).then(function(data) {
@@ -514,11 +515,14 @@ angular.module('Ionic03.controllers')
                     $log.error('Add Failed', err);
                 });
         },
-        getItems: function(lastItem) {
-            $log.log('DataSyncService:getItems', lastItem);
+        getItems: function(lastItem, limit) {
+            limit = limit || 20;
+            var published = bumpDate(lastItem.published, 60000);
+            $log.log('DataSyncService:getItems', lastItem, published);
 
-            var published = lastItem.published;
-            return blogger_getModifiedDocuments(null, published, 10);
+            // don't make limit too small as it will get into a series of same date item
+            // and will not be able to progress to next item
+            return blogger_getModifiedDocuments(null, published, Math.max(20, limit));
         },
 
         //---------------------
@@ -543,7 +547,8 @@ angular.module('Ionic03.controllers')
                 }, function(reason) {
                     $log.error('readdb failed', reason);
                 });
-        }
+        },
+        _mapPost: mapPost
 
         /*
         deletedb: function() {

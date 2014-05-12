@@ -14,6 +14,7 @@ angular.module('Ionic03.services',[])
         var openDb = function() {
             var id = ConfigService.blogId; // why this is null?
             _blogdb = pouchdb.create('blogdb_' + id);
+            //console.log('OpenDB', _blogdb);
         };
 
         return {
@@ -21,7 +22,8 @@ angular.module('Ionic03.services',[])
             isLogin: false,
             getItems: function(limit, lastItem) {
                 limit = limit || 10;
-                $log.log('DataService: getItems');
+
+                console.log('DataService: getItems', limit, lastItem);
 
                 var options = {
                     include_docs: true,
@@ -36,10 +38,7 @@ angular.module('Ionic03.services',[])
                     options.skip = 1;
                 }
 
-                $log.log('DataService:getItems - Query Database', options);
-
                 var alldocs = _blogdb.allDocs(options);
-
                 return alldocs;
             },
             getItem: function(id) {
@@ -69,6 +68,8 @@ angular.module('Ionic03.services',[])
                     }).catch(function(reason) {
                         $log.error('readdb failed', reason);
                     });
+
+                return alldocs;
             },
             selectBlog: function(blog) {
                 $log.log('Select BLog', blog);
@@ -99,8 +100,9 @@ angular.module('Ionic03.services',[])
             // Todo: Problem need the server to get or create the albumId based on blogId/Name, if album not found need to create or album is full need to create a new one (limit 2000 images)
             albumId: '5965097735673433505',
 
-            //mainScreen: 'app.playlists',
-            mainScreen: 'dbtest',
+
+            mainScreen: 'app.playlists',
+            //mainScreen: 'dbtest',
             blogId: '4462544572529633201', //'4355243139467288758'
             initialSyncLimit: 100,
         }

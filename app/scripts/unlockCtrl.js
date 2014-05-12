@@ -1,5 +1,5 @@
 'use strict';
-angular.module('Ionic03.controllers')
+angular.module('Ionic03.UnlockCtrl', [])
 
 .controller('UnlockCtrl', function ($scope, ConfigService, localStorageService, $log, $state) {
     var storageKey = 'unlock_code';
