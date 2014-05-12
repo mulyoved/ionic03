@@ -3,7 +3,8 @@ angular.module('Ionic03.PostListCtrl', [])
 .controller('PostListCtrl', function (
         $rootScope, $scope, $state, $log, ConfigService,
         $ionicNavBarDelegate, $ionicViewService, $ionicScrollDelegate, DataSync, DataService, HTMLReformat,
-        items) {
+        RetrieveItemsService
+        /*items*/) {
 
     var iconError = 'icon ion-alert';
     var iconOk = 'ion-ios7-star-outline';
@@ -29,7 +30,7 @@ angular.module('Ionic03.PostListCtrl', [])
             startRefresh = false;
         }
 
-        $log.log('Updated icon ', $scope.syncIcon);
+        //$log.log('Updated icon ', $scope.syncIcon);
     };
 
     $scope.sync = function() {
@@ -49,49 +50,50 @@ angular.module('Ionic03.PostListCtrl', [])
     $ionicNavBarDelegate.showBackButton(false);
     $ionicViewService.clearHistory();
     $scope.syncIcon = "ok";
+    var pendingResetRequest = false;
 
-    var loadItems = function(isLoadMore, lastItem) {
+    var loadItems = function(isLoadMore) {
+
+        $log.log('PostListCtrl Going To Request RetrieveItemsService.loadItems - more:', isLoadMore);
         var scrollPos = $ionicScrollDelegate.getScrollPosition();
         var limit = 10;
-        if (!lastItem && scrollPos && scrollPos.top > 0) {
+        if (!isLoadMore && scrollPos && scrollPos.top > 0) {
             limit = $scope.items.length;
         }
-        $log.log('loadItems', lastItem, $scope.items, limit);
 
-        //Todo: back scroll to the middle?
-        var p = DataService.getItems(limit, lastItem);
-        p.then(function (answer) {
-            $log.log('PostListCtrl: DataService.getItems: Set PlayList !', answer);
+        RetrieveItemsService.loadItems(limit, isLoadMore)
+            .then(function(answer) {
+                $log.log('PostListCtrl:Answer', answer.length, answer, RetrieveItemsService.getStatus());
+                //console.table(answer);
+                $scope.items = answer;
 
-            if (lastItem) {
-                angular.forEach(answer.rows, function(item) {
-                    $scope.items.push(item);
-                });
-            }
-            else {
-                $scope.items = answer.rows;
-            }
+                if (isLoadMore) {
+                    $scope.$broadcast('scroll.infiniteScrollComplete');
+                }
 
-            if (isLoadMore) {
-                $scope.$broadcast('scroll.infiniteScrollComplete');
-            }
-        }, function (err) {
-            if (isLoadMore) {
-                $scope.$broadcast('scroll.infiniteScrollComplete');
-            }
+                $scope.noMoreItemsAvailable = RetrieveItemsService.getStatus().source === 'end';
 
-            $log.error('DataService.getItems Failed ', err);
-        });
+                if (pendingResetRequest) {
+                    pendingResetRequest = false;
+                    loadItems(false);
+                }
+            })
+            .catch(function(err) {
+                if (isLoadMore) {
+                    $scope.$broadcast('scroll.infiniteScrollComplete');
+                }
+
+                $log.error('DataService.getItems Failed ', err);
+                if (!isLoadMore) {
+                    //Failed, probebly Busy, so mark that need to reset
+                    pendingResetRequest = true;
+                }
+            });
     };
 
     $scope.loadMore = function() {
-        if ($scope.items.length>0) {
-            loadItems(true, $scope.items[$scope.items.length - 1].doc);
-        }
-        else {
-            loadItems(true);
-        }
-
+        $log.log('PostListCtrl: loadMore');
+        loadItems(true);
     };
 
 
@@ -101,7 +103,7 @@ angular.module('Ionic03.PostListCtrl', [])
     });
 
     $scope.$on("event:DataSync:DataChange", function (event) {
-        $log.log('PostListCtrl: Recived: event:DataSync:DataChange');
+        $log.log('PostListCtrl: Recived: event:DataSync:DataChange, reload list from start');
         loadItems(false); // load only as needed items in case of update
     });
 
@@ -112,18 +114,15 @@ angular.module('Ionic03.PostListCtrl', [])
     };
 
     $scope.show = function(item) {
-        var results = HTMLReformat.reformat(item.doc.content);
-        //$log.log(item);
-        return results;
+        return HTMLReformat.reformat(item.content);
     };
 
     $scope.needToSync = function(item) {
-        return item.doc.key === 'U';
+        return item.key === 'U';
     };
 
     $scope.noMoreItemsAvailable = false;
-    $scope.items = items.rows;
+    //$scope.items = RetrieveItemsService.getItems();
     updateIcon();
-    loadItems(false);
-
+    //loadItems(false);
 });

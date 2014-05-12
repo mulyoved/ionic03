@@ -3,7 +3,7 @@
 angular.module('Ionic03.BlogListSync', [])
 
 .service('BlogListSync', function($rootScope, $q, localStorageService, $log,
-                          GoogleApp, GoogleApi, GAPI, Blogger, ConfigService) {
+                          GoogleApp, GoogleApi, GAPI, Blogger) {
 
     var blogListSync = {
         clearStorage: function() {
@@ -11,7 +11,7 @@ angular.module('Ionic03.BlogListSync', [])
         },
 
         loadBlogList: function() {
-            var p = Blogger.listBlogsByUser('self')
+            return Blogger.listBlogsByUser('self')
             .then(function(answer) {
                 $log.log('loadBlogList', answer);
                 console.table(answer.items);
@@ -32,8 +32,6 @@ angular.module('Ionic03.BlogListSync', [])
             }).catch(function(err) {
                 $log.error('loadBlogList Error', err);
             });
-
-            return p;
         },
 
         getBlogList: function() {

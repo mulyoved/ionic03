@@ -76,7 +76,7 @@ angular.module('Ionic03', [
                 $log.error('Sync error', DataSync.error);
                 DataSync.error.done = true;
                 if (DataSync.error.status == 401) {
-                    $status.go('login');
+                    $state.go('login');
                 }
                 else {
                     var err = 'Unknown';
@@ -282,11 +282,13 @@ angular.module('Ionic03', [
                     controller: 'PostListCtrl'
                 }
             },
+            /*
             resolve: {
                 items: function (DataService) {
                     return DataService.getItems(20);
                 }
             },
+            */
             authenticate: true
         })
         .state('app.single', {

@@ -27,7 +27,7 @@ angular.module('Ionic03.DataSync', [])
             + ":" + pad(Math.abs(offset) % 60, 2);
     };
 
-    var ConvertDateToKey = function(date) {
+    var convertDateToKey = function(date) {
         var timePublished = new Date(date).getTime();
         return 'P' + (2000000000000 - timePublished) + '#';
     };
@@ -103,11 +103,10 @@ angular.module('Ionic03.DataSync', [])
         }
 
         //$log.log('Retrive posts from blogId', ConfigService.blogId, startDate, endDate, limit, params);
-        var promise = Blogger.listPosts(ConfigService.blogId, params).
+        return Blogger.listPosts(ConfigService.blogId, params).
             then(function(list) {
 
                 // Get all modified comments from Blogger
-                var lastDate = null;
                 if ('items' in list && list.items.length > 0) {
                     _bloggerList = list.items;
                     //$log.log('Received From blogger Posts: ', list.items.length, list);
@@ -133,8 +132,6 @@ angular.module('Ionic03.DataSync', [])
 
                 return _bloggerList;
             });
-
-        return promise;
     };
 
     var syncFromBlogger = function() {
@@ -143,7 +140,7 @@ angular.module('Ionic03.DataSync', [])
         var _bloggerList = [];
 
         //Update DB->Blogger
-        var p = DataService.blogdb().get('lastUpdate').
+        DataService.blogdb().get('lastUpdate').
         // read last update time from database
         then(function(lastUpdate) {
             // Get last update from DB
@@ -176,7 +173,7 @@ angular.module('Ionic03.DataSync', [])
                     }
                 });
 
-                var maxKey = ConvertDateToKey(maxDate)+'z';
+                var maxKey = convertDateToKey(maxDate)+'z';
                 $log.log('Query database for exsting document in the same date range as recived from blogger', maxDate, maxKey);
                 return DataService.blogdb().allDocs({
                     include_docs: true,
@@ -360,7 +357,7 @@ angular.module('Ionic03.DataSync', [])
     var proccessArray = function(arr, promise) {
         var item = arr.pop();
         if (item) {
-            var p = promise(item).
+            return promise(item).
                 then(function (answer) {
                     if (arr.length > 0) {
                         return proccessArray(arr, promise);
@@ -369,8 +366,6 @@ angular.module('Ionic03.DataSync', [])
                         return 0;
                     }
                 });
-
-            return p;
         }
         else {
             return 0;
@@ -395,14 +390,17 @@ angular.module('Ionic03.DataSync', [])
          });
          */
 
-        var p = alldocs
+        alldocs
         .then(function(answer) {
             $log.log('syncToBlogger ',answer);
 
-            if (answer.total_rows > 0) {
-                return proccessArray(answer.rows, syncToBloggerDoc)
+            //Reverse the order, work better with blogger
+            var arr = answer.rows.reverse();
+
+            if (arr.length > 0) {
+                return proccessArray(arr, syncToBloggerDoc)
                 .then(function(doc) {
-                    $log.log('syncToBlogger syncToBloggerDoc Answer',answer);
+                    $log.log('syncToBlogger syncToBloggerDoc Answer', doc);
                     deferred.resolve(doc);
                 }, function(err) {
                     $log.log('syncToBlogger syncToBloggerDoc Error',err);
@@ -480,8 +478,6 @@ angular.module('Ionic03.DataSync', [])
         },
 
         savePost: function(text) {
-            var time = new Date();
-
             text = text.replace(/\n/g, '<br />');
             $log.log('DataService: Save Item', text);
             dataSync.createPost('', text);
@@ -491,7 +487,7 @@ angular.module('Ionic03.DataSync', [])
             var time = new Date();
 
             var post = {
-                id: 'G' + time.getTime(), // Generated ID
+                id: 'G' + time.getTime(),
                 kind: 'db#post',
                 title: title,
                 content: content,
@@ -517,7 +513,10 @@ angular.module('Ionic03.DataSync', [])
         },
         getItems: function(lastItem, limit) {
             limit = limit || 20;
-            var published = bumpDate(lastItem.published, 60000);
+            var published = null;
+            if (lastItem) {
+                published = bumpDate(lastItem.published, 60000);
+            }
             $log.log('DataSyncService:getItems', lastItem, published);
 
             // don't make limit too small as it will get into a series of same date item

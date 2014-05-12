@@ -17,7 +17,7 @@
     </ion-refresher>
 
     <ion-list>
-      <div class="item item-body post-item item-icon-right" ng-repeat="item in items track by item.id" href="#/app/playlists/{{item.id}}">
+      <div class="item item-body post-item item-icon-right" ng-repeat="item in items track by item._id" href="#/app/playlists/{{item.id}}">
           <div class="blog-content" ng-bind-html="show(item)"></div>
           <i ng-if="needToSync(item)" class="icon ion-ios7-refresh-empty"></i>
           <!-- <p class="blog-content">{{item.doc.content}}</p> -->

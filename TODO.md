@@ -51,3 +51,4 @@ done test 1 image upload ok 2nd not, improve code to upload only the 2nd image
 10. Test on older Android - Which version will be used
 11. Testing with Protector
 12. lock screen and retrigger request on power button, app switch
+

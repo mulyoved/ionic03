@@ -2,7 +2,7 @@
  * Created by Muly on 4/20/2014.
  */
 angular.module('Ionic03.services',[])
-    .factory('DataService', function($log,$q, pouchdb, ConfigService) {
+    .factory('DataService', function($rootScope, $log,$q, pouchdb, ConfigService) {
         var _blogdb;
         var currentNewText = '';
 
@@ -38,8 +38,7 @@ angular.module('Ionic03.services',[])
                     options.skip = 1;
                 }
 
-                var alldocs = _blogdb.allDocs(options);
-                return alldocs;
+                return alldocs = _blogdb.allDocs(options);
             },
             getItem: function(id) {
                 return items[id-1];
@@ -80,6 +79,7 @@ angular.module('Ionic03.services',[])
                 ConfigService.blogName = blog.name;
                 $log.log('ConfigService.blogId', ConfigService.blogId, id, ConfigService.blogName);
                 openDb();
+                $rootScope.$broadcast('event:DataSync:DataChange');
 
                 //done Switch database, remobe blogdb and make it property of Config, access from controlers by var
                 //done reimplement delete database to actually drop and create
@@ -104,6 +104,6 @@ angular.module('Ionic03.services',[])
             mainScreen: 'app.playlists',
             //mainScreen: 'dbtest',
             blogId: '4462544572529633201', //'4355243139467288758'
-            initialSyncLimit: 100,
+            initialSyncLimit: 100
         }
     });
