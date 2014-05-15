@@ -11,9 +11,10 @@
 angular.module('Ionic03.dbTestCtrl', [])
 
 .controller('dbTestCtrl', function(
-    $scope, ConfigService, $log, $q,
+    $scope, ConfigService, $log, $q, $http,
     GAPI, Blogger, pouchdb, GoogleApi, GoogleApp, DataSync,
-    DataService, HTMLReformat, MiscServices, BlogListSync, RetrieveItemsService
+    DataService, HTMLReformat, MiscServices, BlogListSync, RetrieveItemsService,
+    PushServices
     )
 {
     $scope.answer = '<empty>';
@@ -22,6 +23,7 @@ angular.module('Ionic03.dbTestCtrl', [])
         $log.log('sync');
 
         DataSync.sync();
+        $scope.dumpAnswer = 'sync';
     };
 
     $scope.createPost = function () {
@@ -68,11 +70,22 @@ angular.module('Ionic03.dbTestCtrl', [])
 
     //---------------------
     $scope.dumpDatabase = function () {
-        DataSync.dumpDatabase();
+        DataSync.dumpDatabase()
+            .then(function(rows) {
+                $scope.dumpAnswer = 'dump';
+                $scope.answerCount = rows.length;
+            })
+            .catch(function(err) {
+                $scope.dumpAnswer = 'error' + err;
+                $log.error('Failed', err);
+            })
+
     };
 
     $scope.deletedb = function () {
         DataService.deletedb();
+        $scope.dumpAnswer = 'deleted';
+        $scope.answerCount = 0;
     };
 
     $scope.db_showItems = [];
@@ -200,6 +213,8 @@ angular.module('Ionic03.dbTestCtrl', [])
 
     $scope.clearToken = function() {
         GoogleApi.clearToken();
+        BlogListSync.clearStorage();
+
     };
 
     //-------------------------------------------------------------------
@@ -436,11 +451,44 @@ angular.module('Ionic03.dbTestCtrl', [])
         BlogListSync.getBlogList()
             .then(function(answer) {
                 var blog = answer[idx];
-                DataService.selectBlog(blog);
+                DataService.selectBlog(blog.id);
                 $log.log('Selected Blog', idx, blog, ConfigService);
             }).catch(function(err) {
                 $log.error('SelectBlog Error', err);
             });
 
+    };
+
+    //-----------------------------------------------------------------------------
+    $scope.pushQuery = function() {
+        $log.log('pushQuery Started');
+        PushServices.dbg_queryAll();
+    };
+
+    $scope.sendPostMessage = function() {
+        $log.log('sendPostMessage');
+
+        PushServices.updateBlog(ConfigService.blogId);
+        /*
+        var message = 'New Star';
+
+        var pushInfo = {
+            device_types: 'all',
+            audience: {
+                'tag': 'BLOG:' + ConfigService.blogId
+            },
+            notification: {
+                alert: message
+            }
+        };
+
+        $http.post('http://127.0.0.1:3000/push/', pushInfo)
+        .success(function(answer) {
+                $log.log('Success', answer);
+            })
+        .error(function(err) {
+                $log.error('Failed', err);
+            });
+        */
     }
 });

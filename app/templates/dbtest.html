@@ -1,12 +1,18 @@
 <ion-view title="DBTest">
     <ion-content class="has-header">
         <p>version 3:<a href="#/app/playlists">Main</a></p>
+        <p>answer: <span>{{dumpAnswer}}</span> Count:<span>{{answerCount}}</span></p>
+        <p>-------------------------------------------------------------------------------------------------------------</p>
+        <p>Push</p>
+        <button ng-click="pushQuery()">Push Query</button>
+        <button ng-click="sendPostMessage()">Send Push Message</button>
+
         <p>-------------------------------------------------------------------------------------------------------------</p>
         <p><a href="#/testInfinitScroll">testInfinitScroll</a></p>
         <p>-------------------------------------------------------------------------------------------------------------</p>
         <p>DataBase Operations</p>
         <button ng-click="dumpDatabase()">Dump Database</button>
-        <button ng-click="deletedb()">Delete Database</button>
+        <button id="delete-database" ng-click="deletedb()">Delete Database</button>
         <p>-------------------------------------------------------------------------------------------------------------</p>
         <p>Sync</p>
         <button ng-click="sync()">Sync</button>
@@ -60,7 +66,7 @@
         <p>-------------------------------------------------------------------------------------------------------------</p>
         <button ng-click="raiseError()">Raise Error</button>
         <p>-------------------------------------------------------------------------------------------------------------</p>
-        <p>answer: {{answer}}</p>
+
         <p>syncResult: {{syncResult}}</p>
 
         <list class="fade-in-not-out col" onhold="onListHold" can-delete="true" on-delete="deleteItem(item)" delete-icon="ion-trash-a" show-delete="isDeletingItems">
@@ -73,7 +79,7 @@
         <p>-------------------------------------------------------------------------------------------------------------</p>
         <p>Auth</p>
         <button ng-click="logout()">Logout</button>
-        <button ng-click="clearToken()">Clear Local Token</button>
+        <button ng-click="clearToken()">Clear Local Storage</button>
 
         <p>-------------------------------------------------------------------------------------------------------------</p>
         <button ng-click="htmlParserTest()">HTML Parser Test</button>

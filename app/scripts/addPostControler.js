@@ -5,31 +5,20 @@ angular.module('Ionic03.AddCtrl', [])
         DataService, DataSync, MiscServices, HTMLReformat,
         item) {
 
-    function savePost(text) {
-        DataSync.savePost(text);
-        $ionicNavBarDelegate.back();
-    }
-
-    function cameraPicture(sourceType) {
-        $log.log('takePicture mode:', sourceType);
-
-        //Camera.PictureSourceType.CAMERA
-        MiscServices.cameraPicture(sourceType).
-            then(function (imageURI) {
-                if (imageURI) {
-                    $log.log('Got image URI', imageURI);
-                    var text = MiscServices.formatImageUrl(imageURI);
-                    //$scope.upload_answer = text;
-                    savePost(text);
-                }
-            }, function (err) {
-                $log.error('cameraPicture', err);
-                $scope.upload_answer = err;
-            });
-    }
-
     $scope.title = ConfigService.blogName;
     $scope.item = item;
+
+    function savePost(text) {
+        if (text) {
+            DataSync.savePost(text)
+                .then(function(answer) {
+                    $ionicNavBarDelegate.back();
+                })
+                .catch(function(err) {
+                    throw new Error('Failed to save new post in local database');
+                });
+        }
+    }
 
     $scope.save = function () {
         console.log('Going to save: ', $scope.item);
@@ -41,22 +30,6 @@ angular.module('Ionic03.AddCtrl', [])
     $scope.cancel = function () {
         console.log('Cancel');
         $ionicNavBarDelegate.back();
-    };
-
-    $scope.takePicture = function () {
-        var sourceType = 0;
-        if (typeof Camera != 'undefined') {
-            sourceType = Camera.PictureSourceType.CAMERA;
-        }
-        cameraPicture(sourceType);
-    };
-
-    $scope.pickImage = function () {
-        var sourceType = 0;
-        if (typeof Camera != 'undefined') {
-            sourceType = Camera.PictureSourceType.PHOTOLIBRARY;
-        }
-        cameraPicture(sourceType);
     };
 
     //not sure why, seem like bug in chrom, textinput is not working correctly

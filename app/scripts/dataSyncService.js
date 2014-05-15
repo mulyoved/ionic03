@@ -135,6 +135,8 @@ angular.module('Ionic03.DataSync', [])
     };
 
     var syncFromBlogger = function() {
+        var deferred = $q.defer();
+        var recived = 0;
         var _lastUpdate;
         var _lastUpdateChanged = false;
         var _bloggerList = [];
@@ -163,8 +165,6 @@ angular.module('Ionic03.DataSync', [])
 
             //Get all documents in database
             if (list.length > 0) {
-                //todo: try to improve bu limit documents by key
-                //find earlist date in records so we can retrive only the relevant documents from the database
                 var maxDate = list[0].published;
                 angular.forEach(list, function(item) {
                     //$log.log('Item from blogger: ', item);
@@ -174,7 +174,7 @@ angular.module('Ionic03.DataSync', [])
                 });
 
                 var maxKey = convertDateToKey(maxDate)+'z';
-                $log.log('Query database for exsting document in the same date range as recived from blogger', maxDate, maxKey);
+                $log.log('Query database for exsting document in the same date range as received from blogger', maxDate, maxKey);
                 return DataService.blogdb().allDocs({
                     include_docs: true,
                     attachments: false,
@@ -232,6 +232,7 @@ angular.module('Ionic03.DataSync', [])
 
                 _lastUpdate.date = lastUpdate;
                 if (toUpdate.length > 0) {
+                    recived  += toUpdate.length;
                     _lastUpdateChanged = true;
                     return DataService.blogdb().bulkDocs({'docs': toUpdate});
                 }
@@ -248,9 +249,15 @@ angular.module('Ionic03.DataSync', [])
                 $log.log('Nothing to update, all uptodate', answer);
                 return 0;
             }
+        })
+        .then(function(answer) {
+            deferred.resolve(recived);
+        })
+        .catch(function(err) {
+            deferred.reject(err);
         });
 
-        return p;
+        return deferred.promise;
     };
 
     var uploadImages = function(doc) {
@@ -397,11 +404,12 @@ angular.module('Ionic03.DataSync', [])
             //Reverse the order, work better with blogger
             var arr = answer.rows.reverse();
 
-            if (arr.length > 0) {
+            var count = arr.length;
+            if (count > 0) {
                 return proccessArray(arr, syncToBloggerDoc)
                 .then(function(doc) {
                     $log.log('syncToBlogger syncToBloggerDoc Answer', doc);
-                    deferred.resolve(doc);
+                    deferred.resolve(count);
                 }, function(err) {
                     $log.log('syncToBlogger syncToBloggerDoc Error',err);
                     deferred.reject(err);
@@ -420,6 +428,7 @@ angular.module('Ionic03.DataSync', [])
         gapiLogin: false,
         needSync: false, // Dirty
         duringSync: false,
+        newData: false,
 
         init: function() {
             return GoogleApi.getToken({
@@ -454,16 +463,31 @@ angular.module('Ionic03.DataSync', [])
                 dataSync.error = null;
                 console.log('Start Sync');
                 $rootScope.$broadcast('event:DataSync:StatusChange');
+                var sent = 0;
+                var recived = 0;
                 syncToBlogger()
                     .then(function (answer) {
+                        sent = answer;
                         return syncFromBlogger();
                     })
                     .then(function (answer) {
+                        recived = answer;
+
+                        var data = {
+                            action: 'sync',
+                            blogid: ConfigService.blogId,
+                            sent: sent,
+                            received: recived,
+                            duringSync: false,
+                            error: null
+                        };
+
                         $log.log('syncModifiedDocuments completed', answer);
                         dataSync.duringSync = false;
                         dataSync.error = null;
                         $rootScope.$broadcast('event:DataSync:StatusChange');
-                        $rootScope.$broadcast('event:DataSync:DataChange');
+                        //$rootScope.$broadcast('event:DataSync:DataChange');
+                        $rootScope.$broadcast('event:DataSync:Notify', data);
                     }, function (reason) {
                         $log.error('syncModifiedDocuments Failed', reason);
                         dataSync.duringSync = false;
@@ -480,7 +504,7 @@ angular.module('Ionic03.DataSync', [])
         savePost: function(text) {
             text = text.replace(/\n/g, '<br />');
             $log.log('DataService: Save Item', text);
-            dataSync.createPost('', text);
+            return dataSync.createPost('', text);
         },
 
         createPost: function(title, content) {
@@ -496,16 +520,16 @@ angular.module('Ionic03.DataSync', [])
             };
 
             mapPost(post);
-            DataService.blogdb().post(post)
+            return DataService.blogdb().post(post)
                 .then(function(answer) {
                     $log.log('Add Success', answer);
                     //Trigger db change
                     //Start Sync
 
                     //todo: uncomment temp to see unsync item from database in list
-                    //dataSync.needSync = true;
-                    $log.log('Data Sync $broadcast DataChange');
-                    $rootScope.$broadcast('event:DataSync:DataChange');
+                    dataSync.needSync = true;
+                    dataSync.newData = true;
+                    //$rootScope.$broadcast('event:DataSync:DataChange');
                     $rootScope.$broadcast('event:DataSync:StatusChange');
                 }, function(err) {
                     $log.error('Add Failed', err);
@@ -528,7 +552,7 @@ angular.module('Ionic03.DataSync', [])
         dumpDatabase: function() {
             var alldocs = DataService.blogdb().allDocs({include_docs: true, attachments: true});
 
-            alldocs
+            return alldocs
                 .then(function(answer) {
                     $log.log('All docs', answer);
                     //$scope.syncResult = 'done:' + answer.total_rows;
@@ -542,7 +566,7 @@ angular.module('Ionic03.DataSync', [])
 
                     //console.log(r);
                     console.table(r);
-
+                    return answer.rows;
                 }, function(reason) {
                     $log.error('readdb failed', reason);
                 });

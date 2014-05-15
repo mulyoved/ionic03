@@ -17,12 +17,6 @@ Select Y for overwriting your Gruntfile.js and bower.json to stay up-to-date wit
 Compare them to make sure no packages was removed
 Select Compass = Y
 
-##Grunt Process
-
-`grunt copy:all && grunt emulate:android`
-
-
-
 ##Google Sign In For Cordova
 
 [Article](http://phonegap-tips.com/articles/google-api-oauth-with-phonegaps-inappbrowser.html)
@@ -46,10 +40,6 @@ To install the InAppBrowser plugin (if necessary)...
 `cordova plugin add org.apache.cordova.inappbrowser`
 
 
-Get log from device
-
-`adb logcat CordovaLog:D *:S`
-
 Q: How to reset the emulator
 
 A: Android (from cmd not bash) delete and recreate
@@ -58,11 +48,21 @@ Q: Work with grunt
 
 A:
 
+##Grunt Process
+
 `grunt cordova`
 
 `grunt emulate:android`
 
 `adb logcat CordovaLog:D *:S`
+`adb logcat GCM:D memtrack:S android.os.Debug:S eglCodecCommon:S jdwp:S linker:E *:W`
+
+
+`grunt copy:all && grunt emulate:android`
+
+
+
+
 
 [File upload Example](http://coenraets.org/blog/2013/09/how-to-upload-pictures-from-a-phonegap-application-to-node-js-and-other-servers-2/)
 
@@ -77,6 +77,35 @@ Add Plugins
 `cordova plugin add org.apache.cordova.file-transfer`
 
 `cordova plugin add org.apache.cordova.camera`
+
+Instructions https://github.com/urbanairship/phonegap-ua-push
+
+`cordova plugin add https://github.com/urbanairship/phonegap-ua-push.git`
+
+To debug use logcat full
+Must use Google API and not android https://support.urbanairship.com/customer/portal/articles/1266113-pushing-to-an-android-emulator
+https://software.intel.com/en-us/blogs/2014/03/06/now-available-android-sdk-x86-system-image-with-google-apis
+Add to d:/js/Ionic03/config.xml
+
+	<!-- Urban Airship app credentials -->
+	<preference name="com.urbanairship.production_app_key" value="PRODUCTION_APP_KEY" />
+	<preference name="com.urbanairship.production_app_secret" value="PRODUCTION_APP_SECRET" />
+	<preference name="com.urbanairship.development_app_key" value="dvjEEpPWSDumYs1cbqbIlw" />
+	<preference name="com.urbanairship.development_app_secret" value="saLsLNGmRoC4oGItaQ5Mpw" />
+
+	<!-- If the app is in production or not -->
+	<preference name="com.urbanairship.in_production" value="false" />
+
+	<!-- Enable push when the application launches (instead of waiting for enablePush js call).  Defaults to false -->
+	<preference name="com.urbanairship.enable_push_onlaunch" value="true" />
+
+	<!-- Only required for Android. -->
+	<preference name="com.urbanairship.gcm_sender" value="AIzaSyA78RO9-B7qEr-WXJULOq3u-n4C7RS9wz4" />
+
+
+
+
+if fail create the folders manually
 
 $ cordova plugins ls
 [ 'org.apache.cordova.camera',
@@ -146,3 +175,5 @@ http://stackoverflow.com/questions/20959748/e2e-protractor-test-requiring-oauth-
 
 Hands on Protractor, E2E Testing for AngularJS
 http://blog.liftoffllc.in/2013/12/hands-on-protractor-e2e-testing-for.html
+
+

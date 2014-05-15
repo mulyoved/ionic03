@@ -58,13 +58,16 @@ angular.module('Ionic03.controllers', [])
 
 })
 
-.controller('DiagnosticCtrl', function ($scope, ConfigService, DataSync) {
+.controller('DiagnosticCtrl', function ($scope, $state, ConfigService, DataSync) {
     $scope.gapiLogin = DataSync.gapiLogin;
     $scope.error = DataSync.error;
     $scope.duringSync = DataSync.duringSync;
     $scope.needSync = DataSync.needSync;
     $scope.sync = function() {
         DataSync.sync();
+    };
+    $scope.login = function() {
+        $state.go('login');
     }
 })
 
@@ -83,7 +86,11 @@ angular.module('Ionic03.controllers', [])
     $scope.goback = function() {
         console.log('goback');
         $state.go(ConfigService.mainScreen);
-    }
+    };
+
+    $scope.login = function() {
+        $state.go('login');
+    };
 })
 
 .controller('BlogListCtrl', function ($scope, $state, $log, ConfigService, DataService, BlogListSync, items) {
@@ -105,7 +112,7 @@ angular.module('Ionic03.controllers', [])
 
     $scope.selectBlog = function(item) {
         $log.log('SelectBlog', item);
-        DataService.selectBlog(item);
+        DataService.selectBlog(item.id);
         $state.go(ConfigService.mainScreen);
     };
 

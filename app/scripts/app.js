@@ -15,6 +15,7 @@ angular.module('Ionic03', [
     'Ionic03.dbTestCtrl',
     'Ionic03.GoogleApi',
     'Ionic03.MiscServices',
+    'Ionic03.PushServices',
     'Ionic03.PostListCtrl',
     'Ionic03.UnlockCtrl',
     'Ionic03.services',
@@ -26,7 +27,8 @@ angular.module('Ionic03', [
 ])
 
 
-.run(function ($ionicPlatform, $state, $rootScope, $urlRouter, $log, $ionicPopup, ConfigService, DataService, DataSync) {
+.run(function ($ionicPlatform, $state, $rootScope, $urlRouter, $log, $ionicPopup,
+               ConfigService, DataService, DataSync, PushServices) {
     $ionicPlatform.ready(function () {
         if (window.StatusBar) {
             StatusBar.styleDefault();
@@ -34,6 +36,7 @@ angular.module('Ionic03', [
 
         //start async load of GAPI/Auth2
         DataSync.init();
+        PushServices.init();
     });
 
     $rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
@@ -59,8 +62,34 @@ angular.module('Ionic03', [
 
     });
 
+    $rootScope.$on("event:DataSync:Notify", function (event, args) {
+        console.log('APP event:DataSync:Notify', event, args);
+
+        if (args.sent > 0) {
+            PushServices.updateBlog(args.blogid)
+                .then(function(answer) {
+                    $log.log('Sent Push', args);
+                })
+                .catch(function(err) {
+                    $log.error('Failed to send push', err);
+
+                    $ionicPopup.alert({
+                        title: 'Failed to send push',
+                        content: err
+                    }).then(function (res) {
+                    });
+                });
+        }
+
+        if (args.action === 'blogid') {
+            //switched blog, listen to the new one
+            PushServices.listenToBlogs([args.blogid]);
+            DataSync.needSync = true;
+        }
+    });
+
     $rootScope.$on("event:DataSync:StatusChange", function (event) {
-        console.log('APP Recived DataSync:StatusChange', $state.is('login'), event);
+        console.log('APP Recived DataSyn:StatusChange', $state.is('login'), event);
         if (DataSync.gapiLogin && $state.is('login')) {
             $state.go(ConfigService.mainScreen);
         }
@@ -101,7 +130,7 @@ angular.module('Ionic03', [
     });
 
     //Todo: read from local storage
-    DataService.selectBlog({ id: '4462544572529633201', name: 'Unknown'});
+    DataService.selectBlog('4462544572529633201');
 })
 .config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.useXDomain = true;
@@ -341,8 +370,8 @@ angular.module('Ionic03', [
         });
     // if none of the above states are matched, use this as the fallback
 
-        //$urlRouterProvider.otherwise('/app/playlists');
-    $urlRouterProvider.otherwise('dbtest');
+    $urlRouterProvider.otherwise('/app/playlists');
+    //$urlRouterProvider.otherwise('dbtest');
 });
 
 if (typeof String.prototype.startsWith != 'function') {

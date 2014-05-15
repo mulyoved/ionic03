@@ -1,28 +1,33 @@
 <ion-view align-title="left" title="{{title}}">
-  <ion-nav-buttons side="left">
-      <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
-  </ion-nav-buttons>
-  <ion-nav-buttons side="right">
-      <button class="button button-icon" ng-click="sync()">
+    <ion-nav-buttons side="left">
+        <button menu-toggle="left" class="button button-icon icon ion-navicon">
+        </button><button class="button button-icon" ng-click="sync()">
         <i class="icon ion-alert" ng-class="syncIcon"></i>
-      </button><button class="button button-icon" ng-click="add()">
+    </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="right">
+        <button class="button button-icon" ng-click="takePicture()">
+        <i class="icon ion-android-camera"></i>
+    </button><button class="button button-icon" ng-click="pickImage()">
+        <i class="icon ion-image"></i>
+    </button><button class="button button-icon" ng-click="add()">
         <i class="icon ion-plus-round"></i>
-      </button>
-  </ion-nav-buttons>
-  <ion-content class="has-header">
+    </button>
+    </ion-nav-buttons>
+    <ion-content class="has-header">
 
-    <ion-refresher on-refresh="doRefresh()"
-        pulling-text="Pull to refresh..."
-        refreshing-icon="">
-    </ion-refresher>
+        <ion-refresher on-refresh="doRefresh()"
+                       pulling-text="Pull to refresh..."
+                       refreshing-icon="">
+        </ion-refresher>
 
-    <ion-list>
-      <div class="item item-body post-item item-icon-right" ng-repeat="item in items track by item._id" href="#/app/playlists/{{item.id}}">
-          <div class="blog-content" ng-bind-html="show(item)"></div>
-          <i ng-if="needToSync(item)" class="icon ion-ios7-refresh-empty"></i>
-          <!-- <p class="blog-content">{{item.doc.content}}</p> -->
-      </div>
-    </ion-list>
-    <ion-infinite-scroll ng-if="!noMoreItemsAvailable" on-infinite="loadMore()" distance="1%"></ion-infinite-scroll>
-  </ion-content>
+        <ion-list>
+            <div class="item item-body post-item item-icon-right" ng-repeat="item in items track by item._id" href="#/app/playlists/{{item.id}}">
+                <div class="blog-content" ng-bind-html="show(item)"></div>
+                <i ng-if="needToSync(item)" class="icon ion-ios7-refresh-empty"></i>
+                <!-- <p class="blog-content">{{item.doc.content}}</p> -->
+            </div>
+        </ion-list>
+        <ion-infinite-scroll ng-if="!noMoreItemsAvailable" on-infinite="loadMore()" distance="1%"></ion-infinite-scroll>
+    </ion-content>
 </ion-view>

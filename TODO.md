@@ -30,25 +30,55 @@ done test 1 image upload ok 2nd not, improve code to upload only the 2nd image
     done Switch blog, just use different database?
 
 2. done - Allow to select blog
-4. Limit Database size
-5. Load More - Infinit list, when beyond database use blogger directly
+4. done - Limit Database size
+5. done - Load More - Infinit list, when beyond database use blogger directly
     - http://ionicframework.com/docs/api/directive/ionInfiniteScroll/
     - play with load more list
     - see if can add more items dynamicly without saving in database
     - check delete old records from database
-3. Auto sync, retry and such, delay
 
 
-7. Alerts
-8. Hidden Images
-9. Alerts - Notifications -
+7. Alerts - Push notifications
+
     http://plugreg.com/plugin/phonegap-build/PushPlugin or
     https://github.com/Pushwoosh/phonegap-cordova-push-notifications
     https://github.com/katzer/cordova-plugin-local-notifications
     http://aerogear.org/
     http://forum.ionicframework.com/t/pushnotification-guide-for-android/3756
 
-10. Test on older Android - Which version will be used
-11. Testing with Protector
-12. lock screen and retrigger request on power button, app switch
+    Send PUSH
+    Subscribe to blog ID
+    Send After Sync
+    Sync on blog switch
+    sync on incomming message
+    hold - network state, sync on reconnect
+    test end to end push -
+        done make new post
+        done see notification sent
+        done recived
+        close app and open from notification
+        filter by username
+        done set variables of server
+        done deploy server
 
+3. Hold - Auto sync, retry and such, delay
+     Connection - wait for online event for syncronization
+     Periodic Sync - on hold, maybe will get push notification to do this
+
+12. lock screen and retrigger request on power button, app switch
+    Connect to events -> maybe use pushservice events
+    Improve lock screen
+
+13 test on Android 4.0.3
+
+11. Testing with Protector
+    http://gaslight.co/blog/getting-started-with-protractor-and-page-objects-for-angularjs-e2e-testing
+    https://egghead.io/lessons/angularjs-getting-started-with-protractor
+
+14. Deploy in Google Store -> APK
+15. Test on device
+
+After 1.0
+==========
+8. Hidden Images
+11. Insta NASA lock screen
