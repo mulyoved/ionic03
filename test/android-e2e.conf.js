@@ -10,29 +10,39 @@ exports.config = {
     ],
     chromeOnly: false,
     capabilities: {
-        device: 'android',
-        'browserName': 'Android',
+        //device: 'android',
+        //automationName: 'selendroid',
+        platform: 'Android',
+        platformName: 'Android',
+        platformVersion: "4.4",
+        'browserName': '',
         'deviceName' : 'Android Emulator',
         "appPackage": "com.example.Ionic03",
-        "appActivity" : 'Ionic03',
+        "appActivity" : 'Ionic03'
         //'app'
     },
-    baseUrl: 'http://10.0.2.2:' + (process.env.HTTP_PORT || '8000'),
+    suites: {
+        dbtest: './e2e/dbtest.spec.js',
+        browse: './e2e/browse.spec.js'
+    },
+    params: {
+        login: {
+            user: 'bloggerApplication',
+            password: 'Giza2000'
+        }
+    },
+    //baseUrl: 'http://10.0.2.2:' + (process.env.HTTP_PORT || '8000'),
     jasmineNodeOpts: {
         onComplete: null,
-        isVerbose: false,
+        isVerbose: true,
         showColors: true,
-        includeStackTrace: false
+        includeStackTrace: true
     },
+    'webviewSupport': true,
 
+    /*
     onPrepare: function() {
         jasmine.getEnv().addReporter(new ScreenshotReporter(".tmp/protractorss"));
     }
+    */
 };
-
-if (typeof String.prototype.startsWith != 'function') {
-    String.prototype.startsWith = function (str){
-        return this.slice(0, str.length) == str;
-    };
-}
-

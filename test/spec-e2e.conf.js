@@ -22,6 +22,12 @@ exports.config = {
         dbtest: './e2e/dbtest.spec.js',
         browse: './e2e/browse.spec.js'
     },
+    params: {
+        login: {
+            user: 'bloggerApplication',
+            password: 'Giza2000'
+        }
+    },
 
     onPrepare: function() {
         jasmine.getEnv().addReporter(new ScreenshotReporter(".tmp/protractorss"));

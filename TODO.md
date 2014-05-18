@@ -101,3 +101,5 @@ After 1.0
 
 Use: Google Closure Compiler
 http://www.mircozeiss.com/a-radical-new-approach-to-developing-angularjs-apps/
+
+background & title image to login screen

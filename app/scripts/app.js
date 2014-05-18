@@ -45,14 +45,18 @@ angular.module('Ionic03', [
         //http://arthur.gonigberg.com/2013/06/29/angularjs-role-based-auth/
         //https://medium.com/opinionated-angularjs/4e927af3a15f
 
-        console.log("Redirect to login", toState.name);
-        if (!DataSync.gapiLogin && toState.name !== 'login') {
-            $state.transitionTo('login');
-            event.preventDefault();
-        }
-        else if (!ConfigService.blogId && toState.name !== 'app.bloglist' && toState.name !== 'login') {
-            $state.transitionTo('app.bloglist');
-            event.preventDefault();
+        console.log("$stateChangeStart", fromState.name, toState.name);
+        if (toState.authenticate) {
+            if (!DataSync.gapiLogin && toState.name !== 'login') {
+                console.log("$stateChangeStart Force login page");
+                $state.transitionTo('login');
+                event.preventDefault();
+            }
+            else if (!ConfigService.blogId && toState.name !== 'app.bloglist' && toState.name !== 'login') {
+                console.log("$stateChangeStart Force blog list page to select blog");
+                $state.transitionTo('app.bloglist');
+                event.preventDefault();
+            }
         }
 
         if (false) {

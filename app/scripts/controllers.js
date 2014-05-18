@@ -37,13 +37,19 @@ angular.module('Ionic03.controllers', [])
             }
 
             //Reinit after we get new token
-            DataSync.init();
+            DataSync.init()
+                .then(function() {
+                    $state.go(ConfigService.mainScreen);
+                })
+                .catch(function(err) {
+                   $log.error('Login failed', err);
+                });
             /*
             return GoogleApi.getUserInfo();
         }).then(function(userInfo) {
             //Get and save user name
             */
-            $state.go(ConfigService.mainScreen);
+
         }, function (data) {
             //Show an error message if access was denied
             if (data) {
@@ -54,7 +60,6 @@ angular.module('Ionic03.controllers', [])
             }
             $scope.loading = false;
         });
-
     }
 
 })
@@ -125,6 +130,15 @@ angular.module('Ionic03.controllers', [])
         $log.log('SelectBlog', item);
         DataService.selectBlog(item.id, true);
         $state.go(ConfigService.mainScreen);
+
+        /*
+            .then(function() {
+                $state.go(ConfigService.mainScreen);
+            })
+            .catch(function(err) {
+                $log.error('selectBlog Error', err);
+            });
+        */
     };
 
     $scope.blogInfo = function(item) {

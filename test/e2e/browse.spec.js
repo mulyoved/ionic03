@@ -2,13 +2,34 @@ describe("browse screens", function () {
     describe("Main Screen", function () {
         var postText;
 
+
+        xit("Start", function () {
+            driver.context("WEBVIEW", function(err) {
+                if (err) {
+                    console.error('window switch', err);
+                }
+                else {
+                    console.error('window switch OK');
+                }
+            });
+
+            /*
+            browser.window('WEBVIEW', function(err) {
+                if (err) {
+                    console.error('window switch', err);
+                }
+                else {
+                    console.error('window switch OK');
+                }
+            });
+            */
+        });
+
         it("should display the correct title", function () {
             // in the video, I used the protractor.getInstance() which was removed shortly thereafter in favor of this browser approach
             browser.get('/#');
             expect(browser.getCurrentUrl()).toContain('#/login');
             expect(browser.getTitle()).toBe('Ionic03');
-
-            browser.debugger();
         });
 
         it("should be able to login", function() {
@@ -17,7 +38,25 @@ describe("browse screens", function () {
 
             login.login()
                 .then(function (answer) {
-                    expect(answer).toBe('LoginProcess: Login Done');
+                    expect(answer).toContain('Success');
+                    console.log('Login Process answer', answer);
+                    //done();
+                })
+                .thenCatch(function (err) {
+                    expect(true).toBe(err);
+                    console.log('Login Process Err', err);
+                    //done(err);
+                });
+        });
+
+        it("should be able to login twice without getting confused", function() {
+            browser.debugger();
+            var loginProcess = require("./pages/loginProcess");
+            var login = new loginProcess();
+
+            login.login()
+                .then(function (answer) {
+                    expect(answer).toBe('LoginProcess: Success, Already Done');
                     console.log('Login Process answer', answer);
                     //done();
                 })
