@@ -184,5 +184,7 @@ angular.module('Ionic03.controllers', [])
 
     $scope.items = [];
     addItemes();
-});
+})
 
+.controller('SplashCtrl', function ($scope, ConfigService) {
+});

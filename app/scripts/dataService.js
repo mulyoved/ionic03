@@ -149,6 +149,7 @@ angular.module('Ionic03.services',[])
             mainScreen: 'app.playlists',
             //mainScreen: 'dbtest',
             blogId: false,
+            locked: true,
             username: 'Unknown', // needed for push to exclude self, but not implemented yet
             initialSyncLimit: 100
         }

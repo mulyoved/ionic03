@@ -18,6 +18,7 @@ angular.module('Ionic03', [
     'Ionic03.PushServices',
     'Ionic03.PostListCtrl',
     'Ionic03.UnlockCtrl',
+    'Ionic03.Unlock2Ctrl',
     'Ionic03.services',
     'Ionic03.directives',
     'Ionic03.RetrieveItemsService',
@@ -104,13 +105,18 @@ angular.module('Ionic03', [
 
     $rootScope.$on("event:DataSync:StatusChange", function (event) {
         console.log('APP Recived DataSyn:StatusChange', $state.is('login'), event);
-        if (!DataSync.gapiLogin && !$state.is('login')) {
+
+
+        if (ConfigService.locked) {
+            //Do nothing with the event
+        }
+        else if (!DataSync.gapiLogin && !$state.is('login')) {
             $state.go('login');
         }
         else if (!ConfigService.blogId) {
             $state.go('app.bloglist');
         }
-        else if (DataSync.gapiLogin && $state.is('login')) {
+        else if (DataSync.gapiLogin && ($state.is('login') || $state.is('splash'))) {
             $state.go(ConfigService.mainScreen);
         }
 
@@ -262,6 +268,20 @@ angular.module('Ionic03', [
             controller: 'UnlockCtrl',
             authenticate: false
         })
+        .state('splash', {
+            url: '/splash',
+            abstract: false,
+            templateUrl: 'templates/splash.html',
+            controller: 'SplashCtrl',
+            authenticate: false
+        })
+        .state('unlock2', {
+            url: '/unlock2',
+            abstract: false,
+            templateUrl: 'templates/unlock2.html',
+            controller: 'Unlock2Ctrl',
+            authenticate: false
+        })
         .state('login', {
             url: '/login',
             abstract: false,
@@ -387,15 +407,26 @@ angular.module('Ionic03', [
     $urlRouterProvider.otherwise('/app/playlists');
     //$urlRouterProvider.otherwise('dbtest');
 })
-.factory('AppInit', function($rootScope, $log, $q,
+.factory('AppInit', function($rootScope, $log, $q, $state,
                              localStorageService, ConfigService, DataService, DataSync, PushServices) {
 
         var init = function(startSync) {
-            //Todo: read from local storage
+            var unlockCode = localStorageService.get('unlock_code');
+            var nextScreen;
+            if (unlockCode === 'skip' || !ConfigService.locked) {
+                nextScreen = 'splash';
+            }
+            else {
+                nextScreen = 'unlock2';
+            }
+
+            $log.log('AppInit Init', startSync, nextScreen);
+            $state.go(nextScreen);
             DataService.selectBlog(false, false);
             DataSync.init();
             DataSync.needSync = true;
             PushServices.init();
+
         };
 
         return {

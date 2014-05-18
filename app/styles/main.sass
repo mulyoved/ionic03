@@ -72,21 +72,6 @@
 //*
 //  outline: 1px dashed red
 
-.unlock-area
-  outline: 1px dashed blue
-  -webkit-align-content: space-around
-  align-content: space-around
-  //height: 300px
-  display: -webkit-flex
-  -webkit-flex-flow: row wrap
-  max-width: 240px
-  max-height: 300px
-
-.unlock-icon
-  //outline: 1px dashed gold
-  text-align: center
-  font-size: 32px
-
 .google-sign-button
   background: url('../images/Red-signin_Long_base_44dp.png')
   background-position: center
@@ -113,5 +98,111 @@
 .bar .button.button-icon .icon:before
   font-size: 26px
 
-.bar .button
-  padding
+.unlock-background
+  background-color: #444
+
+.unlock-text
+  color: white
+
+
+//--------------------------------------------------
+
+.unlock-area
+  //outline: 1px dashed blue
+  -webkit-align-content: space-around
+  align-content: space-around
+  //height: 300px
+  display: -webkit-flex
+  -webkit-flex-flow: row wrap
+  max-width: 600px
+  max-height: 600px
+
+
+.patternlockcontainer
+  width: 260px
+  padding-left: 5px
+  margin: auto
+  background-color: #444
+  height: 260px
+  //-webkit-border-radius: 15px
+  //-moz-border-radius: 15px
+  //border-radius: 15px
+  overflow: hidden
+  transform: scale(1.5,1.5)
+
+.patternlockbuttoncontainer
+  position: absolute
+  width: 300px
+
+.patternlocklineshorizontalcontainer
+  position: absolute
+  width: 250px
+  padding: 22px
+
+.patternlocklinesverticalcontainer
+  position: absolute
+  width: 280px
+  padding-left: 22px
+  padding-top: 22px
+
+.patternlocklinesdiagonalcontainer
+  position: absolute
+  width: 240px
+  padding: 22px
+
+
+.patternlockbutton
+  background-image: url('../images/unlock/button.png')
+  background-repeat: no-repeat
+  display: block
+  width: 53px
+  height: 53px
+  float: left
+  margin: 16px
+    -ms-touch-action:  none
+
+.touched
+  background-image: url('../images/unlock/button_active.png')
+
+.multiple
+  background-image: url('../images/unlock/button_active2.png')
+
+.patternlocklinehorizontal
+  background-image: url('../images/unlock/line_hor.png')
+  background-repeat: no-repeat
+  height: 83px
+  width: 53px
+  display: block
+  float: left
+  margin: 2px -7px 0px 38px
+  visibility: hidden
+
+.patternlocklinevertical
+  background-image: url('../images/unlock/line_ver.png')
+  background-repeat: no-repeat
+  height: 53px
+  width: 83px
+  display: block
+  float: left
+  margin: 38px 0px -7px 3px
+  visibility: hidden
+
+.patternlocklinediagonalforward
+  background-image: url('../images/unlock/line_diagonal1.png')
+  background-repeat: no-repeat
+  height: 83px
+  width: 83px
+  display: block
+  float: left
+  margin: 26px -26px -24px 26px
+  visibility: hidden
+
+.patternlocklinediagonalbackwards
+  background-image: url('../images/unlock/line_diagonal2.png')
+  background-repeat: no-repeat
+  height: 83px
+  width: 83px
+  display: block
+  float: left
+  margin: 26px -26px -24px 26px
+  visibility: hidden

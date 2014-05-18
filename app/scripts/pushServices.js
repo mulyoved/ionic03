@@ -38,6 +38,7 @@ angular.module('Ionic03.PushServices', [])
 
             // Handle resume
             document.addEventListener('resume', function () {
+                ConfigService.locked = true;
                 $log.log('PushServices: Device resume!');
 
                 PushNotification.resetBadge();
@@ -51,6 +52,7 @@ angular.module('Ionic03.PushServices', [])
 
             // Handle pause
             document.addEventListener('pause', function () {
+                ConfigService.locked = true;
                 $log.log('PushServices: Device pause!');
 
                 // Remove urbanairship events.  Important on android to not receive push in the background.
@@ -188,7 +190,6 @@ angular.module('Ionic03.PushServices', [])
             $log.log('PushServices: #endMinute',obj.endMinute);
         })
     };
-
 
     return {
         init: init,

@@ -28,11 +28,16 @@ describe("browse screens", function () {
         it("should display the correct title", function () {
             // in the video, I used the protractor.getInstance() which was removed shortly thereafter in favor of this browser approach
             browser.get('/#');
+            browser.getCurrentUrl().then(function(url) {
+                console.log('URL', url);
+            });
             expect(browser.getCurrentUrl()).toContain('#/login');
             expect(browser.getTitle()).toBe('Ionic03');
+            //browser.debugger();
         });
 
         it("should be able to login", function() {
+            console.log("Login1");
             var loginProcess = require("./pages/loginProcess");
             var login = new loginProcess();
 
@@ -50,7 +55,7 @@ describe("browse screens", function () {
         });
 
         it("should be able to login twice without getting confused", function() {
-            browser.debugger();
+            console.log("Login2");
             var loginProcess = require("./pages/loginProcess");
             var login = new loginProcess();
 

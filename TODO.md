@@ -86,7 +86,8 @@ done test 1 image upload ok 2nd not, improve code to upload only the 2nd image
     browse throgh main screen with delay for visual compare
     swipe throgh list
 
-12: Save Selected blog in local storage
+11: Change sort field _id based on updated and not published
+done 12: Save Selected blog in local storage
 13: make local storage specific for user
 12: logic to clean database from old records
 12: option to clear database, options from blogger select
@@ -103,3 +104,5 @@ Use: Google Closure Compiler
 http://www.mircozeiss.com/a-radical-new-approach-to-developing-angularjs-apps/
 
 background & title image to login screen
+
+Use https://github.com/apache/cordova-plugin-network-information/blob/master/doc/index.md
