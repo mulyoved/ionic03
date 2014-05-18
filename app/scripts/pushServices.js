@@ -17,7 +17,7 @@ angular.module('Ionic03.PushServices', [])
 
                     //todo: select blogid and show this blog
                     var blogid = event.extras.blogid;
-                    DataService.selectBlog(blogid);
+                    DataService.selectBlog(blogid, true);
                 } else {
                     $log.log('PushServices: No incoming message');
                 }

@@ -9,6 +9,7 @@ angular.module('Ionic03.controllers', [])
     console.log('LoginCtrl');
     $scope.googleClientId = GoogleApp.clientId;
     $scope.loading = false;
+    $scope.canCancelSelection = ConfigService.blogId;
 
     $scope.login = function() {
         $scope.loading = true;
@@ -59,10 +60,19 @@ angular.module('Ionic03.controllers', [])
 })
 
 .controller('DiagnosticCtrl', function ($scope, $state, ConfigService, DataSync) {
+        $scope.ConfigService  = ConfigService;
+        $scope.DataSync = DataSync;
+
+    $scope.syncEnabled = DataSync.syncEnabled;
+    $scope.blogName = ConfigService.blogName;
+    $scope.userName = ConfigService.username;
+
+
     $scope.gapiLogin = DataSync.gapiLogin;
     $scope.error = DataSync.error;
     $scope.duringSync = DataSync.duringSync;
     $scope.needSync = DataSync.needSync;
+
     $scope.sync = function() {
         DataSync.sync();
     };
@@ -95,6 +105,7 @@ angular.module('Ionic03.controllers', [])
 
 .controller('BlogListCtrl', function ($scope, $state, $log, ConfigService, DataService, BlogListSync, items) {
     $scope.items = items;
+    //$scope.showBackButton(false);
 
     $scope.doRefresh = function() {
         console.log('Refreshing!');
@@ -112,13 +123,19 @@ angular.module('Ionic03.controllers', [])
 
     $scope.selectBlog = function(item) {
         $log.log('SelectBlog', item);
-        DataService.selectBlog(item.id);
+        DataService.selectBlog(item.id, true);
         $state.go(ConfigService.mainScreen);
     };
 
     $scope.blogInfo = function(item) {
         $log.log('BlogInfo', item);
     };
+
+    $scope.cancel = function() {
+        if (ConfigService.blogId) {
+            $state.go(ConfigService.mainScreen);
+        }
+    }
 
 })
 

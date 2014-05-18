@@ -177,8 +177,16 @@ angular.module('Ionic03.PostListCtrl', [])
 
 
 
-        $scope.noMoreItemsAvailable = false;
+    $scope.noMoreItemsAvailable = false;
     //$scope.items = RetrieveItemsService.getItems();
     updateIcon();
+    if (!DataSync.syncEnabled) {
+        $log.log('Set DataSync.syncEnabled = true');
+        DataSync.syncEnabled = true;
+
+        if (DataSync.needSync) {
+            DataSync.sync();
+        }
+    }
     //loadItems(false);
 });

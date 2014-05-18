@@ -28,15 +28,14 @@ angular.module('Ionic03', [
 
 
 .run(function ($ionicPlatform, $state, $rootScope, $urlRouter, $log, $ionicPopup,
-               ConfigService, DataService, DataSync, PushServices) {
+               ConfigService, DataService, DataSync, PushServices, AppInit) {
+
     $ionicPlatform.ready(function () {
         if (window.StatusBar) {
             StatusBar.styleDefault();
         }
 
-        //start async load of GAPI/Auth2
-        DataSync.init();
-        PushServices.init();
+        AppInit.init();
     });
 
     $rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
@@ -90,14 +89,17 @@ angular.module('Ionic03', [
 
     $rootScope.$on("event:DataSync:StatusChange", function (event) {
         console.log('APP Recived DataSyn:StatusChange', $state.is('login'), event);
-        if (DataSync.gapiLogin && $state.is('login')) {
-            $state.go(ConfigService.mainScreen);
-        }
-        else if (!DataSync.gapiLogin && !$state.is('login')) {
+        if (!DataSync.gapiLogin && !$state.is('login')) {
             $state.go('login');
         }
+        else if (!ConfigService.blogId) {
+            $state.go('app.bloglist');
+        }
+        else if (DataSync.gapiLogin && $state.is('login')) {
+            $state.go(ConfigService.mainScreen);
+        }
 
-        if (DataSync.needSync && !DataSync.duringSync && DataSync.gapiLogin && !DataSync.error) {
+        if (DataSync.syncEnabled && DataSync.needSync && !DataSync.duringSync && DataSync.gapiLogin && !DataSync.error && ConfigService.blogId) {
             DataSync.sync();
         }
         else if (DataSync.error) {
@@ -128,9 +130,6 @@ angular.module('Ionic03', [
             }
         }
     });
-
-    //Todo: read from local storage
-    DataService.selectBlog('4462544572529633201');
 })
 .config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.useXDomain = true;
@@ -147,8 +146,8 @@ angular.module('Ionic03', [
 
     //GAPI On Browser
     apiKey: 'AIzaSyA78RO9-B7qEr-WXJULOq3u-n4C7RS9wz4',
-    //clientId: '44535440585-tej15rtq3jgao112ks9pe4v5tobr7nhd.apps.googleusercontent.com', // spy-js
-    clientId: '44535440585-rshs1j4t1jc4qnp295fqmkr7jt12tbrh.apps.googleusercontent.com', // grunt serve
+    clientId: '44535440585-tej15rtq3jgao112ks9pe4v5tobr7nhd.apps.googleusercontent.com', // protractor, spy-js (need to change to 9001)
+    //clientId: '44535440585-rshs1j4t1jc4qnp295fqmkr7jt12tbrh.apps.googleusercontent.com', // grunt serve
     scopes: [
         // whatever scopes you need for your app, for example:
         //'https://www.googleapis.com/auth/drive',
@@ -256,7 +255,7 @@ angular.module('Ionic03', [
             authenticate: false
         })
         .state('dbtest', {
-            url: '/dbtest',
+            url: '/dbtest:options',
             abstract: false,
             templateUrl: 'templates/dbtest.html',
             controller: 'dbTestCtrl',
@@ -372,7 +371,22 @@ angular.module('Ionic03', [
 
     $urlRouterProvider.otherwise('/app/playlists');
     //$urlRouterProvider.otherwise('dbtest');
-});
+})
+.factory('AppInit', function($rootScope, $log, $q,
+                             localStorageService, ConfigService, DataService, DataSync, PushServices) {
+
+        var init = function(startSync) {
+            //Todo: read from local storage
+            DataService.selectBlog(false, false);
+            DataSync.init();
+            DataSync.needSync = true;
+            PushServices.init();
+        };
+
+        return {
+            init: init
+        };
+    });
 
 if (typeof String.prototype.startsWith != 'function') {
     String.prototype.startsWith = function (str){

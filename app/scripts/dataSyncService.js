@@ -425,10 +425,27 @@ angular.module('Ionic03.DataSync', [])
     };
 
     var dataSync = {
+        initDone: false,
         gapiLogin: false,
         needSync: false, // Dirty
         duringSync: false,
         newData: false,
+        syncEnabled: false,
+
+        /*
+        checkInit: function() {
+            if (!dataSync.initDone) {
+                return dataSync.init()
+                    .then(function(asnwer) {
+                        dataSync.initDone = true;
+                        $log.log('DataSync: INit done');
+                    })
+                    .catch(function(err) {
+                        $log.error('DataSync: INit done');
+                    });
+            }
+        },
+        */
 
         init: function() {
             return GoogleApi.getToken({
@@ -457,7 +474,9 @@ angular.module('Ionic03.DataSync', [])
         },
 
         sync: function() {
-            if (!dataSync.duringSync) {
+            var deferred = $q.defer();
+
+            if (!dataSync.duringSync && dataSync.gapiLogin && dataSync.syncEnabled) {
                 dataSync.duringSync = true;
                 dataSync.needSync = false;
                 dataSync.error = null;
@@ -488,17 +507,22 @@ angular.module('Ionic03.DataSync', [])
                         $rootScope.$broadcast('event:DataSync:StatusChange');
                         //$rootScope.$broadcast('event:DataSync:DataChange');
                         $rootScope.$broadcast('event:DataSync:Notify', data);
+                        deferred.resolve(true);
                     }, function (reason) {
                         $log.error('syncModifiedDocuments Failed', reason);
                         dataSync.duringSync = false;
                         dataSync.needSync = true;
                         dataSync.error = reason || 'Failed unknown reason';
                         $rootScope.$broadcast('event:DataSync:StatusChange');
+                        deferred.reject(dataSync.error);
                     })
             }
             else {
-                $log.error('Calling sync while sync in progress');
+                $log.error('Calling sync while sync in progress or not login or not enabled', dataSync.duringSync, dataSync.gapiLogin, dataSync.syncEnabled);
+                deferred.reject('Wrong State To Sync');
             }
+
+            return deferred.promise;
         },
 
         savePost: function(text) {

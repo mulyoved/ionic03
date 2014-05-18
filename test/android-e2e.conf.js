@@ -1,17 +1,23 @@
 var ScreenshotReporter = require('./ScreenshotReporter.js');
 
 exports.config = {
-    seleniumAddress: "http://127.0.0.1:4444/wd/hub",
+    seleniumAddress: "http://127.0.0.1:4723/wd/hub",
     seleniumPort: null,
     seleniumArgs: [],
     specs: [
         './e2e/*spec.{js,coffee}',
         './e2e/pages/*.{js,coffee}'
     ],
+    chromeOnly: false,
     capabilities: {
-        'browserName': 'chrome'
+        device: 'android',
+        'browserName': 'Android',
+        'deviceName' : 'Android Emulator',
+        "appPackage": "com.example.Ionic03",
+        "appActivity" : 'Ionic03',
+        //'app'
     },
-    baseUrl: 'http://localhost:9000',
+    baseUrl: 'http://10.0.2.2:' + (process.env.HTTP_PORT || '8000'),
     jasmineNodeOpts: {
         onComplete: null,
         isVerbose: false,

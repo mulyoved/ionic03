@@ -75,6 +75,22 @@ done test 1 image upload ok 2nd not, improve code to upload only the 2nd image
     http://gaslight.co/blog/getting-started-with-protractor-and-page-objects-for-angularjs-e2e-testing
     https://egghead.io/lessons/angularjs-getting-started-with-protractor
 
+    done Have login without sync
+    done complete delete - dump test reliably
+    done sync test
+    done add post + sync to blogger
+    debug test make sure all is work
+    run test on emulator
+
+    other tests
+    browse throgh main screen with delay for visual compare
+    swipe throgh list
+
+12: Save Selected blog in local storage
+13: make local storage specific for user
+12: logic to clean database from old records
+12: option to clear database, options from blogger select
+
 14. Deploy in Google Store -> APK
 15. Test on device
 
@@ -82,3 +98,6 @@ After 1.0
 ==========
 8. Hidden Images
 11. Insta NASA lock screen
+
+Use: Google Closure Compiler
+http://www.mircozeiss.com/a-radical-new-approach-to-developing-angularjs-apps/

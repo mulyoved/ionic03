@@ -63,6 +63,7 @@ angular.module('Ionic03.services',[])
                 return _blogdb;
             },
             deletedb: function() {
+                var deferred = $q.defer();
                 var alldocs = _blogdb.allDocs({include_docs: true, attachments: true});
 
                 alldocs
@@ -72,22 +73,33 @@ angular.module('Ionic03.services',[])
                             r.push(_blogdb.remove(doc.doc));
                         });
 
-                        $log.log('Delete all', r);
+                        //$log.log('Delete all', r);
                         return $q.all(r);
                     }).
                     then(function(answer) {
-                        $log.log('Delete all', answer);
+                        $log.log('deletedb: Delete all', answer);
+                        deferred.resolve(answer);
                     }).catch(function(reason) {
                         $log.error('readdb failed', reason);
+                        deferred.reject(reason);
                     });
 
-                return alldocs;
+                return deferred.promise;
             },
-            selectBlog: function(blogid) {
+            selectBlog: function(blogid, triggerSync) {
+                if (!blogid) {
+                    blogid = localStorageService.get('selected_blog');
+                }
+                if (!blogid) {
+                    $log.log('Blog not selected, need to request user to select one');
+                    return false;
+                }
                 $log.log('Select BLog', blogid);
 
                 var id = blogid;
                 var blog = getBlogByID(id);
+                localStorageService.add('selected_blog', id);
+
 
 
                 ConfigService.blogId = id;
@@ -100,13 +112,18 @@ angular.module('Ionic03.services',[])
 
                 $log.log('ConfigService.blogId', ConfigService.blogId, id, ConfigService.blogName);
                 openDb();
-                //$rootScope.$broadcast('event:DataSync:DataChange');
-                $rootScope.$broadcast('event:DataSync:Notify', {
+
+                if (triggerSync) {
+                    //$rootScope.$broadcast('event:DataSync:DataChange');
+                    $rootScope.$broadcast('event:DataSync:Notify', {
                         action: 'blogid',
                         blogid: id,
                         sent: 0,
                         received: 0
                     });
+                }
+
+                return true;
 
                 //done Switch database, remobe blogdb and make it property of Config, access from controlers by var
                 //done reimplement delete database to actually drop and create
@@ -131,7 +148,7 @@ angular.module('Ionic03.services',[])
 
             mainScreen: 'app.playlists',
             //mainScreen: 'dbtest',
-            blogId: '4462544572529633201', //'4355243139467288758'
+            blogId: false,
             username: 'Unknown', // needed for push to exclude self, but not implemented yet
             initialSyncLimit: 100
         }

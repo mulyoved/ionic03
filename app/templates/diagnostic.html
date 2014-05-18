@@ -1,12 +1,17 @@
 <ion-view title="Diagnostic">
   <ion-content class="has-header">
     <h1>Diagnostic Information</h1>
-    <h2>DataSync</h2>
+      <h2>ConfigService</h2>
+      <p<p>BlogID = {{ConfigService.blogId}}</p>
+      <p>Blog Name = {{ConfigService.blogName}}</p>
+      <p>Username = {{ConfigService.username}}</p>
 
-    <p>gapiLogin = {{gapiLogin}}</p>
-    <p>error = {{error}}</p>
-    <p>duringSync = {{duringSync}}</p>
-    <p>needSync = {{needSync}}</p>
+      <h2>DataSync</h2>
+    <p>syncEnabled = {{DataSync.syncEnabled}}</p>
+    <p>gapiLogin = {{DataSync.gapiLogin}}</p>
+    <p>error = {{DataSync.error}}</p>
+    <p>duringSync = {{DataSync.duringSync}}</p>
+    <p>needSync = {{DataSync.needSync}}</p>
       <button ng-click="sync()">Retry Synchronize</button>
       <button ng-click="login()">Re-Login</button>
   </ion-content>

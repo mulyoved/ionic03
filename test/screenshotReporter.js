@@ -10,7 +10,7 @@ var ScreenshotReporter = function(dir_) {
     // base function to take a screenshot -- change path as needed
     var screenshot = function(testDescription, id) {
         var fname = testDescription.replace(/\s/g, "_") + "_" + id + ".png";
-        console.log('Create dir', dir);
+        //console.log('Create dir', dir);
         mkdirp(dir);
         browser.takeScreenshot().then(function(png) {
             var stream = fs.createWriteStream(path.join(dir, fname));

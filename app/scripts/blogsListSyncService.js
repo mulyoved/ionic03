@@ -45,9 +45,11 @@ angular.module('Ionic03.BlogListSync', [])
                 $log.log('Blog list not in storage, load from google');
                 blogListSync.loadBlogList()
                 .then(function(blogs) {
+                    $log.log('Got from google', blogs);
                     deferred.resolve(blogs);
                 }).catch(function(err) {
                     $log.error('getBlogList Error', err);
+                        deferred.reject(err);
                 });
             }
             return deferred.promise;

@@ -1,7 +1,7 @@
 <ion-view title="DBTest">
     <ion-content class="has-header">
         <p>version 3:<a href="#/app/playlists">Main</a></p>
-        <p>answer: <span>{{dumpAnswer}}</span> Count:<span>{{answerCount}}</span></p>
+        <pre>answer: <span>{{dumpAnswer}}</span> Count:<span>{{answerCount}}</span></pre>
         <p>-------------------------------------------------------------------------------------------------------------</p>
         <p>Push</p>
         <button ng-click="pushQuery()">Push Query</button>
@@ -12,7 +12,9 @@
         <p>-------------------------------------------------------------------------------------------------------------</p>
         <p>DataBase Operations</p>
         <button ng-click="dumpDatabase()">Dump Database</button>
+        <button ng-click="dumpTopRecord()">Dump Top Record</button>
         <button id="delete-database" ng-click="deletedb()">Delete Database</button>
+
         <p>-------------------------------------------------------------------------------------------------------------</p>
         <p>Sync</p>
         <button ng-click="sync()">Sync</button>
@@ -20,6 +22,7 @@
         <button ng-click="createImagePost1()">Create 1 Image Post</button>
         <button ng-click="createImagePost2()">Create 2 Image Post</button>
         <button ng-click="createImagePost2error()">Create 2 Image Post with Error</button>
+        <input id="newpost-text" type="text" name="newpost.text" ng-model="newpost.text"/>
         <p>DataService Test</p>
         <button ng-click="getPostsDB(1000)">Get 1000 Posts (db)</button>
         <button ng-click="getPostsDB(10)">Get Posts 1st 10 Posts (db)</button>

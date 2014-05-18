@@ -166,6 +166,9 @@ Work Great!
 
 #Test
 
+
+node C:/Users/Muly/AppData/Roaming/npm/node_modules/protractor/bin/elementexplorer.js http://localhost:9000/#/app/bloglist
+
 http://attackofzach.com/setting-up-a-project-using-karma-with-mocha-and-chai/
 
 router problems https://github.com/angular-ui/ui-router/issues/212
@@ -176,4 +179,12 @@ http://stackoverflow.com/questions/20959748/e2e-protractor-test-requiring-oauth-
 Hands on Protractor, E2E Testing for AngularJS
 http://blog.liftoffllc.in/2013/12/hands-on-protractor-e2e-testing-for.html
 
+`protractor test/spec-e2e.conf.js`
 
+export ANDROID_HOME=/D/Mobile/Android/android-sdk
+appium
+
+protractor test/android-e2e.conf.js
+
+
+ element(by.repeater('item in items')).findElement(by.binding('item.name'))

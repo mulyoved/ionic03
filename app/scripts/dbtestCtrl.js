@@ -11,26 +11,39 @@
 angular.module('Ionic03.dbTestCtrl', [])
 
 .controller('dbTestCtrl', function(
-    $scope, ConfigService, $log, $q, $http,
-    GAPI, Blogger, pouchdb, GoogleApi, GoogleApp, DataSync,
+    $scope, ConfigService, $log, $q, $http, $stateParams,
+    GAPI, Blogger, pouchdb, GoogleApi, GoogleApp, DataSync, localStorageService,
     DataService, HTMLReformat, MiscServices, BlogListSync, RetrieveItemsService,
     PushServices
     )
 {
     $scope.answer = '<empty>';
+    $scope.newpost = {
+        text: 'Sample Post: ' + new Date().toString()
+    };
+
+    //console.log('$stateParams', $stateParams.options);
 
     $scope.sync = function sync() {
         $log.log('sync');
 
-        DataSync.sync();
-        $scope.dumpAnswer = 'sync';
+        DataSync.syncEnabled = true;
+        DataSync.sync()
+            .then(function(answer) {
+                DataSync.syncEnabled = false;
+                $scope.dumpAnswer = 'sync';
+                $log.log('Sync Answer', answer);
+            })
+            .catch(function(answer) {
+                $log.log('Sync Error', answer);
+                DataSync.syncEnabled = false;
+                $scope.dumpAnswer = 'sync error';
+            });
     };
 
     $scope.createPost = function () {
-        $log.log('Add dummy post');
-        var time = new Date();
-
-        DataSync.createPost('V2: ' + time.toString(), 'Sample Content' + time.toString());
+        DataSync.createPost('', $scope.newpost.text);
+        $log.log('Add dummy post:', $scope.newpost.text);
     };
 
     $scope.createImagePost1 = function createImagePost() {
@@ -79,13 +92,40 @@ angular.module('Ionic03.dbTestCtrl', [])
                 $scope.dumpAnswer = 'error' + err;
                 $log.error('Failed', err);
             })
+    };
 
+    $scope.dumpTopRecord = function() {
+        DataSync.dumpDatabase()
+            .then(function(rows) {
+                if (rows.length > 0) {
+                    var doc = rows[0].doc;
+                    console.log(doc);
+                    $scope.dumpAnswer = JSON.stringify(doc,null,2);
+                    $scope.answerCount = rows.length;
+                    console.log($scope.dumpAnswer);
+                }
+                else {
+                    $scope.dumpAnswer = 'empty';
+                    $scope.answerCount = 0;
+                }
+
+            })
+            .catch(function(err) {
+                $scope.dumpAnswer = 'error' + err;
+                $log.error('Failed', err);
+            })
     };
 
     $scope.deletedb = function () {
-        DataService.deletedb();
-        $scope.dumpAnswer = 'deleted';
-        $scope.answerCount = 0;
+        DataService.deletedb()
+            .then(function(answer) {
+                console.log('deleted');
+                $scope.dumpAnswer = 'deleted';
+                $scope.answerCount = 0;
+            })
+            .catch(function(err) {
+                $log.error('Failed to delete', err);
+            });
     };
 
     $scope.db_showItems = [];
@@ -214,7 +254,8 @@ angular.module('Ionic03.dbTestCtrl', [])
     $scope.clearToken = function() {
         GoogleApi.clearToken();
         BlogListSync.clearStorage();
-
+        localStorageService.remove('selected_blog');
+        localStorageService.remove('unlock_code');
     };
 
     //-------------------------------------------------------------------
@@ -414,7 +455,7 @@ angular.module('Ionic03.dbTestCtrl', [])
     $scope.getBlogList = function() {
         $log.log('getBlogList');
 
-        Blogger.listBlogsByUser('mulyoved')
+        Blogger.listBlogsByUser('self')
         .then(function(answer) {
             $log.log('listBlogsByUser', answer);
             console.table(answer.items);
@@ -451,7 +492,7 @@ angular.module('Ionic03.dbTestCtrl', [])
         BlogListSync.getBlogList()
             .then(function(answer) {
                 var blog = answer[idx];
-                DataService.selectBlog(blog.id);
+                DataService.selectBlog(blog.id, true);
                 $log.log('Selected Blog', idx, blog, ConfigService);
             }).catch(function(err) {
                 $log.error('SelectBlog Error', err);

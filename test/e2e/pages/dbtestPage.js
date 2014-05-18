@@ -1,9 +1,10 @@
 var DbTestPage = function() {
     this.dumpAnswer = element(by.binding('dumpAnswer'));
     this.countAnswer = element(by.binding('answerCount'));
+    this.postText = element(by.id('newpost-text'));
 
     this.click = function(text) {
-        element(By.buttonText(text)).click();
+        return element(By.buttonText(text)).click();
     };
 
     this.get = function() {
@@ -11,20 +12,22 @@ var DbTestPage = function() {
     };
 
     this.deleteDB = function() {
-        //deleteDB
-        this.deleteDatabase = element(By.id('delete-database'));
-        //console.log('this.dumpDatabase', this.dumpDatabase);
-        this.deleteDatabase.click();
+        return this.click('Delete Database');
     };
 
     this.dumpDB = function() {
-        this.dumpDatabase = element(By.buttonText('Dump Database')); //element($("button > span:contains('Dump Database')"));
-        this.dumpDatabase.click();
+        return this.click('Dump Database');
     };
 
     this.sync = function() {
-        this.click('Sync');
+        return this.click('Sync');
     };
+
+    this.setPostText = function(text) {
+        this.postText.clear();
+        this.postText.sendKeys(text);
+    }
+
 };
 
 module.exports = DbTestPage;
