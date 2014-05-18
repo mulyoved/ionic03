@@ -25,6 +25,7 @@ describe("dbTest", function () {
         var dbTest = new dbTestPage();
         var recordCount = -1;
         var topRecord = null;
+        var postText;
 
         var deleteDB = function() {
             dbTest.deleteDB();
@@ -37,7 +38,7 @@ describe("dbTest", function () {
         };
 
         var sync = function() {
-            console.log('Start Sync');
+            //console.log('Start Sync');
             dbTest.sync();
 
             return browser.wait(function () {
@@ -128,7 +129,6 @@ describe("dbTest", function () {
         }
 
         it("should dump db", function () {
-            console.log('Start Dump DB');
             dbTest.get();
 
             dumpDB().then(function() {
@@ -152,13 +152,12 @@ describe("dbTest", function () {
 
         if (!skipSync) {
             it("should have something after sync", function () {
-                sync();
+                sync().then(function() {
+                });
             });
 
             it("Dump after sync", function() {
-                console.log('End Sync?');
                 dumpDB().then(function() {
-                    console.log('End Sync - After Dump DB');
                     expect(recordCount).toBeGreaterThan(100);
                     expect(recordCount).toBeLessThan(110);
                 });
@@ -171,9 +170,7 @@ describe("dbTest", function () {
                 });
             });
 
-            var postText;
             it("should create new post", function () {
-                console.log('Next test after Sync');
                 postText = 'Protector Post: ' + new Date().toString();
                 dbTest.setPostText(postText);
                 dbTest.click('Create New Post').then(function() {

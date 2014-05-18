@@ -24,7 +24,7 @@ var LoginProcess = function() {
                     });
             }
             else {
-                console.log('handleAuth: Has only one window');
+                //console.log('handleAuth: Has only one window');
                 browser.switchTo().window(handles[0]);
             }
         });
@@ -69,16 +69,16 @@ var LoginProcess = function() {
                      */
 
                     //browser.driver.sleep(2000);
-                    console.log('LoginProcess: Fill login page fields');
+                    //console.log('LoginProcess: Fill login page fields');
                     email.sendKeys('bloggerApplication');
                     password.sendKeys('Giza2000');
                     signin.click();
                     browser.driver.sleep(1500);
-                    console.log('LoginProcess: End waited to login screen');
+                    //console.log('LoginProcess: End waited to login screen');
 
                     that.handleAuth()
                         .then(function(answer) {
-                            console.log('Done', answer);
+                            //console.log('Done', answer);
                             deferred.fulfill('LoginProcess: Login Done');
                         })
                         .thenCatch(function(err) {
@@ -87,7 +87,7 @@ var LoginProcess = function() {
                         })
                         .thenFinally(function(done) {
                             browser.switchTo().window(parentHandle);
-                            console.log('LoginProcess: Finally', done);
+                            //console.log('LoginProcess: Finally', done);
                         });
                 });
         });

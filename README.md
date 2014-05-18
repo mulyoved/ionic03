@@ -167,6 +167,7 @@ Work Great!
 #Test
 
 
+##elementexplorer:
 node C:/Users/Muly/AppData/Roaming/npm/node_modules/protractor/bin/elementexplorer.js http://localhost:9000/#/app/bloglist
 
 http://attackofzach.com/setting-up-a-project-using-karma-with-mocha-and-chai/

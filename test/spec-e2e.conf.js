@@ -18,6 +18,10 @@ exports.config = {
         showColors: true,
         includeStackTrace: false
     },
+    suites: {
+        dbtest: './e2e/dbtest.spec.js',
+        browse: './e2e/browse.spec.js'
+    },
 
     onPrepare: function() {
         jasmine.getEnv().addReporter(new ScreenshotReporter(".tmp/protractorss"));
