@@ -140,6 +140,7 @@ angular.module('Ionic03.services',[])
         return {
             version: '0.8.0.1',
             blogName: 'Unknown',
+            isUnittest: false,
             imageUploadServerURL: 'http://picasawebapibridge.herokuapp.com', //http://10.0.2.2:3000' (localhost on emulator)
             pushServiceURL: 'http://picasawebapibridge.herokuapp.com/push/', //http://10.0.2.2:3000/push/', //http://127.0.0.1:3000/push/',
 

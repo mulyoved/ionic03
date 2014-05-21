@@ -48,7 +48,11 @@ angular.module('Ionic03.PostListCtrl', [])
 
     $scope.title = ConfigService.blogName;
     $ionicNavBarDelegate.showBackButton(false);
-    $ionicViewService.clearHistory();
+
+    if (!ConfigService.isUnittest) {
+        $ionicViewService.clearHistory();
+    }
+
     $scope.syncIcon = "ok";
     var pendingResetRequest = false;
 

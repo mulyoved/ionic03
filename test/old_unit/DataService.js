@@ -2,12 +2,12 @@
 
 describe('DataService', function() {
     beforeEach(module('Ionic03Mock'));
+
     //beforeEach(module('stateMock'));
     beforeEach(function() {
         inject(function(DataService, util) {
             //DataSync.init();
             DataService.selectBlog({ id: '4462544572529633201', name: 'Unknown'});
-            util.flush();
         });
     });
 

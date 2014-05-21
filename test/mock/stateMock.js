@@ -12,11 +12,11 @@ angular.module('stateMock').service("$state", function(){
             throw Error("No more transitions were expected!");
         }
         console.log("Mock transition to: " + stateName);
-    }
+    };
 
     this.expectTransitionTo = function(stateName) {
         this.expectedTransitions.push(stateName);
-    }
+    };
 
 
     this.ensureAllTransitionsHappened = function(){

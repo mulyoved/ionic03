@@ -15,18 +15,20 @@ angular.module('Ionic03Mock', [
     'Ionic03.dbTestCtrl',
     'Ionic03.GoogleApi',
     'Ionic03.MiscServices',
+    'Ionic03.PushServices',
     'Ionic03.PostListCtrl',
-    'Ionic03.UnlockCtrl',
+    'Ionic03.testTouchEventsCtrl',
+    'Ionic03.Unlock2Ctrl',
     'Ionic03.services',
     'Ionic03.directives',
+    'Ionic03.RetrieveItemsService',
     'gapi',
     'pouchdb',
     'LocalStorageModule'
 ])
 
 .run(function ($ionicPlatform, $state, $rootScope, $urlRouter, $log, $ionicPopup, ConfigService, DataService, DataSync) {
-    //temp
-    //$log.log = console.log;
+    ConfigService.isUnittest = true;
 })
 
 .config(['$httpProvider', function($httpProvider) {
