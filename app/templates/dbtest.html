@@ -2,6 +2,7 @@
     <ion-content class="has-header">
         <p>version 3:<a href="#/app/playlists">Main</a></p>
         <pre>answer: <span>{{dumpAnswer}}</span> Count:<span>{{answerCount}}</span></pre>
+        <pre>answer2: <span>{{dump2Answer}}</span></pre>
         <p>-------------------------------------------------------------------------------------------------------------</p>
         <p>Push</p>
         <button ng-click="pushQuery()">Push Query</button>
@@ -19,7 +20,7 @@
         <p>-------------------------------------------------------------------------------------------------------------</p>
         <p>Sync</p>
         <button ng-click="sync()">Sync</button>
-        <button ng-click="createPost()">Create New Post</button>
+        <button ng-click="savePost()">Create New Post</button>
         <button ng-click="createImagePost1()">Create 1 Image Post</button>
         <button ng-click="createImagePost2()">Create 2 Image Post</button>
         <button ng-click="createImagePost2error()">Create 2 Image Post with Error</button>

@@ -1,4 +1,5 @@
 describe("dbTest", function () {
+    require('jasmine-expect');
 
     if (typeof String.prototype.startsWith != 'function') {
         String.prototype.startsWith = function (str){
@@ -180,7 +181,7 @@ describe("dbTest", function () {
             });
 
             it("should create new post", function () {
-                postText = 'Protector Post: ' + new Date().toString();
+                postText = 'dbtest: ' + new Date().toString();
                 dbTest.setPostText(postText);
                 dbTest.click('Create New Post').then(function() {
                     var prevCount = recordCount;
@@ -188,6 +189,10 @@ describe("dbTest", function () {
                         expect(recordCount).toBe(prevCount + 1);
                     });
                 });
+            });
+
+            it("fail to take screen shot", function() {
+                expect('take screenshot').toContain('done');
             });
 
             it("dump top record", function() {

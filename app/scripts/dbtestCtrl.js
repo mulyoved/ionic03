@@ -41,8 +41,8 @@ angular.module('Ionic03.dbTestCtrl', [])
             });
     };
 
-    $scope.createPost = function () {
-        DataSync.createPost('', $scope.newpost.text);
+    $scope.savePost = function () {
+        RetrieveItemsService.savePost($scope.newpost.text);
         $log.log('Add dummy post:', $scope.newpost.text);
     };
 
@@ -52,7 +52,7 @@ angular.module('Ionic03.dbTestCtrl', [])
         var url = 'file://lh6.googleusercontent.com/-oJNCUlvzVKs/U2UqdZsnctI/AAAAAAAAKHk/0aM2vyiZoJ4/%25255BUNSET%25255D.jpg';
         text = MiscServices.formatImageUrl(url);
         $log.log('createImagePost', text);
-        DataSync.createPost('title v3', '1Images<br>' + text);
+        RetrieveItemsService.savePost('1Images<br>' + text);
     };
 
     $scope.createImagePost2 = function createImagePost() {
@@ -65,7 +65,7 @@ angular.module('Ionic03.dbTestCtrl', [])
         text2 = MiscServices.formatImageUrl(url2);
 
         $log.log('createImagePost', text);
-        DataSync.createPost('title v3', '2Images<br>' + text + '<br>' + text2);
+        RetrieveItemsService.savePost('2Images<br>' + text + '<br>' + text2);
     };
 
     $scope.createImagePost2error = function createImagePost() {
@@ -78,7 +78,7 @@ angular.module('Ionic03.dbTestCtrl', [])
         text2 = MiscServices.formatImageUrl(url2);
 
         $log.log('createImagePost', text);
-        DataSync.createPost('title v3', '2Images Error<br>' + text + '<br>' + text2);
+        RetrieveItemsService.savePost('2Images Error<br>' + text + '<br>' + text2);
     };
 
     //---------------------
@@ -103,6 +103,12 @@ angular.module('Ionic03.dbTestCtrl', [])
                     $scope.dumpAnswer = JSON.stringify(doc,null,2);
                     $scope.answerCount = rows.length;
                     console.log($scope.dumpAnswer);
+
+                    if (rows.length > 1) {
+                        doc = rows[1].doc;
+                        console.log(doc);
+                        $scope.dump2Answer = JSON.stringify(doc,null,2);
+                    }
                 }
                 else {
                     $scope.dumpAnswer = 'empty';

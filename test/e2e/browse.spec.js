@@ -1,6 +1,7 @@
 describe("browse screens", function () {
     describe("Main Screen", function () {
         var postText;
+        require('jasmine-expect');
 
 
         xit("Start", function () {
@@ -37,37 +38,37 @@ describe("browse screens", function () {
         });
 
         it("should be able to login", function() {
-            console.log("Login1");
             var loginProcess = require("./pages/loginProcess");
             var login = new loginProcess();
+            if (login.dbg) console.log("Login1");
 
             login.login()
                 .then(function (answer) {
                     expect(answer).toContain('Success');
-                    console.log('Login Process answer', answer);
+                    if (login.dbg) console.log('Login Process answer', answer);
                     //done();
                 })
                 .thenCatch(function (err) {
                     expect(true).toBe(err);
-                    console.log('Login Process Err', err);
+                    if (login.dbg) console.log('Login Process Err', err);
                     //done(err);
                 });
         });
 
         it("should be able to login twice without getting confused", function() {
-            console.log("Login2");
             var loginProcess = require("./pages/loginProcess");
             var login = new loginProcess();
+            if (login.dbg) console.log("Login2");
 
             login.login()
                 .then(function (answer) {
                     expect(answer).toBe('LoginProcess: Success, Already Done');
-                    console.log('Login Process answer', answer);
+                    if (login.dbg) console.log('Login Process answer', answer);
                     //done();
                 })
                 .thenCatch(function (err) {
                     expect(true).toBe(err);
-                    console.log('Login Process Err', err);
+                    if (login.dbg) console.log('Login Process Err', err);
                     //done(err);
                 });
         });
@@ -121,7 +122,7 @@ describe("browse screens", function () {
         it("check items", function() {
             var list = element.all(by.repeater('item in items'));
             expect(list.count()).toBeGreaterThan(9);
-            expect(list.get(0).getText()).toBe(postText);
+            expect(list.get(0).getText()).toStartWith(postText);
         });
     });
 });

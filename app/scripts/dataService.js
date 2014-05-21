@@ -53,9 +53,6 @@ angular.module('Ionic03.services',[])
 
                 return alldocs = _blogdb.allDocs(options);
             },
-            getItem: function(id) {
-                return items[id-1];
-            },
             getCurrentNewItem: function() {
                 return editItem;
             },

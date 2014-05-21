@@ -7,6 +7,19 @@ var ScreenshotReporter = function(dir_) {
     //dir = path.join(dir, new Date().toISOString());
     var index = 0;
 
+    var cleanFolder = function(dir) {
+        fs.readdirSync(dir).forEach(function (fileName) {
+            console.log(fileName);
+            /*
+            if (path.extname(fileName) === ".csv") {
+                fs.unlinkSync(fileName);
+            }
+            */
+        });
+    };
+
+    cleanFolder(dir);
+
     // base function to take a screenshot -- change path as needed
     var screenshot = function(testDescription, id) {
         var fname = testDescription.replace(/\s/g, "_") + "_" + id + ".png";

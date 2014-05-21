@@ -1,21 +1,22 @@
 var LoginProcess = function() {
+    this.dbg = false;
 
     this.handleAuth = function() {
         return browser.getAllWindowHandles().then(function (handles) {
             // switch to the popup
-            console.log('handleAuth: handles:', handles);
+            if (this.dbg) console.log('handleAuth: handles:', handles);
 
             if (handles.length>1) {
                 var popUpHandle = handles[1];
                 var parentHandle = handles[0];
 
-                console.log('handleAuth: browser.switchTo popup');
+                if (this.dbg) console.log('handleAuth: browser.switchTo popup');
                 browser.switchTo().window(popUpHandle);
 
 
                 browser.driver.getCurrentUrl().then(
                     function (url) {
-                        console.log('handleAuth: Popup URL', url);
+                        if (this.dbg) console.log('handleAuth: Popup URL', url);
 
                         var submit = browser.driver.findElement(by.id('submit_approve_access'));
                         submit.click();
@@ -24,7 +25,7 @@ var LoginProcess = function() {
                     });
             }
             else {
-                //console.log('handleAuth: Has only one window');
+                if (this.dbg) console.log('handleAuth: Has only one window');
                 browser.switchTo().window(handles[0]);
             }
         });
@@ -32,47 +33,55 @@ var LoginProcess = function() {
 
     var waitForLoginPage = function() {
         browser.get('/#/login');
-        var loginButton = element(by.css('.google-sign-button'));
-        loginButton.click();
+        return browser.getCurrentUrl().then(function (url) {
+            if (url.indexOf('/#/login') > -1) {
+                var loginButton = element(by.css('.google-sign-button'));
+                loginButton.click();
 
-        return browser.wait(function () {
-            return browser.getAllWindowHandles().then(function (handles) {
-                if (handles.length > 1) {
-                    return true;
-                }
-                else {
-                    return browser.getCurrentUrl().then(function (url) {
-                        if (url.indexOf('/#/login') > -1) {
-                            return false;
-                        }
-                        else {
+                return browser.wait(function () {
+                    return browser.getAllWindowHandles().then(function (handles) {
+                        if (handles.length > 1) {
                             return true;
                         }
+                        else {
+                            return browser.getCurrentUrl().then(function (url) {
+                                if (url.indexOf('/#/login') > -1) {
+                                    return false;
+                                }
+                                else {
+                                    return true;
+                                }
+                            });
+                        }
                     });
-                }
-            });
-        }, 20000);
+                }, 20000);
+            }
+            else {
+                if (this.dbg) console.log('Login page skiped, already in', url);
+                return true;
+            }
+        });
     };
 
     this.login = function() {
-        console.log('Start Login:');
+        if (this.dbg) console.log('Start Login:');
         var deferred = protractor.promise.defer();
         var that = this;
 
         waitForLoginPage().then(function() {
             browser.getAllWindowHandles().then(function (handles) {
-                console.log('handles:', handles);
+                if (this.dbg) console.log('handles:', handles);
 
                 if (handles.length > 1) {
                     var popUpHandle = handles[1];
                     var parentHandle = handles[0];
 
-                    console.log('browser.switchTo popup');
+                    if (this.dbg) console.log('browser.switchTo popup');
                     browser.switchTo().window(popUpHandle);
 
                     browser.driver.getCurrentUrl().then(
                         function (url) {
-                            //console.log('Popup URL', url);
+                            if (this.dbg) console.log('Popup URL', url);
                             var email = browser.driver.findElement(by.id('Email'));
                             var password = browser.driver.findElement(by.id('Passwd'));
                             var signin = browser.driver.findElement(by.id('signIn'));
@@ -89,13 +98,13 @@ var LoginProcess = function() {
                              */
 
                             //browser.driver.sleep(2000);
-                            //console.log('LoginProcess: Fill login page fields');
+                            if (this.dbg) console.log('LoginProcess: Fill login page fields');
                             var params = browser.params;
                             email.sendKeys(params.login.user);
                             password.sendKeys(params.login.password);
                             signin.click();
                             browser.driver.sleep(1500);
-                            //console.log('LoginProcess: End waited to login screen');
+                            if (this.dbg) console.log('LoginProcess: End waited to login screen');
 
                             that.handleAuth()
                                 .then(function (answer) {
@@ -113,7 +122,7 @@ var LoginProcess = function() {
                         });
                 }
                 else {
-                    //console.log('Login Has only one window');
+                    if (this.dbg) console.log('Login Has only one window');
                     browser.switchTo().window(handles[0]);
                     deferred.fulfill('LoginProcess: Success, Already Done');
                 }

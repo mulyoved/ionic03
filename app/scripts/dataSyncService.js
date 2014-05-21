@@ -533,13 +533,11 @@ angular.module('Ionic03.DataSync', [])
             return dataSync.createPost('', text);
         },
 
-        createPost: function(title, content) {
-            var time = new Date();
-
+        createPost: function(content, time) {
             var post = {
                 id: 'G' + time.getTime(),
                 kind: 'db#post',
-                title: title,
+                title: '',
                 content: content,
                 published: date2GAPIDate(time),
                 updated: date2GAPIDate(time),

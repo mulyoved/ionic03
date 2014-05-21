@@ -170,6 +170,8 @@ Work Great!
 
 #Test
 
+protractor test/spec-e2e.conf.js --suite browse
+
 
 ##elementexplorer:
 node C:/Users/Muly/AppData/Roaming/npm/node_modules/protractor/bin/elementexplorer.js http://localhost:9000/#/app/bloglist

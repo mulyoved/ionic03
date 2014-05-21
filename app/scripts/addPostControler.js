@@ -2,7 +2,7 @@ angular.module('Ionic03.AddCtrl', [])
 
 .controller('AddCtrl', function (
         $scope, ConfigService, $ionicNavBarDelegate, $timeout, $log,
-        DataService, DataSync, MiscServices, HTMLReformat,
+        DataService, DataSync, MiscServices, HTMLReformat, RetrieveItemsService,
         item) {
 
     $scope.title = ConfigService.blogName;
@@ -10,7 +10,7 @@ angular.module('Ionic03.AddCtrl', [])
 
     function savePost(text) {
         if (text) {
-            DataSync.savePost(text)
+            RetrieveItemsService.savePost(text)
                 .then(function(answer) {
                     $ionicNavBarDelegate.back();
                 })

@@ -11,6 +11,7 @@ angular.module('Ionic03.RetrieveItemsService',[])
             lastItem = {
                 source: 'db',
                 doc: null,
+                topItemDateTime: new Date(0),
                 blogId: ConfigService.blogId
             };
             blogItemCount = -1;
@@ -136,14 +137,18 @@ angular.module('Ionic03.RetrieveItemsService',[])
                     DataService.getItems(limit, lastItem.doc)
                         .then(function (answer) {
                             if (answer.rows.length > 0) {
+                                var date = new Date(answer.rows[0].doc.updated);
+                                if (_items.length === 0 && date > lastItem.topItemDateTime) {
+                                    lastItem.topItemDateTime = date;
+                                }
+
                                 for (i = 0; i < answer.rows.length; i++) {
                                     var doc = answer.rows[i].doc;
                                     _items.push(doc);
                                 }
 
                                 $log.log('Recived Items from DB', answer.rows.length);
-                                var doc1 = answer.rows[answer.rows.length - 1].doc;
-                                lastItem.doc = doc1;
+                                lastItem.doc = answer.rows[answer.rows.length - 1].doc;
                             }
 
                             if (answer.rows.length < limit) {
@@ -179,9 +184,22 @@ angular.module('Ionic03.RetrieveItemsService',[])
             return deferred.promise;
         };
 
+        savePost = function(text) {
+            text = text.replace(/\n/g, '<br />');
+            $log.log('DataService: Save Item', text);
+            var time = new Date();
+
+            if (time < lastItem.topItemDateTime) {
+                time = new Date(lastItem.topItemDateTime.getTime() + 1);
+            }
+            lastItem.topItemDateTime = time;
+            return DataSync.createPost(text, time);
+        };
+
         return {
             _syncLists: syncLists,
             loadItems: loadItems,
+            savePost: savePost,
             getItems: function() {
                 return _items;
             },

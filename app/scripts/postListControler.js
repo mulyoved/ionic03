@@ -130,8 +130,21 @@ angular.module('Ionic03.PostListCtrl', [])
         return HTMLReformat.reformat(item.content);
     };
 
+    var formatDateTimeAgo = function(datetime) {
+        var todayDate = new Date().getDate();
+        var date = new Date(datetime).getDate();
+
+        if (date == todayDate) {
+
+            return datetime.getHours()+':'+('0'  + datetime.getMinutes()).slice(-2)+':'+('0' + datetime.getSeconds()).slice(-2);
+        }
+        else {
+            return datetime.toLocaleString("en-us", { month: "short" }) + ' ' + datetime.getDate();
+        }
+    };
+
     $scope.show_dateTime = function(item) {
-        return item.updated;
+        return formatDateTimeAgo(new Date(item.updated));
     };
 
     $scope.needToSync = function(item) {
@@ -140,7 +153,7 @@ angular.module('Ionic03.PostListCtrl', [])
 
     function savePost(text) {
         if (text) {
-            DataSync.savePost(text)
+            RetrieveItemsService.savePost(text)
                 .then(function(answer) {
                     //do nothing
                 })
