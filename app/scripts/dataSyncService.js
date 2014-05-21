@@ -33,7 +33,7 @@ angular.module('Ionic03.DataSync', [])
     };
 
     var mapPost = function(doc) {
-        var timePublished = new Date(doc.published).getTime();
+        var timePublished = new Date(doc.updated).getTime();
         if (doc.kind.startsWith('delete#')) {
             doc._id = 'D' + doc.id;
         }
@@ -91,7 +91,7 @@ angular.module('Ionic03.DataSync', [])
 
         if (startDate && startDate.length > 0) {
             //Start date use the publish field, so we will not get updated posts
-            params.startDate = bumpDate(startDate);
+            params.startDate = startDate;
         }
         else {
             params.maxResults = limit;
@@ -102,7 +102,7 @@ angular.module('Ionic03.DataSync', [])
             params.endDate = endDate;
         }
 
-        //$log.log('Retrive posts from blogId', ConfigService.blogId, startDate, endDate, limit, params);
+        $log.log('blogger_getModifiedDocuments: Retrieve posts from blogId', ConfigService.blogId, startDate, endDate, limit, params);
         return Blogger.listPosts(ConfigService.blogId, params).
             then(function(list) {
 
@@ -204,8 +204,10 @@ angular.module('Ionic03.DataSync', [])
                 var lastUpdate = _lastUpdate.date;
                 var toUpdate = [];
                 angular.forEach(list, function(item) {
-                    if (lastUpdate < item.updated) {
-                        lastUpdate = item.updated;
+
+                    //Updated is wrong it is too late, need to be rounded to 1 minute
+                    if (lastUpdate < item.published) {
+                        lastUpdate = item.published;
                     }
 
                     var needUpdate = false;
@@ -540,6 +542,7 @@ angular.module('Ionic03.DataSync', [])
                 title: title,
                 content: content,
                 published: date2GAPIDate(time),
+                updated: date2GAPIDate(time),
                 key: 'U'
             };
 

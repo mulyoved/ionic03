@@ -126,6 +126,10 @@ angular.module('Ionic03.PostListCtrl', [])
         return HTMLReformat.reformat(item.content);
     };
 
+    $scope.show_dateTime = function(item) {
+        return item.updated;
+    };
+
     $scope.needToSync = function(item) {
         return item.key === 'U';
     };

@@ -17,7 +17,7 @@ angular.module('Ionic03', [
     'Ionic03.MiscServices',
     'Ionic03.PushServices',
     'Ionic03.PostListCtrl',
-    'Ionic03.UnlockCtrl',
+    'Ionic03.testTouchEventsCtrl',
     'Ionic03.Unlock2Ctrl',
     'Ionic03.services',
     'Ionic03.directives',
@@ -151,6 +151,12 @@ angular.module('Ionic03', [
             }
         }
     });
+
+    $rootScope.$on('Event:device-resume', function(event) {
+        if (ConfigService.locked && ConfigService.unlockCode !== '*skip*' ) {
+            $state.go('unlock2');
+        }
+    });
 })
 .config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.useXDomain = true;
@@ -261,13 +267,6 @@ angular.module('Ionic03', [
     localStorageServiceProvider.setPrefix('Ionic03');
 
     $stateProvider
-        .state('unlock', {
-            url: '/unlock',
-            abstract: false,
-            templateUrl: 'templates/unlock.html',
-            controller: 'UnlockCtrl',
-            authenticate: false
-        })
         .state('splash', {
             url: '/splash',
             abstract: false,
@@ -301,6 +300,14 @@ angular.module('Ionic03', [
             abstract: false,
             templateUrl: 'templates/testInfinitScroll.html',
             controller: 'testInfinitScrollCtrl',
+            authenticate: false
+        })
+
+        .state('testTouchEvents', {
+            url: '/testTouchEvents',
+            abstract: false,
+            templateUrl: 'templates/testTouchEvents.html',
+            controller: 'testTouchEventsCtrl',
             authenticate: false
         })
 
@@ -412,15 +419,16 @@ angular.module('Ionic03', [
 
         var init = function(startSync) {
             var unlockCode = localStorageService.get('unlock_code');
+            ConfigService.unlockCode = unlockCode;
             var nextScreen;
-            if (unlockCode === 'skip' || !ConfigService.locked) {
+            if (unlockCode === '*skip*' || !ConfigService.locked) {
                 nextScreen = 'splash';
             }
             else {
                 nextScreen = 'unlock2';
             }
 
-            $log.log('AppInit Init', startSync, nextScreen);
+            $log.log('AppInit Init', ConfigService.version, startSync, nextScreen);
             $state.go(nextScreen);
             DataService.selectBlog(false, false);
             DataSync.init();

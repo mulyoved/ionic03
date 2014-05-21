@@ -256,6 +256,7 @@ angular.module('Ionic03.dbTestCtrl', [])
         BlogListSync.clearStorage();
         localStorageService.remove('selected_blog');
         localStorageService.remove('unlock_code');
+        ConfigService.unlockCode = '';
     };
 
     //-------------------------------------------------------------------

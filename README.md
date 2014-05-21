@@ -55,9 +55,10 @@ A:
 `grunt emulate:android`
 
 `adb logcat CordovaLog:D *:S`
-`adb logcat GCM:D memtrack:S android.os.Debug:S eglCodecCommon:S jdwp:S linker:E *:W`
+`adb logcat GCM:D memtrack:S android.os.Debug:S eglCodecCommon:S jdwp:S linker:E *:W EGL_emulation:E SoundPool:S AudioService:S IInputConnectionWrapper:E WindowManager:E`
 
 
+adb shell pm uninstall -k com.example.Ionic03
 `grunt copy:all && grunt emulate:android`
 
 
@@ -67,6 +68,8 @@ A:
 [File upload Example](http://coenraets.org/blog/2013/09/how-to-upload-pictures-from-a-phonegap-application-to-node-js-and-other-servers-2/)
 
 Add Plugins
+
+`cordova plugin add org.apache.cordova.inappbrowser`
 
 `cordova plugin add org.apache.cordova.device`
 
@@ -79,6 +82,7 @@ Add Plugins
 `cordova plugin add org.apache.cordova.camera`
 
 Instructions https://github.com/urbanairship/phonegap-ua-push
+https://github.com/phonegap-build/PushPlugin
 
 `cordova plugin add https://github.com/urbanairship/phonegap-ua-push.git`
 

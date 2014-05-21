@@ -30,25 +30,37 @@ var LoginProcess = function() {
         });
     };
 
+    var waitForLoginPage = function() {
+        browser.get('/#/login');
+        var loginButton = element(by.css('.google-sign-button'));
+        loginButton.click();
+
+        return browser.wait(function () {
+            return browser.getAllWindowHandles().then(function (handles) {
+                if (handles.length > 1) {
+                    return true;
+                }
+                else {
+                    return browser.getCurrentUrl().then(function (url) {
+                        if (url.indexOf('/#/login') > -1) {
+                            return false;
+                        }
+                        else {
+                            return true;
+                        }
+                    });
+                }
+            });
+        }, 20000);
+    };
+
     this.login = function() {
         console.log('Start Login:');
         var deferred = protractor.promise.defer();
         var that = this;
 
-        browser.get('http://localhost:9000/#/login').then(function() {
-            browser.driver.sleep(1000);
-            var loginButton = element(by.css('.google-sign-button'));
-            loginButton.click();
-            console.log('Start Login: click');
-
-            browser.driver.sleep(1000);
+        waitForLoginPage().then(function() {
             browser.getAllWindowHandles().then(function (handles) {
-
-                browser.getCurrentUrl().then(function(url) {
-                    console.log('URL', url);
-                });
-
-                // switch to the popup
                 console.log('handles:', handles);
 
                 if (handles.length > 1) {

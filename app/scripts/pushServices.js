@@ -2,7 +2,7 @@
 
 angular.module('Ionic03.PushServices', [])
 
-.service('PushServices', function(ConfigService, $q, $log, $http, DataService) {
+.service('PushServices', function(ConfigService, $q, $log, $http, $state, DataService) {
     var tagPrefix = 'BLOG:';
 
     var init = function() {
@@ -47,6 +47,7 @@ angular.module('Ionic03.PushServices', [])
                 // Reregister for urbanairship events if they were removed in pause event
                 document.addEventListener('urbanairship.registration', onRegistration, false);
                 document.addEventListener('urbanairship.push', handleIncomingPush, false);
+                $rootScope.broadcast('Event:device-resume');
             }, false);
 
 

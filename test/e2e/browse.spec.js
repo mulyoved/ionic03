@@ -101,7 +101,7 @@ describe("browse screens", function () {
             expect(browser.getCurrentUrl()).toContain('#/app/add');
             expect($('h1').getText()).toBe('TestBlog');
 
-            postText = 'Post: ' + new Date().toString();
+            postText = 'browse test post: ' + new Date().toString();
             element(by.id('addpost')).sendKeys(postText);
             element(by.id('save')).click();
         });

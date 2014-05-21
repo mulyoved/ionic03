@@ -12,7 +12,7 @@ angular.module('Ionic03.directives', [])
 
                 var holdFn = function (e) {
                     //o('hold', [e.gesture.touches[0].pageX, e.gesture.touches[0].pageY]);
-                    console.log('Gesture', e.type);
+                    //console.log('Gesture', e.type);
                     return $scope.$apply(function () {
                         return fn($scope)(e);
                     });

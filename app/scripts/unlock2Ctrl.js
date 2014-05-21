@@ -2,7 +2,6 @@
 angular.module('Ionic03.Unlock2Ctrl', [])
 
 .controller('Unlock2Ctrl', function ($scope, ConfigService, localStorageService, $log, $state) {
-    var storageKey = 'unlock_code';
     var nextScreen = ConfigService.mainScreen;
     console.log('UnlockCtrl');
     $scope.dragIds = '';
@@ -184,8 +183,8 @@ angular.module('Ionic03.Unlock2Ctrl', [])
     };
 
 
-    var unlockCode = localStorageService.get(storageKey);
-    $log.info('unlock_code', unlockCode);
+    var unlockCode = localStorageService.get('unlock_code');
+    $log.info('unlockCode', unlockCode);
     var state = 'unlock';
     var temp_unlockCode = '';
     if (!unlockCode) {
@@ -212,7 +211,8 @@ angular.module('Ionic03.Unlock2Ctrl', [])
             }
             else if (code === '709') {
                 //reset code
-                localStorageService.remove(storageKey);
+                localStorageService.remove('unlock_code');
+                ConfigService.unlockCode = '';
                 unlockCode = null;
                 state = 'set';
                 $log.info('Reset lock code');
@@ -232,7 +232,8 @@ angular.module('Ionic03.Unlock2Ctrl', [])
         else if (state === 'confirm') {
             if (temp_unlockCode === code) {
                 //save code
-                localStorageService.add(storageKey, code);
+                localStorageService.add('unlock_code', code);
+                ConfigService.unlockCode = code;
                 $log.info('Save new unlock code', code);
                 $state.go(nextScreen);
             }
@@ -288,5 +289,9 @@ angular.module('Ionic03.Unlock2Ctrl', [])
                 }
             }
         }
-    }
+    };
+
+    $scope.backdoor = function() {
+        $state.go('dbtest');
+    };
 });
