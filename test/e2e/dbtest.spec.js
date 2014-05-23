@@ -8,7 +8,6 @@ describe("dbTest", function () {
     }
 
 
-    var skipLogin = false;
     var skipSync = false;
 
         /*
@@ -81,67 +80,52 @@ describe("dbTest", function () {
         });
         */
 
-        if (!skipLogin) {
-            it("should be able to login", function() {
-                browser.get('/#');
-                var loginProcess = require("./pages/loginProcess");
-                var login = new loginProcess();
+        it("should be able to login", function() {
+            console.log('dbtest start');
+            browser.get('/#');
+            var loginProcess = require("./pages/loginProcess");
+            var login = new loginProcess();
 
-                login.login()
-                    .then(function (answer) {
-                        expect(answer).toContain('Success');
-                        console.log('Login Process answer', answer);
-                        //done();
-                    })
-                    .thenCatch(function (err) {
-                        expect(true).toBe(err);
-                        console.log('Login Process Err', err);
-                        //done(err);
-                    });
-            });
-
-            it("should select blog", function() {
-                browser.getCurrentUrl().then(function(url) {
-                    if (url.indexOf('#/app/bloglist') > -1) {
-                        expect(browser.getCurrentUrl()).toContain('#/app/bloglist');
-
-                        var list = element.all(by.repeater('item in items'));
-                        expect(list.count()).toBe(2);
-                        expect(list.get(1).getText()).toBe('Test Blog #2');
-                        expect(list.get(0).getText()).toBe('TestBlog');
-                        list.get(0).click();
-                    }
-                });
-
-                /*
-                list.count().then(function(count) {
-                    console.log('Count', count);
-                    for (i=0; i<count; i++) {
-                        list.get(i).getText().then(function (text) {
-                            console.log('Item Text', text);
-                            if (text === 'TestBlog') {
-                                list.get(idx).click();
-                            }
-                        });
-
-                        expect(list.count()).toBe(2);
-                        expect(list.get(0).getText()).toBe('Test Blog #2');
-                        expect(list.get(1).getText()).toBe('TestBlog');
-                        list.get(1).click();
-                    }
+            login.login()
+                .then(function (answer) {
+                    expect(answer).toContain('Success');
+                    console.log('Login Process answer', answer);
+                    //done();
                 })
-                */
-            });
-        }
+                .thenCatch(function (err) {
+                    expect(true).toBe(err);
+                    console.log('Login Process Err', err);
+                    //done(err);
+                });
+        });
 
         it("should select blog", function() {
+            browser.getCurrentUrl().then(function(url) {
+                console.log('URL', url);
+                if (url.indexOf('#/app/bloglist') > -1) {
+                    expect(browser.getCurrentUrl()).toContain('#/app/bloglist');
+
+                    var list = element.all(by.repeater('item in items'));
+                    expect(list.count()).toBe(2);
+                    expect(list.get(1).getText()).toBe('Test Blog #2');
+                    expect(list.get(0).getText()).toBe('TestBlog');
+                    list.get(0).click();
+                }
+            });
+        });
+
+        it("should be in main page", function() {
             expect(browser.getCurrentUrl()).toContain('#/app/playlists');
         });
 
         it("should dump db", function () {
-            dbTest.get(); // this reload the application, need to give time to stablize
+            element(by.id('menu-toggle')).click();
+            element(by.id('setup')).click();
+            expect($('h1').getText()).toBe('Setup');
+            expect(browser.getCurrentUrl()).toContain('#/app/setup');
+            element(by.id('self-test')).click();
+            expect(browser.getCurrentUrl()).toContain('#/dbtest');
 
-            //browser.debugger();
             dumpDB().then(function() {
                 console.log('Record in DB before test: ', recordCount);
             });
@@ -149,13 +133,12 @@ describe("dbTest", function () {
 
 
         it("should delete db", function () {
-            dbTest.get();
             deleteDB().then(function() {
                 expect(dbTest.dumpAnswer.getText()).toBe('deleted');
             });
         });
 
-        it("should dump db", function () {
+        it("should dump db, after delete", function () {
             dumpDB().then(function() {
                 expect(recordCount).toBe(0);
             });

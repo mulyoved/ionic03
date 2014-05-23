@@ -71,6 +71,7 @@ describe("login process", function () {
             list.get(0).click();
         });
 
+        /*
         it("should be in main page", function() {
             expect(browser.getCurrentUrl()).toContain('#/app/playlists');
             expect($('h1').getText()).toBe('TestBlog');
@@ -82,5 +83,53 @@ describe("login process", function () {
                 });
             }, 20000);
         });
+
+        it("should open setup menu", function() {
+            element(by.id('menu-toggle')).click();
+            element(by.id('setup')).click();
+            expect($('h1').getText()).toBe('Setup');
+            expect(browser.getCurrentUrl()).toContain('#/app/setup');
+            element(by.id('self-test')).click();
+            expect(browser.getCurrentUrl()).toContain('#/dbtest');
+        });
+
+        it("should be able to login again - 2nd Login", function () {
+            browser.get('/#');
+
+            var loginProcess = require("./pages/loginProcess");
+            var login = new loginProcess();
+
+            login.login()
+                .then(function (answer) {
+                    expect(answer).toContain('Success');
+                    console.log('Login Process answer', answer);
+                    //done();
+                })
+                .thenCatch(function (err) {
+                    expect(true).toBe(err);
+                    console.log('Login Process Err', err);
+                    //done(err);
+                });
+        });
+
+        it("should select blog - 2nd Login", function() {
+            browser.getCurrentUrl().then(function(url) {
+                console.log('URL', url);
+                if (url.indexOf('#/app/bloglist') > -1) {
+                    expect(browser.getCurrentUrl()).toContain('#/app/bloglist');
+
+                    var list = element.all(by.repeater('item in items'));
+                    expect(list.count()).toBe(2);
+                    expect(list.get(1).getText()).toBe('Test Blog #2');
+                    expect(list.get(0).getText()).toBe('TestBlog');
+                    list.get(0).click();
+                }
+            });
+        });
+
+        it("should be in main page - 2nd Login", function() {
+            expect(browser.getCurrentUrl()).toContain('#/app/playlists');
+        });
+        */
     });
 });

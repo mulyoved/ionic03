@@ -1,5 +1,5 @@
 var LoginProcess = function() {
-    this.dbg = false;
+    this.dbg = true;
 
     this.handleAuth = function() {
         return browser.getAllWindowHandles().then(function (handles) {
@@ -64,19 +64,28 @@ var LoginProcess = function() {
     };
 
     var unlock = function() {
+        if (this.dbg) console.log('Unlock: Start');
         var deferred = protractor.promise.defer();
         element(by.id('0')).getText()
             .then(function(text) {
-                if (text !== 'Choose Unlock Code') {
-                    deferred.reject('expected to be Choose Unlock Code', text);
-                    return;
-                }
-                element(by.id('patternlockbutton1')).click();
-                element(by.id('patternlockbutton5')).click();
-                element(by.id('patternlockbutton9')).click();
-                element(by.id('patternlockbutton8')).click();
+                if (this.dbg) console.log('Unlock screen', text);
+                if (text === 'Welcome' || text === 'Choose Unlock Code') {
 
-                return element(by.id('0')).getText();
+                    element(by.id('patternlockbutton1')).click();
+                    element(by.id('patternlockbutton5')).click();
+                    element(by.id('patternlockbutton9')).click();
+                    element(by.id('patternlockbutton8')).click();
+
+                    if (text === 'Welcome') {
+                        deferred.fulfill('Unlocked');
+                    }
+                    else {
+                        return element(by.id('0')).getText();
+                    }
+                }
+                else {
+                    deferred.reject('expected to be Choose Unlock Code', text);
+                }
             })
             .then(function(text) {
                 if (text !== 'Confirm Unlock Code') {
@@ -91,7 +100,6 @@ var LoginProcess = function() {
                 deferred.fulfill('Unloked');
             });
 
-        deferred.fulfill('LoginProcess: Success, Already Done');
         return deferred.promise;
     };
 
@@ -102,75 +110,81 @@ var LoginProcess = function() {
 
         browser.driver.getCurrentUrl()
             .then(function(url) {
+                console.log('Login process started in URL', url);
+
                 if (url.indexOf('unlock2')>-1) {
                     return unlock();
                 }
                 else {
                     if (that.dbg) console.log('already unlocked and login, move forward');
                     deferred.fulfill('LoginProcess: Success, Already Done');
+                    return 0;
                 }
             })
-            .then(function() {
-                return waitForLoginPage().then(function () {
-                    browser.getAllWindowHandles().then(function (handles) {
-                        if (that.dbg) console.log('handles:', handles);
+            .then(function(answer) {
+                if (answer !== 0) {
+                    if (that.dbg) console.log('Login continue');
+                    return waitForLoginPage().then(function () {
+                        browser.getAllWindowHandles().then(function (handles) {
+                            if (that.dbg) console.log('handles:', handles);
 
-                        if (handles.length > 1) {
-                            var popUpHandle = handles[1];
-                            var parentHandle = handles[0];
+                            if (handles.length > 1) {
+                                var popUpHandle = handles[1];
+                                var parentHandle = handles[0];
 
-                            if (that.dbg) console.log('browser.switchTo popup');
-                            browser.switchTo().window(popUpHandle);
+                                if (that.dbg) console.log('browser.switchTo popup');
+                                browser.switchTo().window(popUpHandle);
 
-                            browser.driver.getCurrentUrl().then(
-                                function (url) {
-                                    if (that.dbg) console.log('Popup URL', url);
-                                    var email = browser.driver.findElement(by.id('Email'));
-                                    var password = browser.driver.findElement(by.id('Passwd'));
-                                    var signin = browser.driver.findElement(by.id('signIn'));
+                                browser.driver.getCurrentUrl().then(
+                                    function (url) {
+                                        if (that.dbg) console.log('Popup URL', url);
+                                        var email = browser.driver.findElement(by.id('Email'));
+                                        var password = browser.driver.findElement(by.id('Passwd'));
+                                        var signin = browser.driver.findElement(by.id('signIn'));
 
-                                    //
-                                    //console.log('Email', email);
+                                        //
+                                        //console.log('Email', email);
 
-                                    //console.log('Email exists', element(email).isPresent());
+                                        //console.log('Email exists', element(email).isPresent());
 
-                                    /*
-                                     element(by.id('Email')).isPresent().then(function(answer) {
-                                     console.log('Email exists',answer);
-                                     });
-                                     */
+                                        /*
+                                         element(by.id('Email')).isPresent().then(function(answer) {
+                                         console.log('Email exists',answer);
+                                         });
+                                         */
 
-                                    //browser.driver.sleep(2000);
-                                    if (that.dbg) console.log('LoginProcess: Fill login page fields');
-                                    var params = browser.params;
-                                    email.sendKeys(params.login.user);
-                                    password.sendKeys(params.login.password);
-                                    signin.click();
-                                    browser.driver.sleep(1500);
-                                    if (that.dbg) console.log('LoginProcess: End waited to login screen');
+                                        //browser.driver.sleep(2000);
+                                        if (that.dbg) console.log('LoginProcess: Fill login page fields');
+                                        var params = browser.params;
+                                        email.sendKeys(params.login.user);
+                                        password.sendKeys(params.login.password);
+                                        signin.click();
+                                        browser.driver.sleep(1500);
+                                        if (that.dbg) console.log('LoginProcess: End waited to login screen');
 
-                                    that.handleAuth()
-                                        .then(function (answer) {
-                                            //console.log('Done', answer);
-                                            deferred.fulfill('LoginProcess: Success, Done');
-                                        })
-                                        .thenCatch(function (err) {
-                                            console.log('Err', err);
-                                            deferred.reject('LoginProcess: Login error');
-                                        })
-                                        .thenFinally(function (done) {
-                                            browser.switchTo().window(parentHandle);
-                                            //console.log('LoginProcess: Finally', done);
-                                        });
-                                });
-                        }
-                        else {
-                            if (that.dbg) console.log('Login Has only one window');
-                            browser.switchTo().window(handles[0]);
-                            deferred.fulfill('LoginProcess: Success, Already Done');
-                        }
+                                        that.handleAuth()
+                                            .then(function (answer) {
+                                                //console.log('Done', answer);
+                                                deferred.fulfill('LoginProcess: Success, Done');
+                                            })
+                                            .thenCatch(function (err) {
+                                                console.log('Err', err);
+                                                deferred.reject('LoginProcess: Login error');
+                                            })
+                                            .thenFinally(function (done) {
+                                                browser.switchTo().window(parentHandle);
+                                                //console.log('LoginProcess: Finally', done);
+                                            });
+                                    });
+                            }
+                            else {
+                                if (that.dbg) console.log('Login Has only one window');
+                                browser.switchTo().window(handles[0]);
+                                deferred.fulfill('LoginProcess: Success, Already Done');
+                            }
+                        });
                     });
-                });
+                }
             });
 
         return deferred.promise;
