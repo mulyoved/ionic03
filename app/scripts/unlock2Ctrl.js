@@ -2,10 +2,13 @@
 angular.module('Ionic03.Unlock2Ctrl', [])
 
 .controller('Unlock2Ctrl', function ($scope, ConfigService, localStorageService, $log, $state) {
+    var isClickMode = true;
     var nextScreen = ConfigService.mainScreen;
     console.log('UnlockCtrl');
     $scope.dragIds = '';
     $scope.text = 'Welcome';
+
+    var isBackDoorMode = false;
 
     var isdrawing = false;
     var from = "";
@@ -128,19 +131,24 @@ angular.module('Ionic03.Unlock2Ctrl', [])
         if (inputbox_value != "") {
             clear();
         }
-        b.className = "patternlockbutton touched";
+
         from = "";
         to = b.id.split("patternlockbutton").join("");
-        inputbox_value = to;
-        startbutton = to;
+
+        if (to.length === 1 && to !== '0') {
+            b.className = "patternlockbutton touched";
+            inputbox_value = to;
+            startbutton = to;
+        }
         return false;
     };
 
     var buttonTouchOver = function(b){
         if (isdrawing){
             var thisbutton = b.id.split("patternlockbutton").join("");
+            $log.log('thisbutton', thisbutton);
 
-            if(thisbutton != to){ // touching the same button twice in a row is not allowed (should it ?)
+            if(thisbutton.length == 1 && thisbutton != 0 && thisbutton != to) { // touching the same button twice in a row is not allowed (should it ?)
 
                 //console.log('buttonTouchOver', b);
                 var cn = b.className;
@@ -155,18 +163,16 @@ angular.module('Ionic03.Unlock2Ctrl', [])
 
                 // display line between 2 buttons
                 var thisline = document.getElementById("line" + from + to);
-                if (to <  from){
+                if (to <  from) {
                     thisline = document.getElementById("line" + to + from);
                 }
-                if (thisline){
+                if (thisline) {
                     thisline.style.visibility = 'visible';
 
                     //update input value
                     inputbox_value += to;
                     console.log('buttonTouchOver', from, to, inputbox_value);
                 }
-
-
             }
         }
         return(false)
@@ -207,16 +213,26 @@ angular.module('Ionic03.Unlock2Ctrl', [])
         $log.info('checkUnlockCode', code);
         if (state === 'unlock') {
             if (unlockCode === code) {
+                $log.log('Unlock code is correct, go to', nextScreen);
+                ConfigService.locked = false;
                 $state.go(nextScreen);
             }
-            else if (code === '709') {
+            else if (code === '1251') {
                 //reset code
-                localStorageService.remove('unlock_code');
-                ConfigService.unlockCode = '';
-                unlockCode = null;
-                state = 'set';
-                $log.info('Reset lock code');
-                updateState();
+                if (isBackDoorMode) {
+                    ConfigService.locked = false;
+                    $log.log('Backdor activated, go to dbtest');
+                    $state.go('dbtest');
+                }
+                else {
+                    $log.log('Backdor activated, go to dbtest, clear unlock code');
+                    localStorageService.remove('unlock_code');
+                    ConfigService.unlockCode = '';
+                    unlockCode = null;
+                    state = 'set';
+                    $log.info('Reset lock code');
+                    updateState();
+                }
             }
             else {
                 $log.info('Code does not match, ask again', unlockCode, code);
@@ -235,6 +251,7 @@ angular.module('Ionic03.Unlock2Ctrl', [])
                 localStorageService.add('unlock_code', code);
                 ConfigService.unlockCode = code;
                 $log.info('Save new unlock code', code);
+                ConfigService.locked = false;
                 $state.go(nextScreen);
             }
             else {
@@ -251,7 +268,19 @@ angular.module('Ionic03.Unlock2Ctrl', [])
     //Calculate the unlock path
     $scope.onDragOver = function (e) {
         if (e.type === 'tap') {
-            console.log('Tap: ', e);
+            console.log('Tap: ', e, inputbox_value);
+            if (inputbox_value.length == 0) {
+                buttonTouchStart(e.target);
+            }
+            else {
+                buttonTouchOver(e.target);
+            }
+
+            if (inputbox_value.length == 4) {
+                checkUnlockCode(inputbox_value);
+                console.log('Unlock Pattern', inputbox_value);
+                buttonTouchEnd();
+            }
         }
         else if (e.type === 'dragend') {
             checkUnlockCode(inputbox_value);
@@ -292,6 +321,7 @@ angular.module('Ionic03.Unlock2Ctrl', [])
     };
 
     $scope.backdoor = function() {
-        $state.go('dbtest');
+        $log.log('Backdor', inputbox_value);
+        isBackDoorMode = true;
     };
 });

@@ -1,0 +1,71 @@
+<ion-view title="Setup" hide-back-button="true">
+    <ion-nav-buttons side="left">
+      <a class="button button-icon icon ion-chevron-left" ng-click="cancel()"></a>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="right">
+        <button id="save" class="button button-icon" ng-click="save()">
+            <i class="icon ion-checkmark-round"></i>
+        </button>
+    </ion-nav-buttons>
+
+  <ion-content class="has-header">
+
+  <ion-list>
+      <li class="item item-toggle">
+          Notifications
+          <label class="toggle">
+              <input type="checkbox" ng-model="setup.enablePushNotification">
+              <div class="track">
+                  <div class="handle"></div>
+              </div>
+          </label>
+      </li>
+      <li class="item item-toggle">
+          Lock Screen
+          <label class="toggle">
+              <input type="checkbox" ng-model="setup.enableLockScreen">
+              <div class="track">
+                  <div class="handle"></div>
+              </div>
+          </label>
+      </li>
+      <div class="item item-divider">
+          Misc
+      </div>
+      <li class="item" ng-click="clearStorage()">
+          Clear local storage
+            <i class="icon float-right large-font ion-android-trash"></i>
+            <p><span class="foot-note">No worries, will not delete post from Blogger, just clean them from local storage and synchronize again.</span></p>
+      </li>
+      <li class="item" ng-click="googleLogout()">
+          Google Account Logout
+          <i class="icon float-right large-font ion-chevron-right"></i>
+      </li>
+      <li class="item" ng-click="reset()">
+          Reset
+          <i class="icon float-right large-font ion-chevron-right"></i>
+          <p><span class="foot-note">No worries, will not delete post from Blogger, just clean them from local storage and synchronize again.</span></p>
+      </li>
+      <li class="item" ng-click="diagnostic()">
+          Diagnostic Screen
+          <i class="icon float-right large-font ion-chevron-right"></i>
+      </li>
+      <li class="item" ng-click="selfTest()">
+          Self Test Screen
+          <i class="icon float-right large-font ion-chevron-right"></i>
+      </li>
+      <div class="item item-divider">
+          About
+      </div>
+      <li class="item">
+          Version
+          <span class="float-right">{{setup.version}}</span>
+      </li>
+      <li class="item">
+          Made with <span><i class="icon large-font ion-heart"></i></span> by Muly, May 2014
+
+      </li>
+
+  </ion-list>
+  </ion-content>
+</ion-view>

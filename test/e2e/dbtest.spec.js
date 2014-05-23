@@ -44,7 +44,7 @@ describe("dbTest", function () {
 
             return browser.wait(function () {
                 return dbTest.dumpAnswer.getText().then(function (text) {
-                    return text === 'sync';
+                    return text === 'sync' || text === 'sync error';
                 });
             }, 20000);
         };
@@ -83,6 +83,7 @@ describe("dbTest", function () {
 
         if (!skipLogin) {
             it("should be able to login", function() {
+                browser.get('/#');
                 var loginProcess = require("./pages/loginProcess");
                 var login = new loginProcess();
 
@@ -189,10 +190,6 @@ describe("dbTest", function () {
                         expect(recordCount).toBe(prevCount + 1);
                     });
                 });
-            });
-
-            it("fail to take screen shot", function() {
-                expect('take screenshot').toContain('done');
             });
 
             it("dump top record", function() {

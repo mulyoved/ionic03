@@ -66,6 +66,34 @@ angular.module('Ionic03.DataSync', [])
         return date2GAPIDate(date);
     };
 
+    var createPost = function(content, time) {
+        var post = {
+            id: 'G' + time.getTime(),
+            kind: 'db#post',
+            title: '',
+            content: content,
+            published: date2GAPIDate(time),
+            updated: date2GAPIDate(time),
+            key: 'U'
+        };
+
+        mapPost(post);
+        return DataService.blogdb().post(post)
+            .then(function(answer) {
+                $log.log('Add Success', answer);
+                //Trigger db change
+                //Start Sync
+
+                //todo: uncomment temp to see unsync item from database in list
+                dataSync.needSync = true;
+                dataSync.newData = true;
+                //$rootScope.$broadcast('event:DataSync:DataChange');
+                $rootScope.$broadcast('event:DataSync:StatusChange');
+            }, function(err) {
+                $log.error('Add Failed', err);
+            });
+    };
+
     function getComments(blogId, postId) {
         var params = {
             fetchBodies: true,
@@ -450,6 +478,7 @@ angular.module('Ionic03.DataSync', [])
         */
 
         init: function() {
+            $log.log('DataSync: init');
             return GoogleApi.getToken({
                 client_id: GoogleApp.client_id,
                 client_secret: GoogleApp.client_secret
@@ -466,11 +495,11 @@ angular.module('Ionic03.DataSync', [])
                 return GAPI.init_WithToken(token);
             }).then(function(data) {
                 dataSync.gapiLogin = true;
-                console.log('DataSync: gapiLogin = true', data);
+                $log.log('DataSync: gapiLogin = true', data);
                 $rootScope.$broadcast('event:DataSync:StatusChange', dataSync);
             }, function(err) {
                 dataSync.gapiLogin = false;
-                console.log('DataSync: gapiLogin = false');
+                $log.log('DataSync: gapiLogin = false', err);
                 $rootScope.$broadcast('event:DataSync:StatusChange', dataSync);
             });
         },
@@ -528,38 +557,43 @@ angular.module('Ionic03.DataSync', [])
         },
 
         savePost: function(text) {
+            var deferred = $q.defer();
+
             text = text.replace(/\n/g, '<br />');
             $log.log('DataService: Save Item', text);
-            return dataSync.createPost('', text);
-        },
-
-        createPost: function(content, time) {
-            var post = {
-                id: 'G' + time.getTime(),
-                kind: 'db#post',
-                title: '',
-                content: content,
-                published: date2GAPIDate(time),
-                updated: date2GAPIDate(time),
-                key: 'U'
-            };
-
-            mapPost(post);
-            return DataService.blogdb().post(post)
+            DataService.getItems(1,null)
                 .then(function(answer) {
-                    $log.log('Add Success', answer);
-                    //Trigger db change
-                    //Start Sync
+                    var date = new Date();
+                    var now = date;
+                    if (answer.rows.length > 0) {
+                        var dbdate = new Date(answer.rows[0].doc.updated);
+                        if (date < dbdate) {
+                            date = new Date(dbdate.getTime() + 1000);
+                            $log.log('Calculate post date: date < dbdate', now, date, dbdate);
+                        }
+                        else {
+                            $log.log('Calculate post date: date is fine', now, date, dbdate);
+                        }
 
-                    //todo: uncomment temp to see unsync item from database in list
-                    dataSync.needSync = true;
-                    dataSync.newData = true;
-                    //$rootScope.$broadcast('event:DataSync:DataChange');
-                    $rootScope.$broadcast('event:DataSync:StatusChange');
-                }, function(err) {
-                    $log.error('Add Failed', err);
+
+                    }
+                    return date;
+                })
+                .then(function(time) {
+                    $log.log('savepost calling createPost', text, time);
+                    return createPost(text, time);
+                })
+                .then(function(answer) {
+                    deferred.resolve(answer);
+                })
+                .catch(function(err) {
+                    $log.error(err);
+                    deferred.reject(err);
                 });
+
+            return deferred.promise;
         },
+
         getItems: function(lastItem, limit) {
             limit = limit || 20;
             var published = null;
@@ -590,7 +624,7 @@ angular.module('Ionic03.DataSync', [])
                     });
 
                     //console.log(r);
-                    console.table(r);
+                    //console.table(r);
                     return answer.rows;
                 }, function(reason) {
                     $log.error('readdb failed', reason);

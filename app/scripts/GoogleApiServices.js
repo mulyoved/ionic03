@@ -124,7 +124,7 @@ angular.module('Ionic03.GoogleApi', [])
                 });
             } else {
                 //console.log('GoogleApi:getToken, Not found Token in local storage');
-                deferred.reject();
+                deferred.reject('Token not found in local storage');
             }
 
             return deferred.promise;

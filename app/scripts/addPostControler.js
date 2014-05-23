@@ -10,7 +10,7 @@ angular.module('Ionic03.AddCtrl', [])
 
     function savePost(text) {
         if (text) {
-            RetrieveItemsService.savePost(text)
+            DataSync.savePost(text)
                 .then(function(answer) {
                     $ionicNavBarDelegate.back();
                 })

@@ -184,22 +184,9 @@ angular.module('Ionic03.RetrieveItemsService',[])
             return deferred.promise;
         };
 
-        savePost = function(text) {
-            text = text.replace(/\n/g, '<br />');
-            $log.log('DataService: Save Item', text);
-            var time = new Date();
-
-            if (time < lastItem.topItemDateTime) {
-                time = new Date(lastItem.topItemDateTime.getTime() + 1);
-            }
-            lastItem.topItemDateTime = time;
-            return DataSync.createPost(text, time);
-        };
-
         return {
             _syncLists: syncLists,
             loadItems: loadItems,
-            savePost: savePost,
             getItems: function() {
                 return _items;
             },

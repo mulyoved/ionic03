@@ -110,6 +110,7 @@ angular.module('Ionic03.controllers', [])
 
 .controller('BlogListCtrl', function ($scope, $state, $log, ConfigService, DataService, BlogListSync, items) {
     $scope.items = items;
+    $scope.canCancelSelection = ConfigService.blogId.length > 0;
     //$scope.showBackButton(false);
 
     $scope.doRefresh = function() {
@@ -117,7 +118,7 @@ angular.module('Ionic03.controllers', [])
         BlogListSync.loadBlogList()
         .then(function(answer) {
             $log.log('loadBlogList Completed Refresh Items', answer);
-            console.table(answer);
+            //console.table(answer);
             $scope.items = answer;
             $scope.$broadcast('scroll.refreshComplete');
         }).catch(function(err) {
@@ -150,6 +151,104 @@ angular.module('Ionic03.controllers', [])
             $state.go(ConfigService.mainScreen);
         }
     }
+})
+
+.controller('SetupCtrl', function ($scope, $state, $ionicPopup, $log,
+                                   GoogleApi, BlogListSync, DataService, localStorageService, ConfigService,
+                                   PushServices) {
+    $scope.setup = {
+        enablePushNotification: ConfigService.enablePushNotification,
+        enableLockScreen: ConfigService.unlockCode !== '*skip*',
+        version: ConfigService.version
+    };
+
+    $scope.cancel = function() {
+        $state.go(ConfigService.mainScreen);
+    };
+
+    var done = function(text, nextScreen) {
+        $ionicPopup.alert({
+            title: 'Done',
+            content: text
+        }).then(function (res) {
+            if (nextScreen) {
+                $log.log('SetupCtrl, go ->', nextScreen);
+                $state.go(nextScreen);
+            }
+        });
+    };
+
+    $scope.clearStorage = function() {
+        DataService.deletedb()
+            .then(function(answer) {
+                return done('Clear storage');
+            })
+            .catch(function(err) {
+                $log.error('Failed to delete', err);
+            });
+
+    };
+
+    $scope.reset = function() {
+        DataService.deletedb()
+            .then(function() {
+                GoogleApi.clearToken();
+                BlogListSync.clearStorage();
+                localStorageService.remove('selected_blog');
+                localStorageService.remove('unlock_code');
+                ConfigService.unlockCode = '';
+                return GoogleApi.logout();
+            })
+            .then(function() {
+                return done('Reset', 'unlock2');
+            });
+    };
+
+    $scope.googleLogout = function() {
+        GoogleApi.logout()
+            .then(function() {
+                return done('Google Logout', 'login');
+            });
+    };
+
+    $scope.diagnostic = function() {
+        $state.go('app.diagnostic');
+    };
+
+    $scope.selfTest = function() {
+        $state.go('dbtest');
+    };
+
+    $scope.save = function() {
+        var nextScreen = ConfigService.mainScreen;
+        if ($scope.setup.enableLockScreen && ConfigService.unlockCode === '*skip*') {
+            ConfigService.unlockCode = '';
+            ConfigService.locked = true;
+            localStorageService.remove('unlock_code');
+            nextScreen = 'unlock2';
+        }
+        else if (!$scope.setup.enableLockScreen && ConfigService.unlockCode !== '*skip*') {
+            ConfigService.unlockCode = '*skip*';
+            localStorageService.add('unlock_code', ConfigService.unlockCode);
+            ConfigService.locked = false;
+        }
+
+        if ($scope.setup.enablePushNotification != ConfigService.enablePushNotification) {
+            ConfigService.enablePushNotification = $scope.setup.enablePushNotification;
+
+            if (ConfigService.enablePushNotification) {
+                PushServices.listenToBlogs([ConfigService.blogId]);
+            }
+            else {
+                PushServices.listenToBlogs([]);
+            }
+        }
+
+        if (nextScreen) {
+            $log.log('SetupCtrl go -> ', nextScreen);
+            $state.go(nextScreen);
+        }
+    };
 
 })
 

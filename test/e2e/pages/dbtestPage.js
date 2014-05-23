@@ -4,7 +4,10 @@ var DbTestPage = function() {
     this.postText = element(by.id('newpost-text'));
 
     this.click = function(text) {
-        return element(By.buttonText(text)).click();
+        return browser.actions().mouseMove( element(By.buttonText('Dump Top Record'))).perform()
+            .then(function() {
+            return element(By.buttonText(text)).click();
+        });
     };
 
     this.get = function() {

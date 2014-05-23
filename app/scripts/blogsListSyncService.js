@@ -14,7 +14,7 @@ angular.module('Ionic03.BlogListSync', [])
             return Blogger.listBlogsByUser('self')
             .then(function(answer) {
                 $log.log('loadBlogList', answer);
-                console.table(answer.items);
+                //console.table(answer.items);
 
                 var blogs = [];
                 angular.forEach(answer.items, function (item) {

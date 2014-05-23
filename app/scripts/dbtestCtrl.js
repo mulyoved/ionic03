@@ -42,7 +42,7 @@ angular.module('Ionic03.dbTestCtrl', [])
     };
 
     $scope.savePost = function () {
-        RetrieveItemsService.savePost($scope.newpost.text);
+        DataSync.savePost($scope.newpost.text);
         $log.log('Add dummy post:', $scope.newpost.text);
     };
 
@@ -52,7 +52,7 @@ angular.module('Ionic03.dbTestCtrl', [])
         var url = 'file://lh6.googleusercontent.com/-oJNCUlvzVKs/U2UqdZsnctI/AAAAAAAAKHk/0aM2vyiZoJ4/%25255BUNSET%25255D.jpg';
         text = MiscServices.formatImageUrl(url);
         $log.log('createImagePost', text);
-        RetrieveItemsService.savePost('1Images<br>' + text);
+        DataSync.savePost('1Images<br>' + text);
     };
 
     $scope.createImagePost2 = function createImagePost() {
@@ -65,7 +65,7 @@ angular.module('Ionic03.dbTestCtrl', [])
         text2 = MiscServices.formatImageUrl(url2);
 
         $log.log('createImagePost', text);
-        RetrieveItemsService.savePost('2Images<br>' + text + '<br>' + text2);
+        DataSync.savePost('2Images<br>' + text + '<br>' + text2);
     };
 
     $scope.createImagePost2error = function createImagePost() {
@@ -78,7 +78,7 @@ angular.module('Ionic03.dbTestCtrl', [])
         text2 = MiscServices.formatImageUrl(url2);
 
         $log.log('createImagePost', text);
-        RetrieveItemsService.savePost('2Images Error<br>' + text + '<br>' + text2);
+        DataSync.savePost('2Images Error<br>' + text + '<br>' + text2);
     };
 
     //---------------------
@@ -465,7 +465,7 @@ angular.module('Ionic03.dbTestCtrl', [])
         Blogger.listBlogsByUser('self')
         .then(function(answer) {
             $log.log('listBlogsByUser', answer);
-            console.table(answer.items);
+            //console.table(answer.items);
         }).catch(function(err) {
             $log.error('listBlogsByUser Error', err);
         });
@@ -475,7 +475,7 @@ angular.module('Ionic03.dbTestCtrl', [])
         BlogListSync.loadBlogList()
         .then(function(answer) {
             $log.log('loadBlogList Completed', answer);
-            console.table(answer);
+            //console.table(answer);
         }).catch(function(err) {
             $log.error('loadBlogList Error', err);
         });
@@ -489,7 +489,7 @@ angular.module('Ionic03.dbTestCtrl', [])
         BlogListSync.getBlogList()
         .then(function(answer) {
             $log.log('getBlogListFromStorage Completed', answer);
-            console.table(answer);
+            //console.table(answer);
         }).catch(function(err) {
             $log.error('getBlogListFromStorage Error', err);
         });

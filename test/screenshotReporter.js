@@ -9,12 +9,10 @@ var ScreenshotReporter = function(dir_) {
 
     var cleanFolder = function(dir) {
         fs.readdirSync(dir).forEach(function (fileName) {
-            console.log(fileName);
-            /*
-            if (path.extname(fileName) === ".csv") {
-                fs.unlinkSync(fileName);
+            console.log(path.join(dir, fileName));
+            if (path.extname(fileName) === ".png") {
+                fs.unlinkSync(path.join(dir, fileName));
             }
-            */
         });
     };
 

@@ -40,18 +40,33 @@ angular.module('Ionic03', [
     });
 
     $rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
-        //console.log("$stateChangeStart", event, toState, toParams, fromState, fromParams);
+        console.log("$stateChangeStart", toState.name, event, toState, toParams, fromState, fromParams);
         //console.log("toState.authenticate", toState);
 
         //http://arthur.gonigberg.com/2013/06/29/angularjs-role-based-auth/
         //https://medium.com/opinionated-angularjs/4e927af3a15f
+        $rootScope.currentState = toState.name;
 
-        console.log("$stateChangeStart", fromState.name, toState.name);
-        if (toState.authenticate) {
-            if (!DataSync.gapiLogin && toState.name !== 'login') {
-                console.log("$stateChangeStart Force login page");
-                $state.transitionTo('login');
-                event.preventDefault();
+        if (!ConfigService.isInitDone) {
+            //$state.transitionTo('splash');
+            //event.preventDefault();
+            console.log("$stateChangeStart Called before init");
+        }
+        else if (toState.authenticate) {
+            console.log("$stateChangeStart", fromState.name, toState.name, DataSync.gapiLogin);
+            if (ConfigService.locked) {
+                if (toState.name !== 'unlock2') {
+                    console.log("$stateChangeStart Force unlock screen");
+                    $state.transitionTo('unlock2');
+                    event.preventDefault();
+                }
+            }
+            else if (!DataSync.gapiLogin) {
+                if (toState.name !== 'login') {
+                    console.log("$stateChangeStart Force login page");
+                    $state.transitionTo('login');
+                    event.preventDefault();
+                }
             }
             else if (!ConfigService.blogId && toState.name !== 'app.bloglist' && toState.name !== 'login') {
                 console.log("$stateChangeStart Force blog list page to select blog");
@@ -59,22 +74,6 @@ angular.module('Ionic03', [
                 event.preventDefault();
             }
         }
-
-        if (false) {
-
-            if (!ConfigService.login) {
-                if (toState.authenticate) {
-                    console.log("Redirect to login");
-                    $state.transitionTo("dbtest");
-                    event.preventDefault();
-                }
-            }
-            else if (toState.name == 'login') {
-                $state.transitionTo(ConfigService.mainScreen);
-                event.preventDefault();
-            }
-        }
-
     });
 
     $rootScope.$on("event:DataSync:Notify", function (event, args) {
@@ -98,32 +97,44 @@ angular.module('Ionic03', [
 
         if (args.action === 'blogid') {
             //switched blog, listen to the new one
-            PushServices.listenToBlogs([args.blogid]);
+            if (ConfigService.enablePushNotification) {
+               PushServices.listenToBlogs([args.blogid]);
+            }
             DataSync.needSync = true;
         }
     });
 
     $rootScope.$on("event:DataSync:StatusChange", function (event) {
-        console.log('APP Recived DataSyn:StatusChange', $state.is('login'), event);
 
+        console.log('APP Recived DataSyn:StatusChange', $state.is('login'), $state.is('splash'), $state.$current, event);
+        console.log('State', $state.current, $rootScope.currentState);
 
         if (ConfigService.locked) {
             //Do nothing with the event
+            $log.log('APP StatusChange - Do nothing, locked');
         }
         else if (!DataSync.gapiLogin && !$state.is('login')) {
             $state.go('login');
+            $log.log('APP StatusChange -> Login');
         }
         else if (!ConfigService.blogId) {
             $state.go('app.bloglist');
+            $log.log('APP StatusChange -> Bloglist');
         }
-        else if (DataSync.gapiLogin && ($state.is('login') || $state.is('splash'))) {
+        else if (DataSync.gapiLogin && ($state.is('login') || $rootScope.currentState == 'splash')) {
+            // Had to use and not $state.is('splash') becouse it ws not identfied corretly, nopt sure why
+            // which side effect caused us to stay on splash screen after user already login
+
+            $log.log('APP StatusChange -> Main Screen');
             $state.go(ConfigService.mainScreen);
         }
 
         if (DataSync.syncEnabled && DataSync.needSync && !DataSync.duringSync && DataSync.gapiLogin && !DataSync.error && ConfigService.blogId) {
+            $log.log('APP StatusChange -> Start Sync');
             DataSync.sync();
         }
         else if (DataSync.error) {
+            $log.log('APP StatusChange -> Error');
             if (!DataSync.error.done) {
                 $log.error('Sync error', DataSync.error);
                 DataSync.error.done = true;
@@ -150,6 +161,8 @@ angular.module('Ionic03', [
                 }
             }
         }
+
+        $log.log('APP StatusChange: End');
     });
 
     $rootScope.$on('Event:device-resume', function(event) {
@@ -272,7 +285,7 @@ angular.module('Ionic03', [
             abstract: false,
             templateUrl: 'templates/splash.html',
             controller: 'SplashCtrl',
-            authenticate: false
+            authenticate: false,
         })
         .state('unlock2', {
             url: '/unlock2',
@@ -330,6 +343,17 @@ angular.module('Ionic03', [
             resolve: {
                 items: function (BlogListSync) {
                     return BlogListSync.getBlogList();
+                }
+            },
+            authenticate: true
+        })
+
+        .state('app.setup', {
+            url: '/setup',
+            views: {
+                'menuContent': {
+                    templateUrl: 'templates/setup.html',
+                    controller: 'SetupCtrl'
                 }
             },
             authenticate: true
@@ -411,34 +435,41 @@ angular.module('Ionic03', [
         });
     // if none of the above states are matched, use this as the fallback
 
-    $urlRouterProvider.otherwise('/app/playlists');
+    //$urlRouterProvider.otherwise('/splash');
     //$urlRouterProvider.otherwise('dbtest');
+    $urlRouterProvider.otherwise('app.playlists');
 })
 .factory('AppInit', function($rootScope, $log, $q, $state,
                              localStorageService, ConfigService, DataService, DataSync, PushServices) {
-
         var init = function(startSync) {
             var unlockCode = localStorageService.get('unlock_code');
             ConfigService.unlockCode = unlockCode;
-            var nextScreen;
-            if (unlockCode === '*skip*' || !ConfigService.locked) {
-                nextScreen = 'splash';
-            }
-            else {
-                nextScreen = 'unlock2';
-            }
 
-            $log.log('AppInit Init', ConfigService.version, startSync, nextScreen);
-            $state.go(nextScreen);
             DataService.selectBlog(false, false);
-            DataSync.init();
-            DataSync.needSync = true;
-            PushServices.init();
+            DataSync.init()
+                .then(function(answer) {
+                    DataSync.needSync = true;
+                })
+                .then(function() {
+                    PushServices.init();
+                    ConfigService.isInitDone = true;
 
+                    var nextScreen;
+                    if (unlockCode === '*skip*' || !ConfigService.locked) {
+                        nextScreen = ConfigService.mainScreen;
+                        ConfigService.locked = false;
+                    }
+                    else {
+                        nextScreen = 'unlock2';
+                    }
+
+                    $log.log('AppInit Init', ConfigService.version, startSync, DataSync.gapiLogin, nextScreen);
+                    $state.go(nextScreen);
+                });
         };
 
         return {
-            init: init
+            init: init,
         };
     });
 

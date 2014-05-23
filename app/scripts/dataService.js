@@ -138,17 +138,20 @@ angular.module('Ionic03.services',[])
             version: '0.8.0.1',
             blogName: 'Unknown',
             isUnittest: false,
+            isInitDone: false,
             imageUploadServerURL: 'http://picasawebapibridge.herokuapp.com', //http://10.0.2.2:3000' (localhost on emulator)
+
+            enablePushNotification: true,
             pushServiceURL: 'http://picasawebapibridge.herokuapp.com/push/', //http://10.0.2.2:3000/push/', //http://127.0.0.1:3000/push/',
 
             // Todo: Problem need the server to get or create the albumId based on blogId/Name, if album not found need to create or album is full need to create a new one (limit 2000 images)
             albumId: '5965097735673433505',
 
 
-            mainScreen: 'app.playlists',
+            mainScreen: 'app.playlists', // setup
             //mainScreen: 'dbtest',
             blogId: false,
-            locked: false,
+            locked: true,
             unlockCode: '',
             username: 'Unknown', // needed for push to exclude self, but not implemented yet
             initialSyncLimit: 100

@@ -439,7 +439,7 @@ module.exports = function (grunt) {
         });
 
         var cmd = path.resolve('./node_modules/ripple-emulator/bin', 'ripple');
-        var child = spawn(cmd, ['emulate']);
+        var child = spawn(cmd, [' emulate']);
         child.stdout.on('data', function (data) {
             grunt.log.writeln(data);
         });

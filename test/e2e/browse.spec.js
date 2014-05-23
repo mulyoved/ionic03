@@ -32,7 +32,7 @@ describe("browse screens", function () {
             browser.getCurrentUrl().then(function(url) {
                 console.log('URL', url);
             });
-            expect(browser.getCurrentUrl()).toContain('#/login');
+            expect(browser.getCurrentUrl()).toContain('#/unlock2');
             expect(browser.getTitle()).toBe('Ionic03');
             //browser.debugger();
         });
