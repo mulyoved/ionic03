@@ -19,6 +19,7 @@ exports.config = {
         includeStackTrace: false
     },
     suites: {
+        slogin: './e2e/simplified_login.spec.js',
         login: './e2e/login.spec.js',
         dbtest: './e2e/dbtest.spec.js',
         browse: './e2e/browse.spec.js'

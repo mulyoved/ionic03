@@ -1,24 +1,7 @@
 describe("dbTest", function () {
     require('jasmine-expect');
 
-    if (typeof String.prototype.startsWith != 'function') {
-        String.prototype.startsWith = function (str){
-            return this.slice(0, str.length) == str;
-        };
-    }
-
-
     var skipSync = false;
-
-        /*
-        afterEach(function() {
-            browser.manage().logs().get('browser').then(function(browserLog) {
-                //expect(browserLog.length).toEqual(0);
-                // Uncomment to actually see the log.
-                //console.log('log: ' + require('util').inspect(browserLog));
-            });
-        });
-        */
 
     describe("Database Operations", function () {
         var dbTestPage = require("./pages/dbtestPage");
@@ -83,35 +66,8 @@ describe("dbTest", function () {
         it("should be able to login", function() {
             console.log('dbtest start');
             browser.get('/#');
-            var loginProcess = require("./pages/loginProcess");
-            var login = new loginProcess();
 
-            login.login()
-                .then(function (answer) {
-                    expect(answer).toContain('Success');
-                    console.log('Login Process answer', answer);
-                    //done();
-                })
-                .thenCatch(function (err) {
-                    expect(true).toBe(err);
-                    console.log('Login Process Err', err);
-                    //done(err);
-                });
-        });
-
-        it("should select blog", function() {
-            browser.getCurrentUrl().then(function(url) {
-                console.log('URL', url);
-                if (url.indexOf('#/app/bloglist') > -1) {
-                    expect(browser.getCurrentUrl()).toContain('#/app/bloglist');
-
-                    var list = element.all(by.repeater('item in items'));
-                    expect(list.count()).toBe(2);
-                    expect(list.get(1).getText()).toBe('Test Blog #2');
-                    expect(list.get(0).getText()).toBe('TestBlog');
-                    list.get(0).click();
-                }
-            });
+            require("./pages/loginProcess")();
         });
 
         it("should be in main page", function() {
@@ -130,7 +86,6 @@ describe("dbTest", function () {
                 console.log('Record in DB before test: ', recordCount);
             });
         });
-
 
         it("should delete db", function () {
             deleteDB().then(function() {
@@ -190,7 +145,6 @@ describe("dbTest", function () {
                     dumpDB();
                 });
             });
-
 
             it("dump top record after add post", function() {
                 dumpTopRecord(function() {
