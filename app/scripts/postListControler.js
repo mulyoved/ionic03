@@ -134,13 +134,17 @@ angular.module('Ionic03.PostListCtrl', [])
         var todayDate = new Date().getDate();
         var date = new Date(datetime).getDate();
 
-        if (date == todayDate) {
+        var res = '';
+        if (datetime.getFullYear() != new Date().getFullYear()) {
+            res = datetime.getFullYear()+' ';
+        }
 
-            return datetime.getHours()+':'+('0'  + datetime.getMinutes()).slice(-2)+':'+('0' + datetime.getSeconds()).slice(-2);
+        if (date != todayDate) {
+            res += datetime.toLocaleString("en-us", { month: "short" }) + ' ' + datetime.getDate()+', ';
         }
-        else {
-            return datetime.toLocaleString("en-us", { month: "short" }) + ' ' + datetime.getDate();
-        }
+
+        res += datetime.getHours()+':'+('0'  + datetime.getMinutes()).slice(-2); // +':'+('0' + datetime.getSeconds()).slice(-2);
+        return res;
     };
 
     $scope.show_dateTime = function(item) {
