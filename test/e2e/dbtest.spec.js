@@ -28,7 +28,7 @@ describe("dbTest", function () {
                 return dbTest.dumpAnswer.getText().then(function (text) {
                     return text === 'sync' || text === 'sync error';
                 });
-            }, 20000);
+            }, 30000);
         };
 
         var dumpDB = function() {
