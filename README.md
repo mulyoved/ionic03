@@ -13,9 +13,13 @@
  `npm update -g cordova`
  `npm update -g plugman`
 
+`yo ionic`
 Select Y for overwriting your Gruntfile.js and bower.json to stay up-to-date with the latest workflow
 Compare them to make sure no packages was removed
 Select Compass = Y
+
+npm update
+bower update
 
 ##Google Sign In For Cordova
 
