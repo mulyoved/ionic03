@@ -101,6 +101,8 @@ angular.module('Ionic03', [
                PushServices.listenToBlogs([args.blogid]);
             }
             DataSync.needSync = true;
+            $log.log('Blog changed, Start Sync');
+            DataSync.sync();
         }
     });
 

@@ -6,7 +6,8 @@ angular.module('Ionic03.services')
 
     var reformat = function(input) {
         var results = "";
-        var dbg = false;
+        var dbg = true;
+        if (dbg) $log.log('input:', input);
 
         HTMLParser(input, {
             start: function (tag, attrs, unary) {
@@ -16,6 +17,7 @@ angular.module('Ionic03.services')
 
                 for (var i = 0; i < attrs.length; i++) {
                     if (tag === 'a' && attrs[i].name === 'href') {
+                        //results += ' href="." onclick="clickURL(\'' + attrs[i].escaped + '\')"';
                     }
                     else if (tag === 'img' && attrs[i].name === 'height') {
 

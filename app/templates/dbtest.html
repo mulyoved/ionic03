@@ -1,6 +1,23 @@
 <ion-view title="DBTest">
     <ion-content class="has-header">
         <p>version 3:<a href="#/app/playlists">Main</a></p>
+        <p>-------------------------------------------------------------------------------------------------------------</p>
+        <button ng-click="htmlParserTest()">HTML Parser Test</button>
+        <button ng-click="htmlParserTest_TextWithLink()">Format Existig Links</button>
+        <button ng-click="htmlParserTest_Text_FindLink()">Format Text To Links</button>
+        <button ng-click="htmlParserTest_ShowLink()">Format Text To Links</button>
+
+        <h1>Input:</h1>
+        <pre>{{ input }}</pre>
+        <div ng-bind-html="input"></div>
+        <h1>Results:</h1>
+        <pre>{{ results }}</pre>
+        <div ng-bind-html="results"></div>
+        <div page-contents="results"></div>
+        <p>Before</p>
+        <div page-contents2="results"></div>
+        <p>After</p>
+        <p>-------------------------------------------------------------------------------------------------------------</p>
         <pre>answer: <span>{{dumpAnswer}}</span> Count:<span>{{answerCount}}</span></pre>
         <pre>answer2: <span>{{dump2Answer}}</span></pre>
         <p>-------------------------------------------------------------------------------------------------------------</p>
@@ -87,14 +104,11 @@
         <button ng-click="clearToken()">Clear Local Storage</button>
 
         <p>-------------------------------------------------------------------------------------------------------------</p>
-        <button ng-click="htmlParserTest()">HTML Parser Test</button>
+        <br>
+        <br>
+        <br>
+        <br>
 
-        <h1>Input:</h1>
-        <pre>{{ input }}</pre>
-        <pre ng-bind-html="input"></pre>
-        <h1>Results:</h1>
-        <pre>{{ results }}</pre>
-        <pre ng-bind-html="results"></pre>
 
 
 

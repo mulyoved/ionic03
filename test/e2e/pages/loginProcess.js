@@ -1,5 +1,5 @@
 var LoginProcess = function() {
-    this.dbg = false;
+    this.dbg = true;
 
     this.handleAuth = function() {
         var that = this;

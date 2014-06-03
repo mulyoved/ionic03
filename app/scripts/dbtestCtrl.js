@@ -11,7 +11,7 @@
 angular.module('Ionic03.dbTestCtrl', [])
 
 .controller('dbTestCtrl', function(
-    $scope, ConfigService, $log, $q, $http, $stateParams,
+    $scope, ConfigService, $log, $q, $http, $stateParams, $compile,
     GAPI, Blogger, pouchdb, GoogleApi, GoogleApp, DataSync, localStorageService,
     DataService, HTMLReformat, MiscServices, BlogListSync, RetrieveItemsService,
     PushServices
@@ -287,6 +287,49 @@ angular.module('Ionic03.dbTestCtrl', [])
         $scope.results = results;
 
     };
+
+    $scope.htmlParserTest_TextWithLink = function () {
+        $log.log('htmlParserTest');
+
+        var results = "";
+
+        //Text with link
+        var input = 'The application was posted into google play store <a href="https://play.google.com/store/apps/details?id=com.vixsoftware.Ionic03">https://play.google.com/store/apps/details?id=com.vixsoftware.Ionic03</a>';
+
+        $scope.input = input;
+        results = HTMLReformat.reformat(input);
+        $log.log('Result:', results);
+
+        $scope.results = results;
+
+    };
+
+    $scope.htmlParserTest_Text_FindLink = function () {
+        $log.log('htmlParserTest');
+
+        var results = "";
+
+
+        //Text with link
+        var input = 'The application was posted into google play store https://play.google.com/store/apps/details?id=com.vixsoftware.Ionic03 more text';
+
+        $scope.input = input;
+        results = HTMLReformat.reformat(input);
+        $log.log('Result', results);
+
+        $scope.results = results;
+    };
+
+    $scope.htmlParserTest_ShowLink = function() {
+        //$scope.results = 'Text <a href="http://www.fin-alg.com">http://www.fin-alg.com</a>';
+        //$scope.results = 'Text <a href="http://www.fin-alg.com">http://www.fin-alg.com</a>';
+        $scope.results = 'Text <span class="span-link">http://www.fin-alg.com</span>';
+    };
+
+    window.clickURL = function(url) {
+        $log.log('Click url', url);
+    };
+
     //-------------------------------------------------------------------
 
 
@@ -539,4 +582,39 @@ angular.module('Ionic03.dbTestCtrl', [])
             });
         */
     }
+})
+.directive('pageContents', function($log, $compile){
+    return {
+        link: function(scope, element, attrs){
+            var html = '<a href="http://localhost/about-us/">About Us</a> <a href="http://localhost/contact/">Contact</a>';
+
+            var matches = html.match(/href="(.+?)"/g);
+
+            matches.forEach(function(href){
+                var url = href.match(/href="(.+?)"/)[1]
+
+                html = html.replace(href, 'ng-click="loadPage(\''+url+'\')"')
+            });
+
+            var pageEl = $compile(html)(scope);
+            element.append(pageEl);
+
+            scope.loadPage = function(url){
+                $log.log('Clicked', url);
+                scope.clicked = 'clicked ' +url;
+            };
+        }
+    };
+})
+.directive('pageContents2', function($sce, $parse) {
+    return function(scope, element, attr) {
+        element.addClass('ng-binding').data('$binding', attr.ngBindHtml);
+
+        var parsed = $parse(attr.ngBindHtml);
+        function getStringValue() { return (parsed(scope) || '').toString(); }
+
+        scope.$watch(getStringValue, function ngBindHtmlWatchAction(value) {
+            element.html($sce.getTrustedHtml(parsed(scope)) || '');
+        });
+    };
 });

@@ -148,11 +148,12 @@ angular.module('Ionic03.services',[])
             albumId: '5965097735673433505',
 
 
-            mainScreen: 'app.playlists', // setup
-            //mainScreen: 'dbtest',
+            //mainScreen: 'app.playlists', // setup
+            mainScreen: 'dbtest',
             blogId: false,
-            locked: true,
+            locked: false,
             unlockCode: '',
+            tempDisableUnlock: 0, // needed when switch to camera
             username: 'Unknown', // needed for push to exclude self, but not implemented yet
             initialSyncLimit: 100
         }

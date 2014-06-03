@@ -2,7 +2,7 @@
 
 angular.module('Ionic03.PushServices', [])
 
-.service('PushServices', function(ConfigService, $q, $log, $http, $state, DataService) {
+.service('PushServices', function(ConfigService, $rootScope, $q, $log, $http, $state, DataService) {
     var tagPrefix = 'BLOG:';
 
     var init = function() {
@@ -38,8 +38,13 @@ angular.module('Ionic03.PushServices', [])
 
             // Handle resume
             document.addEventListener('resume', function () {
-                ConfigService.locked = true;
-                $log.log('PushServices: Device resume!');
+                if (ConfigService.tempDisableUnlock === 0) {
+                    ConfigService.locked = true;
+                }
+                else {
+                    ConfigService.tempDisableUnlock -= 1;
+                }
+                $log.log('PushServices: Device resume! count:' + ConfigService.tempDisableUnlock +', ' +  new Date().getTime());
 
                 PushNotification.resetBadge();
                 PushNotification.getIncoming(handleIncomingPush);
@@ -47,14 +52,16 @@ angular.module('Ionic03.PushServices', [])
                 // Reregister for urbanairship events if they were removed in pause event
                 document.addEventListener('urbanairship.registration', onRegistration, false);
                 document.addEventListener('urbanairship.push', handleIncomingPush, false);
-                $rootScope.broadcast('Event:device-resume');
+                $rootScope.$broadcast('Event:device-resume');
             }, false);
 
 
             // Handle pause
             document.addEventListener('pause', function () {
-                ConfigService.locked = true;
-                $log.log('PushServices: Device pause!');
+                if (ConfigService.tempDisableUnlock === 0) {
+                    ConfigService.locked = true;
+                }
+                $log.log('PushServices: Device pause!' + new Date().getTime());
 
                 // Remove urbanairship events.  Important on android to not receive push in the background.
                 document.removeEventListener('urbanairship.registration', onRegistration, false);

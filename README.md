@@ -59,7 +59,7 @@ A:
 `grunt emulate:android`
 
 `adb logcat CordovaLog:D *:S`
-`adb logcat GCM:D memtrack:S android.os.Debug:S eglCodecCommon:S jdwp:S linker:E *:W EGL_emulation:E SoundPool:S AudioService:S IInputConnectionWrapper:E WindowManager:E`
+`adb logcat AndroidRuntime:E dalvikvm:S GCM:D memtrack:S android.os.Debug:S eglCodecCommon:S jdwp:S linker:E SoundPool:S AudioService:S IInputConnectionWrapper:E WindowManager:E`
 
 
 adb shell pm uninstall -k com.example.Ionic03
@@ -199,3 +199,8 @@ protractor test/android-e2e.conf.js
 
 
  element(by.repeater('item in items')).findElement(by.binding('item.name'))
+
+ Publish
+ -------
+
+ https://play.google.com/apps/publish/signup/

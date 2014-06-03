@@ -32,7 +32,7 @@ exports.config = {
     },
 
     onPrepare: function() {
-        jasmine.getEnv().addReporter(new ScreenshotReporter(".tmp/protractorss"));
+        jasmine.getEnv().addReporter(new ScreenshotReporter("test/.tmp"));
     }
 };
 

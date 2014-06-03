@@ -2,7 +2,7 @@
 
 angular.module('Ionic03.MiscServices', [])
 
-.service('MiscServices', function(GoogleApp, ConfigService, $q, $log) {
+.service('MiscServices', function(GoogleApp, $timeout, ConfigService, $q, $log) {
     var service = {
         formatImageUrl: function(url) {
             if (url.startsWith('https://')) {
@@ -95,6 +95,7 @@ angular.module('Ionic03.MiscServices', [])
             return deferred.promise;
         },
         cameraPicture: function (sourceType) {
+            ConfigService.tempDisableUnlock = 1; // when switch to camera we get device pause, so need to unlock
             var deferred = $q.defer();
 
             if (typeof Camera != 'undefined') {
@@ -109,7 +110,8 @@ angular.module('Ionic03.MiscServices', [])
 
                 navigator.camera.getPicture(
                     function (imageURI) {
-                        console.log(imageURI);
+                        $log.log(imageURI);
+                        $log.log('Got image URI from camera plugin' + new Date().getTime());
                         deferred.resolve(imageURI);
                     },
                     function (message) {

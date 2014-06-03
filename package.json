@@ -43,6 +43,8 @@
   },
   "scripts": {
       "test-grunt-old": "grunt test",
-      "test": "karma start test/karma.conf.js"
+      "test": "karma start test/karma.conf.js",
+      "start": "grunt copy:all && grunt emulate:android",
+      "log": "adb logcat GCM:D memtrack:S android.os.Debug:S eglCodecCommon:S jdwp:S linker:E *:W EGL_emulation:E SoundPool:S AudioService:S IInputConnectionWrapper:E WindowManager:E"
   }
 }
