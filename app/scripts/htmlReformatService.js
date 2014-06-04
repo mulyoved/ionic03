@@ -6,7 +6,7 @@ angular.module('Ionic03.services')
 
     var reformat = function(input) {
         var results = "";
-        var dbg = true;
+        var dbg = false;
         if (dbg) $log.log('input:', input);
 
         HTMLParser(input, {
