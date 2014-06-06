@@ -85,6 +85,8 @@ Add Plugins
 
 `cordova plugin add org.apache.cordova.camera`
 
+`cordova plugin add org.apache.cordova.splashscreen`
+
 Instructions https://github.com/urbanairship/phonegap-ua-push
 https://github.com/phonegap-build/PushPlugin
 

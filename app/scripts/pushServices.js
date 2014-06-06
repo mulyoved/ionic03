@@ -60,6 +60,8 @@ angular.module('Ionic03.PushServices', [])
             document.addEventListener('pause', function () {
                 if (ConfigService.tempDisableUnlock === 0) {
                     ConfigService.locked = true;
+                    ConfigService.prevState = $state.current;
+                    if (navigator.splashscreen) navigator.splashscreen.show();
                 }
                 $log.log('PushServices: Device pause!' + new Date().getTime());
 

@@ -108,7 +108,7 @@ angular.module('Ionic03', [
 
     $rootScope.$on("event:DataSync:StatusChange", function (event) {
 
-        console.log('APP Recived DataSyn:StatusChange', $state.is('login'), $state.is('splash'), $state.$current, event);
+        console.log('APP Recived DataSyn:StatusChange', $state.is('login'), $state.$current, event);
         console.log('State', $state.current, $rootScope.currentState);
 
         if (ConfigService.locked) {
@@ -123,10 +123,7 @@ angular.module('Ionic03', [
             $state.go('app.bloglist');
             $log.log('APP StatusChange -> Bloglist');
         }
-        else if (DataSync.gapiLogin && ($state.is('login') || $rootScope.currentState == 'splash')) {
-            // Had to use and not $state.is('splash') becouse it ws not identfied corretly, nopt sure why
-            // which side effect caused us to stay on splash screen after user already login
-
+        else if (DataSync.gapiLogin && ($state.is('login'))) {
             $log.log('APP StatusChange -> Main Screen');
             $state.go(ConfigService.mainScreen);
         }
@@ -170,7 +167,9 @@ angular.module('Ionic03', [
     $rootScope.$on('Event:device-resume', function(event) {
         if (ConfigService.locked && ConfigService.unlockCode !== '*skip*' ) {
             $state.go('unlock2');
+            if (navigator.splashscreen) navigator.splashscreen.hide();
         }
+
     });
 })
 .config(['$httpProvider', function($httpProvider) {
@@ -282,13 +281,6 @@ angular.module('Ionic03', [
     localStorageServiceProvider.setPrefix('Ionic03');
 
     $stateProvider
-        .state('splash', {
-            url: '/splash',
-            abstract: false,
-            templateUrl: 'templates/splash.html',
-            controller: 'SplashCtrl',
-            authenticate: false,
-        })
         .state('unlock2', {
             url: '/unlock2',
             abstract: false,
@@ -437,7 +429,6 @@ angular.module('Ionic03', [
         });
     // if none of the above states are matched, use this as the fallback
 
-    //$urlRouterProvider.otherwise('/splash');
     //$urlRouterProvider.otherwise('dbtest');
     $urlRouterProvider.otherwise('app.playlists');
 })
@@ -467,6 +458,7 @@ angular.module('Ionic03', [
 
                     $log.log('AppInit Init', ConfigService.version, startSync, DataSync.gapiLogin, nextScreen);
                     $state.go(nextScreen);
+                    if (navigator.splashscreen) navigator.splashscreen.hide();
                 });
         };
 

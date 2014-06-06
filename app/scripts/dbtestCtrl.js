@@ -11,7 +11,7 @@
 angular.module('Ionic03.dbTestCtrl', [])
 
 .controller('dbTestCtrl', function(
-    $scope, ConfigService, $log, $q, $http, $stateParams, $compile,
+    $scope, $state, ConfigService, $log, $q, $http, $stateParams, $compile,
     GAPI, Blogger, pouchdb, GoogleApi, GoogleApp, DataSync, localStorageService,
     DataService, HTMLReformat, MiscServices, BlogListSync, RetrieveItemsService,
     PushServices
@@ -581,7 +581,11 @@ angular.module('Ionic03.dbTestCtrl', [])
                 $log.error('Failed', err);
             });
         */
-    }
+    };
+
+    $scope.checkState = function() {
+        $log.log('$state.current', $state.current);
+    };
 })
 .directive('pageContents', function($log, $compile){
     return {

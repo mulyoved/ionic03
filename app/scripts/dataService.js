@@ -148,6 +148,7 @@ angular.module('Ionic03.services',[])
             albumId: '5965097735673433505',
 
 
+            prevState: null,
             mainScreen: 'app.playlists', // setup
             //mainScreen: 'dbtest',
             blogId: false,

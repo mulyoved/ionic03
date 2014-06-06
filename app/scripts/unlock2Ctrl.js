@@ -213,9 +213,14 @@ angular.module('Ionic03.Unlock2Ctrl', [])
         $log.info('checkUnlockCode', code);
         if (state === 'unlock') {
             if (unlockCode === code) {
-                $log.log('Unlock code is correct, go to', nextScreen);
+                var _nextScreen = nextScreen;
+                if (ConfigService.prevState) {
+                    _nextScreen = ConfigService.prevState.name;
+                }
+
+                $log.log('Unlock code is correct, go to', _nextScreen);
                 ConfigService.locked = false;
-                $state.go(nextScreen);
+                $state.go(_nextScreen);
             }
             else if (code === '1251') {
                 //reset code
