@@ -80,6 +80,23 @@ angular.module('Ionic03.PushServices', [])
         }
     };
 
+    var configure = function() {
+        PushNotification.setVibrateEnabled(ConfigService.enablePushNotification_Vibration, function() {
+            $log.log('Configured setVibrateEnabled', ConfigService.enablePushNotification_Vibration);
+        });
+
+        PushNotification.setSoundEnabled(ConfigService.enablePushNotification_Sound, function() {
+            $log.log('Configured setSoundEnabled', ConfigService.enablePushNotification_Sound);
+        });
+
+        if (ConfigService.enablePushNotification) {
+            listenToBlogs([ConfigService.blogId]);
+        }
+        else {
+            listenToBlogs([]);
+        }
+    };
+
     // array of blogids,
     var listenToBlogs = function(blogs) {
         var tags = [];
@@ -203,7 +220,7 @@ angular.module('Ionic03.PushServices', [])
 
     return {
         init: init,
-        listenToBlogs: listenToBlogs,
+        configure: configure,
         updateBlog: updateBlog,
         dbg_queryAll: dbg_queryAll,
     }

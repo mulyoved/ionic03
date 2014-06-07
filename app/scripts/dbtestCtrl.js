@@ -586,39 +586,8 @@ angular.module('Ionic03.dbTestCtrl', [])
     $scope.checkState = function() {
         $log.log('$state.current', $state.current);
     };
-})
-.directive('pageContents', function($log, $compile){
-    return {
-        link: function(scope, element, attrs){
-            var html = '<a href="http://localhost/about-us/">About Us</a> <a href="http://localhost/contact/">Contact</a>';
 
-            var matches = html.match(/href="(.+?)"/g);
-
-            matches.forEach(function(href){
-                var url = href.match(/href="(.+?)"/)[1]
-
-                html = html.replace(href, 'ng-click="loadPage(\''+url+'\')"')
-            });
-
-            var pageEl = $compile(html)(scope);
-            element.append(pageEl);
-
-            scope.loadPage = function(url){
-                $log.log('Clicked', url);
-                scope.clicked = 'clicked ' +url;
-            };
-        }
-    };
-})
-.directive('pageContents2', function($sce, $parse) {
-    return function(scope, element, attr) {
-        element.addClass('ng-binding').data('$binding', attr.ngBindHtml);
-
-        var parsed = $parse(attr.ngBindHtml);
-        function getStringValue() { return (parsed(scope) || '').toString(); }
-
-        scope.$watch(getStringValue, function ngBindHtmlWatchAction(value) {
-            element.html($sce.getTrustedHtml(parsed(scope)) || '');
-        });
-    };
+    $scope.go = function(state) {
+        $state.go(state);
+    }
 });

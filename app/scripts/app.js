@@ -13,6 +13,7 @@ angular.module('Ionic03', [
     'Ionic03.BlogListSync',
     'Ionic03.DataSync',
     'Ionic03.dbTestCtrl',
+    'Ionic03.testCtrl2',
     'Ionic03.GoogleApi',
     'Ionic03.MiscServices',
     'Ionic03.PushServices',
@@ -29,6 +30,7 @@ angular.module('Ionic03', [
 
 
 .run(function ($ionicPlatform, $state, $rootScope, $urlRouter, $log, $ionicPopup,
+               $ionicSideMenuDelegate,
                ConfigService, DataService, DataSync, PushServices, AppInit) {
 
     $ionicPlatform.ready(function () {
@@ -39,8 +41,35 @@ angular.module('Ionic03', [
         AppInit.init();
     });
 
+        $ionicPlatform.registerBackButtonAction(
+
+        //$ionicPlatform.onHardwareBackButton(
+        function(event) {
+            $log.log('onHardwareBackButton :', $state.current, $rootScope.$viewHistory.histories, $ionicSideMenuDelegate.isOpen());
+
+            //$rootScope.$viewHistory.histories.stack
+            var len = $rootScope.$viewHistory.histories.root.stack.length;
+
+            if ($ionicSideMenuDelegate.isOpen()) {
+                $ionicSideMenuDelegate.toggleLeft(false);
+            }
+            else if ($rootScope.$viewHistory.backView) { // there is a back view, go to it
+                $rootScope.$viewHistory.backView.go();
+            } else if (len>1) { // there is no back view, so close the app instead
+                $state.go($rootScope.$viewHistory.histories.root.stack[len-2].stateName);
+            } else {
+                //ionic.Platform.exitApp();
+                $log.log('onHardwareBackButton - Need to exit!');
+            }
+            event.preventDefault();
+            return false;
+        }, 100);
+
     $rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
         console.log("$stateChangeStart", toState.name, event, toState, toParams, fromState, fromParams);
+
+        var len = $rootScope.$viewHistory.histories.root.stack.length;
+        console.log("$stateChangeStart, History", len, $rootScope.$viewHistory.histories.root.stack);
         //console.log("toState.authenticate", toState);
 
         //http://arthur.gonigberg.com/2013/06/29/angularjs-role-based-auth/
@@ -51,6 +80,9 @@ angular.module('Ionic03', [
             //$state.transitionTo('splash');
             //event.preventDefault();
             console.log("$stateChangeStart Called before init");
+        }
+        else if (toState.test) {
+            $log.log('To State is test, no special handling')
         }
         else if (toState.authenticate) {
             console.log("$stateChangeStart", fromState.name, toState.name, DataSync.gapiLogin);
@@ -96,10 +128,7 @@ angular.module('Ionic03', [
         }
 
         if (args.action === 'blogid') {
-            //switched blog, listen to the new one
-            if (ConfigService.enablePushNotification) {
-               PushServices.listenToBlogs([args.blogid]);
-            }
+            PushServices.configure();
             DataSync.needSync = true;
             $log.log('Blog changed, Start Sync');
             DataSync.sync();
@@ -107,59 +136,61 @@ angular.module('Ionic03', [
     });
 
     $rootScope.$on("event:DataSync:StatusChange", function (event) {
-
         console.log('APP Recived DataSyn:StatusChange', $state.is('login'), $state.$current, event);
         console.log('State', $state.current, $rootScope.currentState);
 
-        if (ConfigService.locked) {
-            //Do nothing with the event
-            $log.log('APP StatusChange - Do nothing, locked');
-        }
-        else if (!DataSync.gapiLogin && !$state.is('login')) {
-            $state.go('login');
-            $log.log('APP StatusChange -> Login');
-        }
-        else if (!ConfigService.blogId) {
-            $state.go('app.bloglist');
-            $log.log('APP StatusChange -> Bloglist');
-        }
-        else if (DataSync.gapiLogin && ($state.is('login'))) {
-            $log.log('APP StatusChange -> Main Screen');
-            $state.go(ConfigService.mainScreen);
-        }
+        if (!$state.current.test && $state.current.name) {
+            if (ConfigService.locked) {
+                //Do nothing with the event
+                $log.log('APP StatusChange - Do nothing, locked');
+            }
+            else if (!DataSync.gapiLogin && !$state.is('login')) {
+                $state.go('login');
+                $log.log('APP StatusChange -> Login');
+            }
+            else if (!ConfigService.blogId) {
+                $state.go('app.bloglist');
+                $log.log('APP StatusChange -> Bloglist');
+            }
+            else if (DataSync.gapiLogin && ($state.is('login'))) {
+                $log.log('APP StatusChange -> Main Screen');
+                $state.go(ConfigService.mainScreen);
+            }
 
-        if (DataSync.syncEnabled && DataSync.needSync && !DataSync.duringSync && DataSync.gapiLogin && !DataSync.error && ConfigService.blogId) {
-            $log.log('APP StatusChange -> Start Sync');
-            DataSync.sync();
-        }
-        else if (DataSync.error) {
-            $log.log('APP StatusChange -> Error');
-            if (!DataSync.error.done) {
-                $log.error('Sync error', DataSync.error);
-                DataSync.error.done = true;
-                if (DataSync.error.status == 401) {
-                    $state.go('login');
-                }
-                else {
-                    var err = 'Unknown';
-                    if (DataSync.error.data) {
-                        err = DataSync.error.data.error.message || 'Unknown';
+            if (DataSync.syncEnabled && DataSync.needSync && !DataSync.duringSync && DataSync.gapiLogin && !DataSync.error && ConfigService.blogId) {
+                $log.log('APP StatusChange -> Start Sync');
+                DataSync.sync();
+            }
+            else if (DataSync.error) {
+                $log.log('APP StatusChange -> Error');
+                if (!DataSync.error.done) {
+                    $log.error('Sync error', DataSync.error);
+                    DataSync.error.done = true;
+                    if (DataSync.error.status == 401) {
+                        $state.go('login');
                     }
-                    else if (DataSync.error.message) {
-                        err = DataSync.error.message;
-                    }
-                    else if (typeof DataSync.error === 'string') {
-                        err = DataSync.error;
-                    }
+                    else {
+                        var err = 'Unknown';
+                        if (DataSync.error.data) {
+                            err = DataSync.error.data.error.message || 'Unknown';
+                        }
+                        else if (DataSync.error.message) {
+                            err = DataSync.error.message;
+                        }
+                        else if (typeof DataSync.error === 'string') {
+                            err = DataSync.error;
+                        }
 
-                    $ionicPopup.alert({
-                        title: 'Blogger Sync Problem',
-                        content: err
-                    }).then(function (res) {
-                    });
+                        $ionicPopup.alert({
+                            title: 'Blogger Sync Problem',
+                            content: err
+                        }).then(function (res) {
+                        });
+                    }
                 }
             }
         }
+
 
         $log.log('APP StatusChange: End');
     });
@@ -300,7 +331,16 @@ angular.module('Ionic03', [
             abstract: false,
             templateUrl: 'templates/dbtest.html',
             controller: 'dbTestCtrl',
-            authenticate: false
+            authenticate: false,
+            test: true
+        })
+        .state('test2', {
+            url: '/test2',
+            abstract: false,
+            templateUrl: 'templates/test2.html',
+            controller: 'testCtrl2',
+            authenticate: false,
+            test: true
         })
         .state('testInfinitScroll', {
             url: '/testInfinitScroll',
@@ -456,8 +496,11 @@ angular.module('Ionic03', [
                         nextScreen = 'unlock2';
                     }
 
-                    $log.log('AppInit Init', ConfigService.version, startSync, DataSync.gapiLogin, nextScreen);
-                    $state.go(nextScreen);
+
+                    $log.log('AppInit Init', ConfigService.version, startSync, DataSync.gapiLogin, nextScreen, $state.current);
+                    if ((!$state.current.test && $state.current.name) || ionic.Platform.isWebView()) {
+                        $state.go(nextScreen);
+                    }
                     if (navigator.splashscreen) navigator.splashscreen.hide();
                 });
         };

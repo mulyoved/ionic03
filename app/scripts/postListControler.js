@@ -1,7 +1,7 @@
 angular.module('Ionic03.PostListCtrl', [])
 
 .controller('PostListCtrl', function (
-        $rootScope, $scope, $state, $log, ConfigService,
+        $rootScope, $scope, $state, $log, ConfigService, $ionicModal,
         $ionicNavBarDelegate, $ionicViewService, $ionicScrollDelegate, DataSync, DataService, HTMLReformat,
         RetrieveItemsService, MiscServices
         /*items*/) {
@@ -119,12 +119,65 @@ angular.module('Ionic03.PostListCtrl', [])
     });
 
     $scope.doRefresh = function() {
-        console.log('Refreshing!');
+        $log.log('Refreshing!');
         startRefresh = true;
         if (!DataSync.duringSync) {
             DataSync.sync();
         }
     };
+
+    $ionicModal.fromTemplateUrl('templates/image-modal.html', {
+        scope: $scope,
+        animation: 'slide-in-up'
+    }).then(function(modal) {
+        $scope.modal = modal;
+    });
+
+    $scope.openModal = function() {
+        $scope.modal.show();
+    };
+
+    $scope.closeModal = function() {
+        $scope.modal.hide();
+    };
+
+    //Cleanup the modal when we're done with it!
+    $scope.$on('$destroy', function() {
+        $scope.modal.remove();
+    });
+    // Execute action on hide modal
+    $scope.$on('modal.hide', function() {
+        // Execute action
+    });
+    // Execute action on remove modal
+    $scope.$on('modal.removed', function() {
+        // Execute action
+    });
+    $scope.$on('modal.shown', function() {
+        $log.log('Modal is shown!');
+    });
+
+    var showImage = function(url) {
+        $scope.imageSrc = url;
+        $scope.openModal();
+    };
+
+    $scope.$on('event:url-click', function(event, url) {
+        $log.log('htmlClick', url);
+
+        if ( url.lastIndexOf('http',0) < 0 ) {
+            url = 'http://' + url;
+        }
+
+        if (url.endsWith('.jpg') || url.endsWith('.png')) {
+            //from http://codepen.io/rdelafuente/pen/tJrik
+            showImage(url);
+        }
+        else {
+            window.open(encodeURI(url), '_system');
+        }
+    });
+
 
     $scope.show = function(item) {
         return HTMLReformat.reformat(item.content);

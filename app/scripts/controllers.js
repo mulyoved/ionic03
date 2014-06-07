@@ -153,17 +153,20 @@ angular.module('Ionic03.controllers', [])
     }
 })
 
-.controller('SetupCtrl', function ($scope, $state, $ionicPopup, $log,
+.controller('SetupCtrl', function ($rootScope, $scope, $state, $ionicPopup, $log, $ionicNavBarDelegate,
                                    GoogleApi, BlogListSync, DataService, localStorageService, ConfigService,
                                    PushServices) {
     $scope.setup = {
         enablePushNotification: ConfigService.enablePushNotification,
+        enablePushNotification_Sound: ConfigService.enablePushNotification_Sound,
+        enablePushNotification_Vibration: ConfigService.enablePushNotification_Vibration,
         enableLockScreen: ConfigService.unlockCode !== '*skip*',
         version: ConfigService.version
     };
 
     $scope.cancel = function() {
         $state.go(ConfigService.mainScreen);
+        //$ionicNavBarDelegate.back(); // not working not sure why
     };
 
     var done = function(text, nextScreen) {
@@ -233,6 +236,7 @@ angular.module('Ionic03.controllers', [])
             ConfigService.locked = false;
         }
 
+        /*
         if ($scope.setup.enablePushNotification != ConfigService.enablePushNotification) {
             ConfigService.enablePushNotification = $scope.setup.enablePushNotification;
 
@@ -243,6 +247,12 @@ angular.module('Ionic03.controllers', [])
                 PushServices.listenToBlogs([]);
             }
         }
+        */
+
+        ConfigService.enablePushNotification = $scope.setup.enablePushNotification
+        ConfigService.enablePushNotification_Sound = $scope.setup.enablePushNotification_Sound;
+        ConfigService.enablePushNotification_Vibration = $scope.setup.enablePushNotification_Vibration;
+        PushServices.configure();
 
         if (nextScreen) {
             $log.log('SetupCtrl go -> ', nextScreen);
