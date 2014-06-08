@@ -154,7 +154,7 @@ angular.module('Ionic03.services',[])
             mainScreen: 'app.playlists', // setup
             //mainScreen: 'dbtest',
             blogId: false,
-            locked: false,
+            locked: true,
             unlockCode: '',
             tempDisableUnlock: 0, // needed when switch to camera
             username: 'Unknown', // needed for push to exclude self, but not implemented yet

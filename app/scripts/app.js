@@ -245,7 +245,7 @@ angular.module('Ionic03', [
                 exception: exception,
                 cause: cause };
 
-            $state.go('exception_page');
+            $state.go('exception');
 
             $delegate(exception, cause);
         };
@@ -327,7 +327,7 @@ angular.module('Ionic03', [
             authenticate: false
         })
         .state('dbtest', {
-            url: '/dbtest:options',
+            url: '/dbtest',
             abstract: false,
             templateUrl: 'templates/dbtest.html',
             controller: 'dbTestCtrl',
@@ -392,16 +392,6 @@ angular.module('Ionic03', [
             },
             authenticate: true
         })
-
-        .state('app.browse', {
-            url: '/browse',
-            views: {
-                'menuContent': {
-                    templateUrl: 'templates/browse.html'
-                }
-            },
-            authenticate: true
-        })
         .state('app.playlists', {
             url: '/playlists',
             views: {
@@ -419,22 +409,6 @@ angular.module('Ionic03', [
             */
             authenticate: true
         })
-        .state('app.single', {
-            url: '/playlists/:playlistId',
-            views: {
-                'menuContent': {
-                    templateUrl: 'templates/playlist.html',
-                    controller: 'PlaylistCtrl'
-                }
-            },
-            resolve: {
-                item: function ($stateParams, DataService) {
-                    var id = $stateParams.playlistId;
-                    return DataService.getItem(id);
-                }
-            },
-            authenticate: true
-        })
         .state('app.add', {
             url: '/add',
             views: {
@@ -450,7 +424,7 @@ angular.module('Ionic03', [
             },
             authenticate: true
         })
-        .state('exception_page', {
+        .state('exception', {
             url: '/exception',
             templateUrl: 'templates/exceptionPage.html',
             controller: 'ExceptionCtrl',
@@ -472,7 +446,7 @@ angular.module('Ionic03', [
     //$urlRouterProvider.otherwise('dbtest');
     $urlRouterProvider.otherwise('app.playlists');
 })
-.factory('AppInit', function($rootScope, $log, $q, $state,
+.factory('AppInit', function($rootScope, $log, $q, $state, $location,
                              localStorageService, ConfigService, DataService, DataSync, PushServices) {
         var init = function(startSync) {
             var unlockCode = localStorageService.get('unlock_code');
@@ -486,6 +460,8 @@ angular.module('Ionic03', [
                 .then(function() {
                     PushServices.init();
                     ConfigService.isInitDone = true;
+                    //ConfigService.locked = ionic.Platform.isWebView();
+
 
                     var nextScreen;
                     if (unlockCode === '*skip*' || !ConfigService.locked) {
@@ -497,10 +473,18 @@ angular.module('Ionic03', [
                     }
 
 
-                    $log.log('AppInit Init', ConfigService.version, startSync, DataSync.gapiLogin, nextScreen, $state.current);
-                    if ((!$state.current.test && $state.current.name) || ionic.Platform.isWebView()) {
-                        $state.go(nextScreen);
+                    var location = '';
+                    if (window.location && window.location.hash) {
+                        location = window.location.hash.substring(2);
+                        if (location.length > 0 && !ionic.Platform.isWebView()) {
+                            nextScreen = location.replace('/', '.');
+                        }
                     }
+
+
+                    $log.log('AppInit Init', ConfigService.version, startSync, DataSync.gapiLogin, nextScreen, $state.current, location, nextScreen);
+                    //$location.path = nextScreen;
+                    $state.go(nextScreen);
                     if (navigator.splashscreen) navigator.splashscreen.hide();
                 });
         };
