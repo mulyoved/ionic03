@@ -11,7 +11,7 @@
 angular.module('Ionic03.dbTestCtrl', [])
 
 .controller('dbTestCtrl', function(
-    $scope, $state, ConfigService, $log, $q, $http, $stateParams, $compile,
+    $scope, $state, ConfigService, $log, $q, $http, $stateParams, $compile, $timeout,
     GAPI, Blogger, pouchdb, GoogleApi, GoogleApp, DataSync, localStorageService,
     DataService, HTMLReformat, MiscServices, BlogListSync, RetrieveItemsService,
     PushServices
@@ -589,5 +589,18 @@ angular.module('Ionic03.dbTestCtrl', [])
 
     $scope.go = function(state) {
         $state.go(state);
+    };
+
+    $scope.startLongRunningProcess = function() {
+        var processCount = function() {
+            $scope.longProcessCount -= 1;
+            $log.log('Long Running Process', (new Date()).getTime(), $scope.longProcessCount);
+            if ($scope.longProcessCount > 0) {
+                $timeout(processCount, 750);
+            }
+        };
+
+        $scope.longProcessCount = 100;
+        processCount();
     }
 });

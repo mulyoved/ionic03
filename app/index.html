@@ -6,10 +6,7 @@
     <title>Ionic03</title>
 
     <!-- build:css styles/vendor.css -->
-    <!-- <link rel="stylesheet" href="vendor/some.contrib.css"> -->
-    <!-- bower:css -->
     <link rel="stylesheet" href="bower_components/ionic/release/css/ionic.css" />
-    <!-- endbower -->
     <!-- endbuild -->
 
     <!-- build:css({.tmp,app}) styles/main.css -->
@@ -21,8 +18,6 @@
     <ion-nav-view></ion-nav-view>
 
     <!-- build:js scripts/vendor.js -->
-    <!-- <script src="vendor/someContribJs.js"></script> -->
-    <!-- bower:js -->
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-animate/angular-animate.js"></script>
     <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
@@ -32,17 +27,17 @@
     <script src="bower_components/angular-local-storage/angular-local-storage.js"></script>
     <script src="bower_components/pouchdb/dist/pouchdb-nightly.js"></script>
     <script src="bower_components/angular-pouchdb/angular-pouchdb.js"></script>
-    <!-- endbower -->
+
+    <script src="bower_components/ngGAPI/gapi.js"></script>
     <!-- endbuild -->
 
-    <script src="https://apis.google.com/js/api.js"></script>
-    <script src="bower_components/ngGAPI/gapi.js"></script>
 
-    <!-- needed for Google Sign -->
-    <script type="text/javascript" src="scripts/jquery-1.10.1.min.js"></script>
-    <script type="text/javascript" src="scripts/htmlparser.js"></script>
+
 
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
+    <script src="scripts/jquery-1.10.1.min.js"></script> <!-- needed for Google Sign -->
+    <script src="scripts/apis_google_com.js"></script>
+    <script src="scripts/htmlparser.js"></script>
     <script src="scripts/GestureDebugDirective.js"></script>
     <script src="scripts/dataService.js"></script>
     <script src="scripts/app.js"></script>

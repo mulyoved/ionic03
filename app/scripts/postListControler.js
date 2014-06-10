@@ -74,6 +74,9 @@ angular.module('Ionic03.PostListCtrl', [])
             .then(function(answer) {
                 $log.log('PostListCtrl:Answer', answer.length, answer, RetrieveItemsService.getStatus());
                 //console.table(answer);
+                angular.forEach(answer, function (item) {
+                    item.format_updated = formatDateTimeAgo(new Date(item.updated));
+                });
                 $scope.items = answer;
 
                 //if (isLoadMore) {
@@ -159,6 +162,7 @@ angular.module('Ionic03.PostListCtrl', [])
 
     var showImage = function(url) {
         $scope.imageSrc = url;
+        $scope.imageLandscape = true;
         $scope.openModal();
     };
 
@@ -183,17 +187,19 @@ angular.module('Ionic03.PostListCtrl', [])
         return HTMLReformat.reformat(item.content);
     };
 
+    var todayDate = new Date().getDate();
+    var todayYear = new Date().getFullYear();
     var formatDateTimeAgo = function(datetime) {
-        var todayDate = new Date().getDate();
-        var date = new Date(datetime).getDate();
+        var date = datetime.getDate();
+
 
         var res = '';
-        if (datetime.getFullYear() != new Date().getFullYear()) {
+        if (datetime.getFullYear() != todayYear) {
             res = datetime.getFullYear()+' ';
         }
 
         if (date != todayDate) {
-            res += datetime.toLocaleString("en-us", { month: "short" }) + ' ' + datetime.getDate()+', ';
+            res += datetime.toLocaleString("en-us", { month: "short" }) + ' ' + date +', ';
         }
 
         res += datetime.getHours()+':'+('0'  + datetime.getMinutes()).slice(-2); // +':'+('0' + datetime.getSeconds()).slice(-2);
@@ -256,7 +262,7 @@ angular.module('Ionic03.PostListCtrl', [])
 
 
     $scope.noMoreItemsAvailable = false;
-    //$scope.items = RetrieveItemsService.getItems();
+    $scope.items = RetrieveItemsService.getItems();
     updateIcon();
     if (!DataSync.syncEnabled) {
         $log.log('Set DataSync.syncEnabled = true');

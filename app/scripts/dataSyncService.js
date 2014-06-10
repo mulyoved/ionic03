@@ -78,6 +78,7 @@ angular.module('Ionic03.DataSync', [])
         };
 
         mapPost(post);
+        $rootScope.$broadcast('event:newpost', post);
         return DataService.blogdb().post(post)
             .then(function(answer) {
                 $log.log('Add Success', answer);

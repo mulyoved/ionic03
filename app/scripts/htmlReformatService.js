@@ -68,7 +68,10 @@ angular.module('Ionic03.services')
                     //if (tag === 'a' && attrs[i].name === 'href') {
                         //results += ' href="." onclick="clickURL(\'' + attrs[i].escaped + '\')"';
                     //}
-                    if (tag === 'img' && attrs[i].name === 'height') {
+                    if (tag === 'a' && attrs[i].name === 'style') {
+
+                    }
+                    else if (tag === 'img' && attrs[i].name === 'height') {
 
                     }
                     else if (tag === 'img' && attrs[i].name === 'width') {

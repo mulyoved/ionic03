@@ -61,6 +61,11 @@ angular.module('Ionic03.PushServices', [])
                 if (ConfigService.tempDisableUnlock === 0) {
                     ConfigService.locked = true;
                     ConfigService.prevState = $state.current;
+
+                    if (ConfigService.locked && ConfigService.unlockCode !== '*skip*' ) {
+                        $state.go('unlock2');
+                    }
+
                     if (navigator.splashscreen) navigator.splashscreen.show();
                 }
                 $log.log('PushServices: Device pause!' + new Date().getTime());
@@ -81,19 +86,21 @@ angular.module('Ionic03.PushServices', [])
     };
 
     var configure = function() {
-        PushNotification.setVibrateEnabled(ConfigService.enablePushNotification_Vibration, function() {
-            $log.log('Configured setVibrateEnabled', ConfigService.enablePushNotification_Vibration);
-        });
+        if (typeof PushNotification != 'undefined') {
+            PushNotification.setVibrateEnabled(ConfigService.enablePushNotification_Vibration, function () {
+                $log.log('Configured setVibrateEnabled', ConfigService.enablePushNotification_Vibration);
+            });
 
-        PushNotification.setSoundEnabled(ConfigService.enablePushNotification_Sound, function() {
-            $log.log('Configured setSoundEnabled', ConfigService.enablePushNotification_Sound);
-        });
+            PushNotification.setSoundEnabled(ConfigService.enablePushNotification_Sound, function () {
+                $log.log('Configured setSoundEnabled', ConfigService.enablePushNotification_Sound);
+            });
 
-        if (ConfigService.enablePushNotification) {
-            listenToBlogs([ConfigService.blogId]);
-        }
-        else {
-            listenToBlogs([]);
+            if (ConfigService.enablePushNotification) {
+                listenToBlogs([ConfigService.blogId]);
+            }
+            else {
+                listenToBlogs([]);
+            }
         }
     };
 

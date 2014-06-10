@@ -1,7 +1,7 @@
 'use strict';
 angular.module('Ionic03.Unlock2Ctrl', [])
 
-.controller('Unlock2Ctrl', function ($scope, ConfigService, localStorageService, $log, $state) {
+.controller('Unlock2Ctrl', function ($scope, $timeout, ConfigService, localStorageService, $log, $state) {
     var isClickMode = true;
     var nextScreen = ConfigService.mainScreen;
     console.log('UnlockCtrl');
@@ -209,18 +209,22 @@ angular.module('Ionic03.Unlock2Ctrl', [])
         }
     };
 
-    var checkUnlockCode = function (code) {
+        function unlock() {
+            var _nextScreen = nextScreen;
+            if (ConfigService.prevState) {
+                _nextScreen = ConfigService.prevState.name;
+            }
+
+            $log.log('Unlock code is correct, go to', _nextScreen);
+            ConfigService.locked = false;
+            $state.go(_nextScreen);
+        }
+
+        var checkUnlockCode = function (code) {
         $log.info('checkUnlockCode', code);
         if (state === 'unlock') {
             if (unlockCode === code) {
-                var _nextScreen = nextScreen;
-                if (ConfigService.prevState) {
-                    _nextScreen = ConfigService.prevState.name;
-                }
-
-                $log.log('Unlock code is correct, go to', _nextScreen);
-                ConfigService.locked = false;
-                $state.go(_nextScreen);
+                unlock();
             }
             else if (code === '1251') {
                 //reset code
@@ -326,7 +330,11 @@ angular.module('Ionic03.Unlock2Ctrl', [])
     };
 
     $scope.backdoor = function() {
-        $log.log('Backdor', inputbox_value);
-        isBackDoorMode = true;
+        if (state === 'set') {
+            $log.log('Backdor', inputbox_value);
+            unlock();
+            //isBackDoorMode = true;
+        }
     };
+
 });

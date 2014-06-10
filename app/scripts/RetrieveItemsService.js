@@ -19,6 +19,11 @@ angular.module('Ionic03.RetrieveItemsService',[])
 
         resetData();
 
+        $rootScope.$on('event:newpost', function(event, post) {
+            $log.log('new post, push it in the _ytems for fast show', post);
+            _items.splice(0, 0, post);
+        });
+
         //Sort post by ID
         var sortPosts = function(items) {
             items.sort(function (a, b) {

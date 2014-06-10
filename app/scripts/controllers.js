@@ -161,8 +161,14 @@ angular.module('Ionic03.controllers', [])
         enablePushNotification_Sound: ConfigService.enablePushNotification_Sound,
         enablePushNotification_Vibration: ConfigService.enablePushNotification_Vibration,
         enableLockScreen: ConfigService.unlockCode !== '*skip*',
-        version: ConfigService.version
+        version: 'unknown' // will be replaced
     };
+
+    if (typeof cordova != 'undefined' && cordova.getAppVersion != 'undefined') {
+        cordova.getAppVersion(function (version) {
+            $scope.setup.version = version;
+        });
+    }
 
     $scope.cancel = function() {
         $state.go(ConfigService.mainScreen);

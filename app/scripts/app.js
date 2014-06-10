@@ -29,7 +29,7 @@ angular.module('Ionic03', [
 ])
 
 
-.run(function ($ionicPlatform, $state, $rootScope, $urlRouter, $log, $ionicPopup,
+.run(function ($ionicPlatform, $state, $rootScope, $urlRouter, $log, $ionicPopup, $timeout,
                $ionicSideMenuDelegate,
                ConfigService, DataService, DataSync, PushServices, AppInit) {
 
@@ -49,6 +49,7 @@ angular.module('Ionic03', [
 
             //$rootScope.$viewHistory.histories.stack
             var len = $rootScope.$viewHistory.histories.root.stack.length;
+            var doDefault = false;
 
             if ($ionicSideMenuDelegate.isOpen()) {
                 $ionicSideMenuDelegate.toggleLeft(false);
@@ -58,11 +59,15 @@ angular.module('Ionic03', [
             } else if (len>1) { // there is no back view, so close the app instead
                 $state.go($rootScope.$viewHistory.histories.root.stack[len-2].stateName);
             } else {
-                //ionic.Platform.exitApp();
                 $log.log('onHardwareBackButton - Need to exit!');
+                ionic.Platform.exitApp();
+                doDefault = true;
             }
-            event.preventDefault();
-            return false;
+
+            if (!doDefault) {
+                event.preventDefault();
+            }
+            return doDefault;
         }, 100);
 
     $rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
@@ -196,11 +201,16 @@ angular.module('Ionic03', [
     });
 
     $rootScope.$on('Event:device-resume', function(event) {
+        $timeout(function() {
+            $log.log('Unlock controler, ready, hide splash screen');
+            if (navigator.splashscreen) navigator.splashscreen.hide();
+        }, 10);
+
+        /*
         if (ConfigService.locked && ConfigService.unlockCode !== '*skip*' ) {
             $state.go('unlock2');
-            if (navigator.splashscreen) navigator.splashscreen.hide();
         }
-
+        */
     });
 })
 .config(['$httpProvider', function($httpProvider) {
@@ -446,7 +456,7 @@ angular.module('Ionic03', [
     //$urlRouterProvider.otherwise('dbtest');
     $urlRouterProvider.otherwise('app.playlists');
 })
-.factory('AppInit', function($rootScope, $log, $q, $state, $location,
+.factory('AppInit', function($rootScope, $log, $q, $state, $location, $timeout,
                              localStorageService, ConfigService, DataService, DataSync, PushServices) {
         var init = function(startSync) {
             var unlockCode = localStorageService.get('unlock_code');
@@ -485,7 +495,9 @@ angular.module('Ionic03', [
                     $log.log('AppInit Init', ConfigService.version, startSync, DataSync.gapiLogin, nextScreen, $state.current, location, nextScreen);
                     //$location.path = nextScreen;
                     $state.go(nextScreen);
-                    if (navigator.splashscreen) navigator.splashscreen.hide();
+                    $timeout(function() {
+                        if (navigator.splashscreen) navigator.splashscreen.hide();
+                    });
                 });
         };
 
