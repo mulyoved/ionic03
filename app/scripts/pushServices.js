@@ -60,7 +60,10 @@ angular.module('Ionic03.PushServices', [])
             document.addEventListener('pause', function () {
                 if (ConfigService.tempDisableUnlock === 0) {
                     ConfigService.locked = true;
-                    ConfigService.prevState = $state.current;
+
+                    if ($state.current.name != 'unlock2') {
+                        ConfigService.prevState = $state.current;
+                    }
 
                     if (ConfigService.locked && ConfigService.unlockCode !== '*skip*' ) {
                         $state.go('unlock2');
@@ -68,7 +71,7 @@ angular.module('Ionic03.PushServices', [])
 
                     if (navigator.splashscreen) navigator.splashscreen.show();
                 }
-                $log.log('PushServices: Device pause!' + new Date().getTime());
+                $log.log('PushServices: Device pause!' + new Date().getTime(), $state.current, ConfigService.prevState);
 
                 // Remove urbanairship events.  Important on android to not receive push in the background.
                 document.removeEventListener('urbanairship.registration', onRegistration, false);

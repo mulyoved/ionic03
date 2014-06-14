@@ -602,5 +602,12 @@ angular.module('Ionic03.dbTestCtrl', [])
 
         $scope.longProcessCount = 100;
         processCount();
-    }
+    };
+
+    $scope.testLogging = function() {
+        $log.log('$log.log');
+        console.log('console.log');
+        $log.log('$log.log - object', $scope);
+        console.log('console.log - object', $scope);
+    };
 });

@@ -225,6 +225,7 @@ angular.module('Ionic03', [
     client_secret: 'BCOBtps2R5GQHlGKb7mu7nQt',
     redirect_uri: 'http://localhost',
     scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/blogger https://picasaweb.google.com/data/',
+    access_type: 'offline',
 
     //GAPI On Browser
     apiKey: 'AIzaSyA78RO9-B7qEr-WXJULOq3u-n4C7RS9wz4',

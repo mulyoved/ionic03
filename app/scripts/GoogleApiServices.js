@@ -33,10 +33,11 @@ angular.module('Ionic03.GoogleApi', [])
                 client_id: options.client_id,
                 redirect_uri: options.redirect_uri,
                 response_type: 'code',
+                access_type: 'offline',
                 scope: options.scope
             });
 
-            console.log('authorize: [' + authUrl + ']');
+            console.log('authorize: ', authUrl);
 
             //Open the OAuth consent page in the InAppBrowser
             var authWindow = window.open(authUrl, '_blank', 'location=no,toolbar=no');
@@ -53,7 +54,7 @@ angular.module('Ionic03.GoogleApi', [])
             authWindow.addEventListener('loadstart', googleCallback);
 
             function googleCallback(e) {
-                console.log('googleCallback [' + e +']');
+                console.log('googleCallback', e);
 
                 var url = (typeof e.url !== 'undefined' ? e.url : e.originalEvent.url);
                 var code = /\?code=(.+)$/.exec(url);
@@ -78,11 +79,11 @@ angular.module('Ionic03.GoogleApi', [])
                         redirect_uri: options.redirect_uri,
                         grant_type: 'authorization_code'
                     }).done(function(data) {
-                       console.log('googleCallback finally, calling setToken' + data);
+                       console.log('googleCallback finally, calling setToken', data);
                         googleapi.setToken(data);
                         deferred.resolve(data);
                     }).fail(function(response) {
-                        console.log('googleCallback catch ' + response);
+                        console.log('googleCallback catch ', response);
                         console.log('googleCallback catch JSON:' + response.responseJSON);
                         deferred.reject(response.responseJSON);
                     });
