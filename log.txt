@@ -1,0 +1,63 @@
+--------- beginning of /dev/log/main
+--------- beginning of /dev/log/system
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : takePicture mode:
+I/CordovaLog( 2876): Changing log level to DEBUG(3)
+I/CordovaLog( 2876): Found start page location: index.html
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : file:///storage/sdcard/Android/data/com.vixsoftware.Ionic03/cache/1401791500618.jpg
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : Got image URI from camera plugin1401791500720
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : PushServices: Device pause!1401791500727
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : Got image URI
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : DataService: Save Item
+D/CordovaLog( 2876): file:///android_asset/www/scripts/dataService.js: Line 39 : DataService: getItems
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : PushServices: Device resume! count:0, 1401791500806
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : Calculate post date: date is fine
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : savepost calling createPost
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : Add Success
+D/CordovaLog( 2876): file:///android_asset/www/scripts/app.js: Line 109 : APP Recived DataSyn:StatusChange
+D/CordovaLog( 2876): file:///android_asset/www/scripts/app.js: Line 110 : State
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : APP StatusChange -> Start Sync
+D/CordovaLog( 2876): file:///android_asset/www/scripts/dataSyncService.js: Line 514 : Start Sync
+D/CordovaLog( 2876): file:///android_asset/www/scripts/app.js: Line 109 : APP Recived DataSyn:StatusChange
+D/CordovaLog( 2876): file:///android_asset/www/scripts/app.js: Line 110 : State
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : APP StatusChange: End
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : PostListCtrl: Recived: event:DataSync:StatusChange
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : syncToBlogger
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : APP StatusChange: End
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : PostListCtrl: Recived: event:DataSync:StatusChange
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : syncToBlogger 
+D/CordovaLog( 2876): file:///android_asset/www/scripts/dataSyncService.js: Line 327 : syncToBloggerDoc
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : to Update
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : uploadImages
+D/CordovaLog( 2876): file:///android_asset/www/scripts/miscServices.js: Line 21 : uploadImage
+D/CordovaLog( 2876): file:///android_asset/www/scripts/miscServices.js: Line 64 : upload options:
+D/CordovaLog( 2876): file:///android_asset/www/scripts/miscServices.js: Line 65 : upload serverURL: [http://picasawebapibridge.herokuapp.com]
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : PushServices: No incoming message
+D/CordovaLog( 2876): file:///android_asset/www/scripts/miscServices.js: Line 70 : uploadImage:Answer
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : uploadImages Answer
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : URI -> URL
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : Replace document
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : to Update Clean
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : insertPosts Answer:
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : syncToBlogger syncToBloggerDoc Answer
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : lastUpdate
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : blogger_getModifiedDocuments: Retrieve posts from blogId
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : blogger_getModifiedDocuments returned 
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : Query database for exsting document in the same date range as received from blogger
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : Blogger -> got answer
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : DB -> alldocs
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : All saved
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : Update last update
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : syncModifiedDocuments completed
+D/CordovaLog( 2876): file:///android_asset/www/scripts/app.js: Line 109 : APP Recived DataSyn:StatusChange
+D/CordovaLog( 2876): file:///android_asset/www/scripts/app.js: Line 110 : State
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : APP StatusChange: End
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : PostListCtrl: Recived: event:DataSync:StatusChange
+D/CordovaLog( 2876): file:///android_asset/www/scripts/app.js: Line 80 : APP event:DataSync:Notify
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : Send PUSH
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : PostListCtrl: Recived: event:DataSync:Notify, reload list from start
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : PostListCtrl Going To Request RetrieveItemsService.loadItems - more:
+D/CordovaLog( 2876): file:///android_asset/www/scripts/dataService.js: Line 39 : DataService: getItems
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : Recived Items from DB
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : PostListCtrl:Answer
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : Send Push to updateBlog, Answer from server
+D/CordovaLog( 2876): file:///android_asset/www/bower_components/angular/angular.js: Line 9869 : Sent Push
